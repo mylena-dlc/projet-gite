@@ -10,7 +10,7 @@ services:
       MYSQL_USER: symfony
       MYSQL_PASSWORD: symfony
     ports:
-      - 3306:3306
+      - 3307:3306
     volumes:
       - ./mysql:/var/lib/mysql
   
@@ -35,7 +35,7 @@ services:
       PMA_USER: root
       PMA_PASSWORD: secret
     ports:
-        - 8890:80
+      - 8890:80
   
   mailhog:
     image: mailhog/mailhog
