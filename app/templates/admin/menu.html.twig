@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+		<h1 class="mb-6">Menu</h1>
+
+		<div class="font-bold text-lg space-y-4">
+			<ul class="flex flex-col">
+				<li>
+					<a href="{{ path('admin_extra') }}"><i class="fa-regular fa-calendar-plus"></i> Extra </a>
+				</li>
+				<div class="line"></div>
+				<li>
+					<a href="{{ path('app_token_index') }}"><i class="fa-solid fa-tags pr-2"></i> Code promo </a>
+				</li>
+				<div class="line"></div>
+				<li>
+					<a href="{{ path('admin_review') }}"><i class="fa-brands fa-gratipay pr-2"></i> Avis à confirmer ({{ reviews|length }})
+				</a>
+				</li>
+				<div class="line"></div>
+				<li>
+					<a href="{{ path('admin_income') }}"><i class="fa-solid fa-sack-dollar pr-2"></i> Revenus</a>
+				</li>
+				<div class="line"></div>
+				<li>
+					<a href="{{ path('admin_statistics') }}"><i class="fa-solid fa-chart-column pr-2"></i> Statistiques</a>
+				</li>
+				<div class="line"></div>
+			</ul>
+
+				<div class="my-6">
+            		<a href="{{ path('app_logout') }}" class="btn-primary">déconnexion</a>
+				</div>
+		</div>
+	</section>
+
+	{% include "_partials/_footer_admin.html.twig" %}
+
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Rapport de {{ month }} {{ year }}{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+		<div>
+			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
+				<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+		</div>
+
+		<h1 class="my-4">{{ month }} {{ year }}</h1>
+
+		<h3 class="mt-6">Vous avez gagné <span class="text-terracota2 font-bold">{{ totalHT }} €</span></h3>
+
+		<div class="font-bold text-lg space-y-4 m-16">
+			<div class="flex justify-between font-bold">
+				<p>Revenus bruts</p>
+				<p>{{ totalHT }} €</p>
+			</div>
+
+			<div class="line mx-0"></div>
+
+			<div class="flex justify-between font-bold">
+				<p>TVA (20%)</p>
+				<p>{{ totalTVA }} €</p>
+			</div>
+
+			<div class="line mx-0"></div>
+
+			<div class="flex justify-between font-bold">
+				<p>Taxe de séjour</p>
+				<p>{{ totalTourismTax}} €</p>
+			</div>
+
+			<div class="line mx-0"></div>
+
+			<div class="flex justify-between font-bold">
+				<p>Total TTC</p>
+				<p>{{ totalTTC }} €</p>
+			</div>
+		</div>
+
+		<div class="flex gap-8 text-xl mx-6">
+			<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col w-3/6">
+				<i class="fa-solid fa-cloud-moon text-center text-5xl"></i>
+				<p class="font-thin pt-6">Nuits réservées</p>
+				<p class="text-terracota2">{{ totalNights }}</p>
+			</div>
+
+			<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col w-3/6">
+				<i class="fa-solid fa-clock-rotate-left text-center text-5xl"></i>
+				<p class="font-thin pt-6">Durée moyenne<br>
+					du séjour</p>
+				<p class="text-terracota2">{{ averageStayDuration }}</p>
+			</div>
+		</div>
+
+		<a href="{{ path('admin_report_export', {'month': monthNumber, 'year': year}) }}" class="btn-primary my-10 w-full">Exporter le rapport au format PDF</a>
+
+	</section>
+
+	{% include "_partials/_footer_admin.html.twig" %}
+{% endblock %}

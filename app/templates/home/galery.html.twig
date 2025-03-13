@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Galerie Photos | Découvrez le Gîte en Alsace à Orbey{% endblock %}
+
+{% block meta_description %} {{ description }} {% endblock %}
+
+{% block body %}
+{% include "_partials/_header.html.twig" %}
+
+<div class="p-8 mb-6 mt-24 lg:p-12">
+
+    {{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+
+    <h1 class="mb-4 mt-2">galerie photos</h1>
+
+    {% for category in categories %}
+
+        <h3 id="{{ category.name | lower | replace({' ': '-'}) }}"  class="text-center font-2xl">{{ category.name }}</h3>
+
+            <div id="gallery" class="px-0 lg:px-8 mb-10 pt-4 pb-10 lg:columns-5 md:columns-4 columns-2 gap-4 border-b ">
+                {% for picture in category.pictures %}
+                <div class="mb-4">
+
+                    <a data-fancybox="gallery" 
+                        href="{{ asset('assets/img/' ~ picture.url) }}" 
+                        data-caption="{{ picture.alt }}"
+                        class="gallery-item"
+
+                    >
+                        <img 
+                            src="{{ asset('assets/img/' ~ picture.url) }}" 
+                            alt="{{ picture.alt }}" 
+                            class="w-full rounded-lg"
+                        >
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+    {% endfor %}
+
+</div>
+
+{% include "_partials/_footer.html.twig" %}
+
+{% block custom_javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.js"></script>
+
+    <script>
+        Fancybox.bind("[data-fancybox='gallery']", {
+            Thumbs: {
+                autoStart: true, // Active les miniatures automatiquement
+            },
+            Toolbar: {
+                display: ["zoom", "close"], // Affiche les boutons nécessaires
+            },
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+    const hash = window.location.hash;
+    if (hash) {
+        const target = document.querySelector(hash);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+});
+
+    </script>
+{% endblock %}
+
+{% endblock %}

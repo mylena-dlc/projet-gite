@@ -1,0 +1,331 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+		<h1 class="mb-6">Le gîte</h1>
+
+		<div class="font-bold text-lg space-y-4">
+			<div class="flex flex-col">
+				<h3 class="mb-4"> <i class="fa-solid fa-house-chimney-window pr-2"></i> INFOS</h3>
+				<div class="flex gap-2 mb-4">
+					<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col justify-between w-3/6">
+						<i class="fa-solid fa-person text-center text-2xl"></i>
+						<p class="font-thin pt-2">Capacité</p>
+						<p id="capacity-value">{{ gite.capacity }} personnes</p>
+						<i class="fa-solid fa-pen text-terracota1 text-sm cursor-pointer text-center mt-2 mx-auto rounded-full border border-terracota1" onclick="openEditModal('capacity', {{ gite.id }}, {{ gite.capacity }})" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"></i>
+					</div>
+					<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col justify-between w-3/6">
+						<i class="fa-regular fa-money-bill-1 text-center text-2xl"></i>
+						<p class="font-thin pt-2">Prix de la nuit</p>
+						<p id="price-value">{{ gite.price }} €</p>
+						<i class="fa-solid fa-pen text-terracota1 text-sm cursor-pointer text-center mt-2 mx-auto rounded-full border border-terracota1" onclick="openEditModal('price', {{ gite.id }}, {{ gite.price }})" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"></i>
+					</div>
+					<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col justify-between w-3/6">
+						<i class="fa-solid fa-broom text-center text-2xl"></i>
+						<p class="font-thin pt-2">Prix du forfait ménage</p>
+						<p id="cleaningCharge-value">{{ gite.cleaningCharge }} €</p>
+						<i class="fa-solid fa-pen text-terracota1 text-sm cursor-pointer text-center mt-2 mx-auto rounded-full border border-terracota1" onclick="openEditModal('cleaningCharge', {{ gite.id }}, {{ gite.cleaningCharge }})" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"></i>
+					</div>
+				</div>
+
+				<div id="editModal" style="display: none;" class="m-auto">
+					<div class="modal-overlay"></div>
+					<div class="modal-content mt-4">
+						<form id="editForm" class="flex flex-col items-center">
+							<input type="hidden" id="field-name" name="field" value="">
+							<input type="hidden" id="gite-id" name="id" value="">
+							<label for="new-value">Nouvelle valeur :</label>
+							<input type="number" id="new-value" name="value" required>
+							<div class="flex">
+								<button type="submit" class="btn-secondary w-auto mt-2 mr-2">Enregistrer</button>
+								<button type="button" onclick="closeEditModal()" class="btn-secondary w-auto mt-2">Annuler</button>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<div class="line"></div>
+
+				<div>
+					<h3 class="my-4">
+						<i class="fa-solid fa-layer-group pr-2"></i>Catégorie d'images</h3>
+					<div class="category-list">
+						{% for category in categories %}
+							<p>{{ category.name }} <a href="{{ path('delete_category', { 'id': category.id }) }}" class="ml-2"><i class="fa-solid fa-trash-can"></i></a></p> 
+						{% endfor %}
+					</div>
+                    <div class="line"></div>
+					<div class="modal-content my-6">
+                        <p class="font-normal pb-2">Ajouter une catégorie</p>
+						<form id="addCategory" class="flex items-center" action="{{ path('admin_gite') }}" method="post">
+							{{ form_start(formAddCategory, { 'attr': { 'id': 'addCategory' } }) }}
+							{{ form_row(formAddCategory.name) }}
+							<div class="flex">
+								<button type="submit" class="btn-secondary w-auto mr-2">Enregistrer</button>
+							</div>
+							{{ form_end(formAddCategory) }}
+						</form>
+					</div>
+				</div>
+				<div class="line"></div>
+
+                <h3 class="my-4"><i class="fa-regular fa-image pr-2"></i> Images de couverture</h3>
+                    <div class="cover-images">
+                        {% for categoryName, pictures in picturesByCategory %}
+                            {% set coverPicture = pictures|filter(p => p.isCover == true)|first %}
+                            <div class="cover-image-item my-4">
+                                <h4>{{ categoryName }}</h4>
+                                {% if coverPicture %}
+                                    <img src="{{ asset('assets/img/' ~ coverPicture.url) }}" alt="{{ coverPicture.alt }}" class="w-20 h-20 object-contain border border-gray-300 rounded-lg p-1 bg-gray-100">
+                                {% else %}
+                                    <p>Aucune image de couverture définie.</p>
+                                {% endif %}
+                                <div class="m-0"> 
+                                    <a href="{{ path('admin_gite_edit_cover', { 'categoryId': categoryName }) }}" class="btn-secondary mt-2 w-full">
+                                        Modifier l'image de couverture
+                                    </a>
+                                </div>    
+                            </div>
+                        {% endfor %}
+                    </div>
+                
+				<h3 class="mt-4"><i class="fa-regular fa-images pr-2"></i>Images</h3>
+
+                {% for categoryName, pictures in picturesByCategory %}
+                    <h4 class="mt-6">{{ categoryName }}</h4>
+                    <div class="image-gallery flex flex-wrap gap-4" data-category="{{ categoryName }}">
+                        {% for picture in pictures %}
+                            {% if not picture.isCover %}
+                                <div class="image-item">
+                                    <img src="{{ asset('assets/img/' ~ picture.url) }}" alt="{{ picture.alt }}" class="w-48 h-48 object-cover rounded-lg">
+                                    <button 
+                                        class="delete-picture-btn rounded-full p-2"
+                                        data-id="{{ picture.id }}">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+				<div class="line"></div>
+               
+                    <h3 class="my-4"><i class="fa-solid fa-camera pr-2"></i> Ajouter une image</h3>
+                    <div class="">
+                        {{ form_start(formPicture, { 'attr': { 'id': 'formPicture' } }) }}
+                        
+                        {{ form_row(formPicture.picture) }}
+                    <div class="py-4">
+                        {{ form_row(formPicture.alt) }}
+                    </div>
+                    <div class="py-4">
+                        <p>Catégorie</p>
+                        <div class="formPictureCategory">
+                            {% for child in formPicture.category %}
+                                <div class="font-normal flex items-center">
+                                    <div class="w-auto pr-2">{{ form_widget(child) }}</div>
+                                    {{ form_label(child) }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="py-4 m-0">
+                        <button type="submit" class="btn-secondary w-auto m-0">Ajouter</button>
+                        {{ form_end(formPicture) }}
+                    </div>
+                </div>
+			</div>
+		</div>
+	</section>
+
+	{% include "_partials/_footer_admin.html.twig" %}
+
+	<script>
+
+		function openEditModal(field, giteId, currentValue) { // Pré-remplir les champs cachés dans la modale
+            document.getElementById('field-name').value = field; // Champ à modifier
+            document.getElementById('gite-id').value = giteId; // Id du gîte
+            document.getElementById('new-value').value = currentValue; // Valeur actuelle du champ
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        // Fonction pour gérer la soumission de la mise à jour AJAX
+        document.getElementById('editForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const field = document.getElementById('field-name').value;
+            const giteId = document.getElementById('gite-id').value;
+            const newValue = document.getElementById('new-value').value;
+
+            fetch(`/gite/update`, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json'
+            },
+                body: JSON.stringify(
+                    {id: giteId, field: field, value: newValue}
+                )
+            }).then((response) => {
+                if (!response.ok) {
+                    throw new Error (`HTTP error! status: ${
+                    response.status
+                }`);
+            }
+                return response.json(); // Attendre une réponse JSON
+
+            }).then((data) => {
+                if (data.success) {
+                const priceFields = ['price', 'cleaningCharge']; // Liste des champs de type prix
+                const displayValue = priceFields.includes(field) ? `${newValue} €` : `${newValue} personnes`;
+
+                // Mettre à jour le texte de l'élément
+                document.getElementById (`${field}-value`).innerText = displayValue;
+
+                closeEditModal();
+                } else {
+                    alert('Erreur lors de la mise à jour.');
+                }
+                    }).catch((error) => {
+                        console.error('Erreur:', error);
+                    });
+                    });
+
+
+        document.getElementById('addCategory').addEventListener('submit', function (e) {
+        e.preventDefault(); // Empêche le rechargement de la page
+
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest', 
+            }
+        }).then((response) => {
+            if (!response.ok) {
+                throw new Error (`HTTP error! status: ${
+                    response.status
+                }`);
+            }
+            return response.json();
+
+        }).then((data) => {
+        if (data.success) {
+            const categoryList = document.querySelector('.category-list');
+            const newCategory = document.createElement('p');
+            newCategory.innerHTML = `
+                ${data.category.name} 
+                <a href="/delete-category/${data.category.id}" class="ml-2">
+                    <i class="fa-solid fa-trash-can"></i>
+                </a>
+            `;
+            categoryList.appendChild(newCategory);
+
+            // Réinitialiser le formulaire
+            this.reset();
+                } else {
+                    alert('Erreur lors de l\'ajout de la catégorie.');
+                }
+                }).catch((error) => {
+                    console.error('Erreur:', error);
+                });
+            });
+
+
+            document.getElementById('formPicture').addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                const formData = new FormData(this);
+
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    if (data.success) {
+                        const categoryName = data.picture.category;
+
+                        // Sélectionner la galerie correspondant à la catégorie
+                        const gallery = document.querySelector(`.image-gallery[data-category="${categoryName}"]`);
+
+                        if (gallery) {
+                            const newImage = document.createElement('div');
+                            newImage.className = 'image-item';
+                            newImage.innerHTML = `
+                                <img src="/assets/img/${data.picture.url}" alt="${data.picture.alt}" class="w-48 h-48 object-cover rounded-lg">
+                            `;
+                            gallery.appendChild(newImage);
+                        } else {
+                            alert('Galerie introuvable pour la catégorie ' + categoryName);
+                        }
+
+                        // Réinitialiser le formulaire
+                        this.reset();
+                    } else {
+                        alert(data.message || 'Erreur lors de l\'ajout de l\'image.');
+                    }
+                })
+                    .catch((error) => {
+                    console.error('Erreur:', error);
+                });
+            });
+
+            document.addEventListener('DOMContentLoaded', () => {
+                document.querySelectorAll('.delete-picture-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        const pictureId = button.getAttribute('data-id');
+
+                        if (!confirm('Voulez-vous vraiment supprimer cette image ?')) {
+                            return;
+                        }
+
+                        fetch(`/dashboard/gite/picture/${pictureId}`, {
+                            method: 'DELETE',
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Supprimer l'image de la galerie
+                                button.closest('.image-item').remove();
+                                // alert(data.message);
+                            } else {
+                                alert('Erreur lors de la suppression : ' + data.message);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erreur :', error);
+                        });
+                    });
+                });
+            });
+
+	</script>
+
+{% endblock %}

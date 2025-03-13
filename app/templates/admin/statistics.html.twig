@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+        <div>
+            <a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
+                <i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+        </div>
+
+        <h1 class="my-4">Statistiques</h1>
+
+
+		<div class="space-y-4">
+            <h3>Avis</h3>
+            <div class="flex mx-4"> 
+                <div class="w-1/2">
+                    <p class="font-bold">{{ averageRating|number_format(2, ',') }} <i class="fa-solid fa-star"></i></p>
+                    <p>Évaluations globale</p>
+                </div>
+                <div class="w-1/2">
+                <p class="font-bold">{{ reviews|length }} <i class="fa-solid fa-comment"></i></p>
+                    <p>Commentaires</p>
+                </div>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="space-y-4">
+                <h3>Réservations</h3>
+                <div class="flex mx-4"> 
+                    <div class="w-1/2">
+                        <p class="font-bold">{{ allReservations|length }} <i class="fa-solid fa-mountain-sun"></i></p>
+                        <p>Réservations confirmées</p>
+                    </div>
+                    <div class="w-1/2">
+                        <p class="font-bold">{{ allReservationsCancel|length }} <i class="fa-solid fa-ban"></i></p>
+                        <p>Réservations annulées</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="line"></div>
+
+            <h3>Taux de remplissage</h3>
+                <div id="myCarousel" class="f-carousel">
+                    {% for data in monthlyData %}
+                        <div class="f-carousel__slide">
+                            <h4>Taux d'occupation pour {{ data.month }} {{ data.year }}</h4>
+                            <p class="font-bold">{{ data.occupancyRate }}%</p>
+                            <div class="mx-10">
+                                <canvas id="chart{{ loop.index }}"></canvas>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+		</div>
+	</section>
+	{% include "_partials/_footer_admin.html.twig" %}
+
+    {% block custom_javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/carousel/carousel.css"/>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+        // Initialisation du carousel
+        const container = document.getElementById("myCarousel");
+        const options = { infinite: false };
+        new Carousel(container, options);
+
+            // Initialisation du graphique
+            {% for data in monthlyData %}
+                // Identifiant unique pour chaque graphique
+                let ctx{{ loop.index }} = document.getElementById('chart{{ loop.index }}').getContext('2d');
+            
+                // Données pour le graphique
+                let data{{ loop.index }} = {
+                    labels: ['Nuits réservées', 'Nuits disponibles'],
+                    datasets: [{
+                        data: [{{ data.totalNightsReserved }}, {{ data.daysInMonth - data.totalNightsReserved }}],
+                        backgroundColor: ['#b58869', '#a9b4a4'], 
+                        hoverOffset: 4
+                    }]
+                };
+
+                // Configuration du graphique
+                new Chart(ctx{{ loop.index }}, {
+                    type: 'doughnut',
+                    data: data{{ loop.index }},
+                    options: {
+                        responsive: true,
+                    }
+                });
+            {% endfor %}
+        });
+    </script>
+    {% endblock %} 
+{% endblock %}

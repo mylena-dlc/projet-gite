@@ -1,0 +1,371 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mt-24 mb-32">
+
+		<h1 class="mb-6">Bienvenue sur votre tableau de bord</h1>
+
+		<h2>vos réservations</h2>
+
+		<div class="my-6 flex space-x-4 p-2 overflow-x-auto md:overflow-x-visible whitespace-nowrap scrollbar-hide snap-x snap-mandatory">
+			{% if ongoingReservation %}
+				<span onclick="showReservations('ongoing', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+					hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
+					En cours ({{ ongoingReservation|length }})
+				</span>
+			{% endif %}
+
+			{% if reservationsToConfirms %}
+				<span onclick="showReservations('confirm', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+					hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
+					À confirmer ({{ reservationsToConfirms|length }})
+				</span>
+			{% endif %}
+
+			<span onclick="showReservations('upcoming', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+				 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
+				À venir ({{ upcomingReservations|length }})
+			</span>
+
+			<span onclick="showReservations('previous', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+				 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
+				Passées ({{ previousReservations|length }})
+			</span>
+
+			<span onclick="showReservations('refuse', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+				hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
+				Refusée(s) ({{ reservationsRefuseds|length }})
+			</span>
+
+			<span onclick="showReservations('cancel', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+				hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
+				Annulée(s) ({{ reservationsCancelled|length }})
+			</span>
+		</div>
+
+		<!-- Conteneur pour les réservations à confirmer -->
+		<div id="confirm" class="m-4 {% if defaultCategory != 'confirm' %}hidden{% endif %}">
+			{% if reservationsToConfirms %}
+					{% for reservationsToConfirm in reservationsToConfirms %}
+						<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+							<div class="flex items-center">
+								<div class="w-1/2">
+									<p class="font-bold pt-2 pl-4">{{ reservationsToConfirm.firstName }}
+										{{ reservationsToConfirm.lastName }}</p>
+									<p class="font-bold pb-2 pl-4">{{ reservationsToConfirm.arrivalDate|format_date( locale: 'fr') }}
+										-
+										{{ reservationsToConfirm.departureDate|format_date(locale: 'fr') }}
+									</p>
+									<p class="pl-4 pb-4">
+										{{ reservationsToConfirm.numberAdult + reservationsToConfirm.numberKid }}
+										voyageur{{ (reservationsToConfirm.numberAdult + reservationsToConfirm.numberKid) > 1 ? 's' : '' }}</p>
+								</div>
+								<div class="w-1/2 relative">
+									<i class="fa-solid fa-triangle-exclamation absolute top-0 right-4"></i>
+									<a href="{{ path('admin_reservation_status', {'id': reservationsToConfirm.id }) }}" class="btn-secondary w-auto mr-6 ">Confirmer la réservation</a>
+								</div>
+							</div>
+							<div class="flex justify-around border-t border-terracota2">
+								<a href="" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+								<a href="{{ path('admin_reservation', {'slug': reservationsToConfirm.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+							</div>
+						</div>
+					{% endfor %}
+				
+			{% endif %}
+			</div>
+			<!-- Conteneur de la réservation en cours -->
+				<div id="ongoingReservation" class="m-4 {% if defaultCategory != 'ongoing' %}hidden{% endif %}">
+				{% if ongoingReservation %}
+					<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+					<div class="flex justify-between">
+					<div>
+						<p class="font-bold pt-2 pl-4">{{ ongoingReservation.firstName }}
+								{{ ongoingReservation.lastName }}</p>
+							<p class="font-bold pb-2 pl-4">{{ ongoingReservation.arrivalDate|format_date(locale: 'fr') }}
+								-
+								{{ ongoingReservation.departureDate|format_date(locale: 'fr') }}
+							</p>
+							<p class="pl-4 pb-4">
+								{{ ongoingReservation.numberAdult + ongoingReservation.numberKid }}
+								voyageur{{ (ongoingReservation.numberAdult + ongoingReservation.numberKid) > 1 ? 's' : '' }}</p>
+							</div>
+								<div class="mr-4">
+							<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ ongoingReservation.isConfirm.status }}</span>
+						</div>
+						
+							<div class="flex justify-around border-t border-terracota2">
+							<a href="" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+							<a href="{{ path('admin_reservation', {'slug': ongoingReservation.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+						</div>
+					</div>
+				{% endif %}
+			</div>
+
+		<!-- Conteneur des réservations à venir -->
+	<div id="upcomingReservations" class="m-4 {% if defaultCategory != 'upcoming' %}hidden{% endif %}">
+	{% for upcomingReservation in upcomingReservations[:4] %}
+				<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+
+					<!-- Calcul du nombre de jours jusqu'à l'arrivée -->
+					{% set today = "now"|date("U") %}
+					{% set arrivalDate = upcomingReservation.arrivalDate|date("U") %}
+					{% set daysUntilArrival = ((arrivalDate - today) / 86400)|round %}
+					<div class="flex justify-between">
+						<div>
+							<p class="font-thin pl-4">Arrivée dans {{ daysUntilArrival }} jour{{ daysUntilArrival > 1 ? 's' : '' }}</p>
+							<p class="font-bold pt-2 pl-4">{{ upcomingReservation.firstName }}
+								{{ upcomingReservation.lastName }}</p>
+							<p class="font-bold pb-2 pl-4">{{ upcomingReservation.arrivalDate|format_date(locale: 'fr') }}
+								-
+								{{ upcomingReservation.departureDate|format_date(locale: 'fr') }}
+							</p>
+							<p class="pl-4 pb-4">
+								{{ upcomingReservation.numberAdult + upcomingReservation.numberKid }}
+								voyageur{{ (upcomingReservation.numberAdult + upcomingReservation.numberKid) > 1 ? 's' : '' }}</p>
+						</div>
+						<div class="mr-4">
+							<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ upcomingReservation.isConfirm.status }}</span>
+						</div>
+					</div>
+					
+					<div class="flex justify-around border-t border-terracota2">
+						<a href="" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+						<a href="{{ path('admin_reservation', {'slug': upcomingReservation.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+					</div>
+				</div>
+			{% endfor %}
+
+			<!-- Bouton "Voir toutes les réservations" -->
+			{% if upcomingReservations|length > 4 %}
+				<div class="flex justify-center mt-4">
+					<button onclick="showAllReservations('upcoming')" class="text-terracota1 underline mt-4 text-center">
+						Voir toutes les réservations
+					</button>
+				</div>
+			{% endif %}
+
+			<!-- Toutes les réservations masquées par défaut -->
+			<div id="allUpcomingReservations" class="hidden">
+				{% for upcomingReservation in upcomingReservations[4:] %}
+					<div
+						class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+
+						<!-- Calcul du nombre de jours jusqu'à l'arrivée -->
+						{% set today = "now"|date("U") %}
+						{% set arrivalDate = upcomingReservation.arrivalDate|date("U") %}
+						{% set daysUntilArrival = ((arrivalDate - today) / 86400)|round %}
+
+						<!-- Forcer l'affichage de 0 jours si moins de 24h -->
+						{% if daysUntilArrival < 1 %}
+							{% set daysUntilArrival = 0 %}
+						{% endif %}
+						<div class="flex justify-between">
+						<div>
+
+						<p class="font-thin pl-4">Arrivée dans
+							{{ daysUntilArrival }}
+							jour{{ daysUntilArrival > 1 ? 's' : '' }}</p>
+						<p class="font-bold pt-2 pl-4">{{ upcomingReservation.firstName }}
+							{{ upcomingReservation.lastName }}</p>
+						<p class="font-bold pb-2 pl-4">{{ upcomingReservation.arrivalDate|format_date(locale: 'fr') }}
+							-
+							{{ upcomingReservation.departureDate|format_date(locale: 'fr') }}
+						</p>
+						<p class="pl-4 pb-4">
+							{{ upcomingReservation.numberAdult + upcomingReservation.numberKid }}
+							voyageur{{ (upcomingReservation.numberAdult + upcomingReservation.numberKid) > 1 ? 's' : '' }}</p>
+						
+						</div>
+						<div class="mr-4">
+							<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ upcomingReservation.isConfirm.status }}</span>
+						</div>
+					</div>
+							<div class="flex justify-around border-t border-terracota2">
+							<a href="" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+							<a href="{{ path('admin_reservation', {'slug': upcomingReservation.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+						</div>
+					</div>
+				{% endfor %}
+				</div>
+			</div>
+
+			<!-- Conteneur des réservations passées -->
+			<div id="previousReservations" class="m-4 hidden">
+				{% for previousReservation in previousReservations %}
+					<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+
+					<div class="flex justify-between">
+					<div>
+						<p class="font-bold pt-2 pl-4">{{ previousReservation.firstName }}
+							{{ previousReservation.lastName }}</p>
+						<p class="font-bold pb-2 pl-4">{{ previousReservation.arrivalDate|format_date(locale: 'fr') }}
+							-
+							{{ previousReservation.departureDate|format_date(locale: 'fr') }}</p>
+						<p class="pl-4 pb-4">{{ previousReservation.numberAdult + previousReservation.numberKid }}
+							voyageur{{ (previousReservation.numberAdult + previousReservation.numberKid) > 1 ? 's' : '' }}</p>
+						</div>
+						<div class="mr-4">
+							<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ previousReservation.isConfirm.status }}</span>
+						</div>
+					</div>
+						
+							<div class="flex justify-around border-t border-terracota2">
+							<a href="#" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+							<a href="{{ path('admin_reservation', {'slug': previousReservation.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+						</div>
+					</div>
+				{% endfor %}
+
+				<!-- Bouton "Voir toutes les réservations" -->
+				{% if previousReservations|length > 4 %}
+					<div class="flex justify-center mt-4">
+						<button onclick="showAllReservations('previous')" class="text-terracota1 underline mt-4 text-center">
+							Voir toutes les réservations
+						</button>
+					</div>
+				{% endif %}
+
+				<!-- Toutes les réservations masquées par défaut -->
+				<div id="allPreviousReservations" class="hidden">
+					{% for previousReservation in previousReservations[4:] %}
+						<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+						<div class="flex justify-between">
+						<div>
+							<p class="font-bold pt-2 pl-4">{{ previousReservation.firstName }}
+								{{ previousReservation.lastName }}</p>
+							<p class="font-bold pb-2 pl-4">{{ previousReservation.arrivalDate|format_date(locale: 'fr') }}
+								-
+								{{ previousReservation.departureDate|format_date(locale: 'fr') }}</p>
+							<p class="pl-4 pb-4">{{ previousReservation.numberAdult + previousReservation.numberKid }}
+								voyageur{{ (previousReservation.numberAdult + previousReservation.numberKid) > 1 ? 's' : '' }}</p>
+							</div>
+							<div class="mr-4">
+								<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ previousReservation.isConfirm.status }}</span>
+							</div>
+						</div>
+							
+								<div class="flex justify-around border-t border-terracota2">
+								<a href="#" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+								<a href="{{ path('admin_reservation', {'slug': rpreviousReservation.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+							</div>
+						</div>
+					{% endfor %}
+				</div>
+</div>
+			<!-- Conteneur des réservations refusées -->
+			<div id="refuse" class="m-4 hidden">
+				{% for reservationsRefused in reservationsRefuseds %}
+					<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+						<div class="flex justify-between">
+							<div>
+								<p class="font-bold pt-2 pl-4">{{ reservationsRefused.firstName }}
+									{{ reservationsRefused.lastName }}</p>
+								<p class="font-bold pb-2 pl-4">{{ reservationsRefused.arrivalDate|format_date(locale: 'fr') }}
+									-
+									{{ reservationsRefused.departureDate|format_date(locale: 'fr') }}</p>
+								<p class="pl-4 pb-4">{{ reservationsRefused.numberAdult + reservationsRefused.numberKid }}
+									voyageur{{ (reservationsRefused.numberAdult + reservationsRefused.numberKid) > 1 ? 's' : '' }}</p>
+							</div>
+							<div class="mr-4">
+								<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ reservationsRefused.isConfirm.status }}</span>
+							</div>
+						</div>
+							<div class="flex justify-around border-t border-terracota2">
+							<a href="#" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+							<a href="{{ path('admin_reservation', {'slug': reservationsRefused.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+
+			<!-- Conteneur des réservations annulée -->
+			<div id="cancel" class="m-4 hidden">
+				{% for reservation in reservationsCancelled %}
+					<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+						<div class="flex justify-between">
+							<div>
+								<p class="font-bold pt-2 pl-4">{{ reservation.firstName }}
+									{{ reservation.lastName }}</p>
+								<p class="font-bold pb-2 pl-4">{{ reservation.arrivalDate|format_date(locale: 'fr') }}
+									-
+									{{ reservation.departureDate|format_date(locale: 'fr') }}</p>
+								<p class="pl-4 pb-4">{{ reservation.numberAdult + reservation.numberKid }}
+									voyageur{{ (reservation.numberAdult + reservation.numberKid) > 1 ? 's' : '' }}</p>
+							</div>
+							<div class="mr-4">
+								<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ reservation.isConfirm.status }}</span>
+							</div>
+						</div>
+							<div class="flex justify-around border-t border-terracota2">
+							<a href="#" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+							<a href="{{ path('admin_reservation', {'slug': reservation.slug }) }}" class="p-4 w-1/2 text-center">Détails</a>
+						</div>
+					</div>
+				{% endfor %}
+			</div>
+
+		</section>
+
+		{% include "_partials/_footer_admin.html.twig" %}
+
+	{% block custom_javascripts %}
+<script>
+	window.showReservations = function (type, element) {
+		const upcoming = document.getElementById('upcomingReservations');
+		const previous = document.getElementById('previousReservations');
+		const ongoing = document.getElementById('ongoingReservation');
+		const refuse = document.getElementById('refuse');
+		const confirm = document.getElementById('confirm');
+		const cancel = document.getElementById('cancel');
+		const buttons = document.querySelectorAll('.my-6 span');
+	
+		// Basculer l'affichage des sections
+		upcoming.classList.add('hidden');
+		previous.classList.add('hidden');
+		ongoing.classList.add('hidden');
+		refuse.classList.add('hidden');
+		confirm.classList.add('hidden');
+		cancel.classList.add('hidden');
+	
+		if (type === 'upcoming') {
+			upcoming.classList.remove('hidden');
+		} else if (type === 'previous') {
+			previous.classList.remove('hidden');
+		} else if (type === 'ongoing') {
+			ongoing.classList.remove('hidden');
+		} else if (type === 'refuse') {
+			refuse.classList.remove('hidden');
+		} else if (type === 'confirm') {
+			confirm.classList.remove('hidden');
+		} else if (type === 'cancel') {
+			cancel.classList.remove('hidden');
+		}
+	};
+	
+	// Gestion du bouton "voir toutes les réservations"
+	window.showAllReservations = function (type) {
+		let allReservations;
+		
+		// Détection du type de réservation (à venir ou passées)
+		if (type === 'upcoming') {
+			allReservations = document.getElementById('allUpcomingReservations');
+		} else if (type === 'previous') {
+			allReservations = document.getElementById('allPreviousReservations');
+		}
+	
+		// Affiche toutes les réservations et cache le bouton
+		if (allReservations) {
+			allReservations.classList.remove('hidden');
+			event.target.style.display = 'none';
+		}
+	};
+</script>
+	{% endblock %}
+
+{% endblock %}

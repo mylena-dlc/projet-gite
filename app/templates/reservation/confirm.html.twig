@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gîte à Orbey, Alsace | Confirmation de réservation{% endblock %}
+
+{% block meta_description %} {{ description }} {% endblock %}
+
+{% block body %}
+{% include "_partials/_header.html.twig" %}
+
+<div class="p-4 mt-24 lg:p-12">
+
+    {# {{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }} #}
+
+        <h1 class="mb-4 mt-2">Demande de réservation confirmée !</h1>
+        <section class="my-6">
+            <p class="">
+                    Merci pour votre demande de réservation au Gîte du Rain du Pair. <br>
+                    Un email avec les détails de votre demande vous a été envoyé.<br>
+                    Nous reviendrons très vite vers vous par email pour confirmer votre réservation.
+                    <br>À bientôt !</p>
+            <p class="pt-2">L'équipe du gîte du Rain du Pair</p>
+        </section>
+    </div>
+
+    {% include "_partials/_footer.html.twig" %}
+
+{% endblock %}

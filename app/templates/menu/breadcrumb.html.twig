@@ -1,0 +1,9 @@
+{# templates/menu/breadcrumb.html.twig #}
+{% for item in item.children %}
+    {% if not loop.first %} > {% endif %}
+    {% if item.uri %}
+        <a class="text-xs" href="{{ item.uri }}">{{ item.label }}</a>
+    {% else %}
+       <p class="text-xs inline text-terracota2">{{ item.label }}</p> 
+    {% endif %}
+{% endfor %}

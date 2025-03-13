@@ -1,0 +1,81 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+		<h1 class="mb-6">Disponibilités</h1>
+
+        <div id="calendar" class="w-auto mx-auto p-4"></div>
+
+        <div class="line"></div>
+
+        <div>
+            <h2>Tarification</h2>
+                <h3 class="my-4">Périodes avec supplément :</h3>
+                {% for period in periods %}
+                <table>
+                    <thead >
+                        <tr>
+                            <th class="px-4 py-2">Date de début</th>
+                            <th class="px-4 py-2">Date de fin</th>
+                            <th class="px-4 py-2">Supplément (par nuit)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="px-4 py-2">{{ period.startDate|date('d-m-Y') }}</td>
+                        <td class="px-4 py-2">{{ period.endDate|date('d-m-Y') }}</td>
+                        <td class="px-4 py-2">{{ period.supplement }} € </td>
+                    </tr>   
+                {% endfor %}
+            </tbody>
+        </table>  
+        </div>
+
+        <div class="line"></div>
+        <div class="space-y-4">
+            <h3>Ajouter une période</h3>
+                {{ form_start(form) }} 
+                {{ form_row(form.startDate) }} 
+                {{ form_row(form.endDate) }} 
+                {{ form_row(form.supplement) }} 
+                <button type="submit" class="btn-secondary mt-4">Ajouter</button>
+            {{ form_end(form) }}
+        </div>
+	</section>
+
+	{% include "_partials/_footer_admin.html.twig" %}
+
+    {% block custom_javascripts %}
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+            const reservations = {{ reservedDates|raw }}; // Données JSON des réservations
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth', // Vue initiale
+                locale: 'fr', // Localisation en français
+                height: 'auto', // Hauteur automatique
+                events: reservations, // Injecter les données des réservations
+                eventClick: function(info) {
+                    if (info.event.url) {
+                    window.location.href = info.event.url; // Redirige vers l'URL associée
+                    info.jsEvent.preventDefault(); // Empêcher le comportement par défaut
+                    }
+                },
+            });
+
+            calendar.render(); // Afficher le calendrier
+        });
+
+    </script>
+    {% endblock %}
+{% endblock %}

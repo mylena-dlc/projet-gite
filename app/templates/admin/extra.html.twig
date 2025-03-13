@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+		<h1 class="mb-6">Les extras</h1>
+
+			<div class="category-list">
+                {% for extra in extras %}
+                    <p class="font-bold"> Nom :</p>
+                    <p>{{ extra.name }} </p> 
+                    <p class="font-bold">Prix :</p>
+                    <p>{{ extra.price }} €</p> 
+                {% endfor %}
+            </div>
+
+            <div class="line"></div>
+
+            <div class="modal-content my-6">
+                <h3>Ajouter un extra</h3>
+                <form id="addCategory" class="flex flex-col items-center" action="{{ path('admin_extra') }}" method="post">
+                    {{ form_start(form) }}
+                    {{ form_row(form.name) }}
+                    {{ form_row(form.price) }}
+
+                    <div class="flex mt-4">
+                        <button type="submit" class="btn-secondary w-auto mr-2">Ajouter</button>
+                    </div>
+                    {{ form_end(form) }}
+                </form>
+            </div>
+
+            <div class="line"></div>
+
+            <div class="modal-content my-6">
+                <h3>Toutes les réservations avec extra</h3>
+                {% for reservationExtra in reservationsWithExtras %}
+                        <div>
+                            <p> Date: {{ reservationExtra.date|date('d/m/Y') }}</p>
+                            <p> Extra: {{ reservationExtra.extra.name }}</p>         
+                            <a href="{{ path('admin_reservation', {'id': reservationExtra.reservation.id }) }}" class="btn-secondary w-full my-4">Voir la réservation</a>
+                        </div>  
+                {% endfor %}
+            </div>
+
+        </section>
+
+	{% include "_partials/_footer_admin.html.twig" %}
+
+{% endblock %}

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservation annulée</title>
+</head>
+<body>
+    <h1>Annulation de réservation</h1>
+    
+    <p>La réservation en date du  : {{ reservation.reservationDate|date('Y-m-d') }} </p>
+    <p>Et de référence : {{ reservation.reference }} vient d'être annulée par le voyageur.</p>
+    
+    <ul>
+        <li>Prix total : {{ reservation.totalPrice }} €</li>
+    </ul>
+    
+    <p>La réservation a été annulée <strong>{{ daysBeforeArrival }}</strong> jours avant l'arrivée.
+     Selon les conditions générales de vente :</p>
+    <ul>
+        {% if refundPercentage == 100 %}
+            <li>La réservation est éligible à un remboursement intégral.</li>
+        {% elseif refundPercentage == 50 %}
+            <li>La réservation est éligible à un remboursement partiel de 50 %.</li>
+        {% else %}
+            <li>Aucun remboursement ne sera accordé en raison de l'annulation tardive.</li>
+        {% endif %}
+    </ul>
+
+    {% if refundAmount > 0 %}
+        <p>Montant remboursé : <strong>{{ refundAmount }} €</strong>.</p>
+    {% endif %}
+
+    <p>Les dates sont à nouveaux disponibles pour une autre réservation.</p>
+</body>
+</html>

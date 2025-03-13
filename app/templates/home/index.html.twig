@@ -1,0 +1,313 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gîte en Alsace | Location de charme à Orbey, proche du Lac Blanc{% endblock %}
+
+{% block meta_description %}{{ description }} {% endblock %}
+
+{% block body %}
+
+{% include "_partials/_header.html.twig" %}
+
+<div class="">
+    <section id="hero-section" class="relative w-full flex justify-center items-center">
+        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/assets/img/IMG_9092.webp');"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent"></div>
+        <div class="relative z-10 max-w-lg px-4">
+            <h1 class="text-xl mb-4 text-gray1 tracking-normal normal-case font-semibold mx-6 text-start">
+                Évadez-vous en Alsace dans un gîte de charme avec bain nordique, idéal pour 4 personnes.
+            </h1>
+            <a href="{{ path('app_search_reservation') }}" class="btn-primary w-full">
+                Réserver un séjour
+            </a>
+        </div>
+    </section>
+
+    <section class="mt-6">
+        <h2 class="mb-4 pl-4 lg:pl-40">Entre nature et tranquilité</h2>
+        <div class="relative pb-12">
+            <div class="absolute bottom-0 right-0 w-full z-0 bg-cover bg-center opacity-30 fond-home" style=" background-image: url('/assets/img/fond.jpg');"></div>
+            <div class="relative p-4 lg:px-40 z-10 w-full flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-8">
+                <p class="w-full lg:w-1/2">
+                    Bienvenue au<strong class="color"> Gîte du Rain du Pair</strong>, un havre de paix situé dans un ancien corps de ferme récemment rénové, perché sur les hauteurs d'Orbey,
+                    <strong class="color"> en Alsace.</strong>
+                    <br class=""><br class=""> Proche de la station de ski du Lac Blanc, notre <strong>hébergement</strong> avec <strong class="color">bain nordique</strong> vous offre une expérience unique pour des
+                    <strong>vacances en Alsace</strong>. <br class=""> <br class="">
+                    Découvrez le confort et l'authenticité de notre<strong class="color"> gîte avec bain nordique</strong>, idéal pour un
+                    <strong class="color"> séjour nature et détente</strong> en Alsace. Profitez d'un hébergement cosy, à deux pas des pistes de ski du Lac Blanc et des sentiers de randonnée dans les Vosges.    
+                </p>
+                <figure class="my-6 w-full lg:w-1/2 flex justify-center">
+                    <img src="{{ asset('assets/img/sejour-gite-alsace.webp') }}" alt="Séjour lumineux du gîte en Alsace avec canapé et grande baie vitrée" class="border w-3/5 m-auto aspect-square object-cover" style="border-radius: 20% 50% 20% 50%;">
+                </figure>
+            </div>
+        </div>
+
+        <div class="py-6 relative">
+            <div class="absolute left-0 top-0 w-full h-full z-[-1]" style="background-image: url('{{ asset('/assets/img/fond-banner.jpg') }}'); background-size: cover; background-position: center;"></div>
+            <h2 class="b-4 text-center pt-8">Les petits +</h2>
+
+            <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xl uppercase font-thin leading-tight">
+                <div class="relative flex items-center justify-center h-40 ">
+                    <img src="{{ asset('assets/img/icon-bain-nordique.png') }}" alt="Bain nordique" class="absolute w-32 opacity-20">
+                        <p class="absolute">
+                            Bain nordique
+                        </p>
+                    </div>
+                    <div class="relative flex items-center justify-center h-40 ">
+                        <i class="fa-solid fa-bed text-terracota1 absolute opacity-20 text-8xl"></i>
+                        <p class="absolute">
+                            Linge de maison
+                        </p>
+                    </div>
+                    <div class="relative flex items-center justify-center h-40 ">
+                        <i class="fa-solid fa-wifi text-terracota1 absolute opacity-20 text-8xl"></i>
+                        <p class="absolute">
+                            Wifi gratuit
+                        </p>
+                    </div>
+                    <div class="relative flex items-center justify-center h-40 ">
+                        <i class="fa-solid fa-square-parking text-terracota1  absolute opacity-20 text-8xl"></i>
+                        <p class="absolute">
+                            Parking privé
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-6 lg:mt-0">
+            <h2 class="pl-4 pb-4 lg:hidden"> le <strong class="font-light">gîte</strong></h2>
+            <h3 class="pl-4 lg:hidden font-light text-center">Un lieu plein de charme</h3>
+            <div class="lg:flex">
+                <div class="lg:w-1/2">
+                    <h2 class="hidden lg:block lg:pl-40 lg:mt-8 "> le <strong class="font-light">gîte</strong></h2>
+                    <h3 class="hidden lg:block lg:pl-40 lg:font-light lg:pb-2">Un lieu plein de charme</h3>
+                    <p class="p-4 lg:pr-4 lg:pl-8 lg:pt-0 lg:pb-0">
+                        Réparti sur deux étages, notre <em class="not-italic">hébergement de vacances</em>
+                        offre un <span class="color">espace confortable</span> pouvant accueillir jusqu'à 4 personnes.
+                    </p>
+                    <div class="flex justify-between lg:p-8">
+                        <img src="{{ asset('assets/img/gite-alsace-orbey-cuisine.webp') }}" alt="Cuisine équipée du gîte en Alsace avec tout le nécessaire pour un séjour confortable à Orbey" class="w-1/3 aspect-square object-cover" />
+                        <img src="{{ asset('assets/img/gite-alsace-orbey-chambre.webp') }}" alt="Chambre spacieuse du gîte en Alsace avec lit 160x200 et salle de bain privative" class="w-1/3 aspect-square object-cover" />
+                        <img src="{{ asset('assets/img/gite-alsace-orbey.webp') }}" alt="Séjour convivial avec décoration boisée et ambiance chaleureuse en Alsace" class="w-1/3 aspect-square object-cover" />
+                    </div>
+                    <p class="p-4 lg:pl-8">
+                        Au rez-de-chaussée, vous profiterez d'une cuisine entièrement équipée ouverte sur le séjour, ainsi qu'un wc séparé.
+                        À l'étage, vous trouverez deux chambres élégamment aménagées,
+                        chacune avec sa propre salle d'eau attenante pour plus d'intimité et un wc séparé.</p>
+                    <p class="p-4 lg:pl-8">
+                        L'intérieur est chaleureux, accueillant et décoré avec soin dans ce superbe
+                        <strong class="color">logement de charme</strong>.
+                    </p>
+
+                    <div class="hidden lg:block lg:p-6" >
+                        <h3 class="pl-4 pb-2 font-light text-center">Bain nordique</h3>
+                        <div class="flex items-center mb-4 lg:mb-0">
+                            <figure class="w-[40%] lg:w-1/4">
+                                <img src="{{ asset( 'assets/img/bain-nordique.jpeg' ) }}" 
+                                    alt="Expérience relaxante dans un bain nordique en Alsace" 
+                                    class="aspect-square object-cover overflow-hidden m-auto" />
+                            </figure>
+                            <p class="w-[100%] p-6">
+                                Offrez-vous un moment de détente unique dans notre <strong class="">bain nordique</strong> chauffé au feu de bois, face à une vue imprenable sur la vallée. <br>
+                                Préparé et chauffé dès 19h, il vous attend pour une soirée inoubliable sous le ciel étoilé.
+                                Une expérience parfaite pour se ressourcer après une journée active.    
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:hidden" >
+                    <h3 class="pl-4 pb-2 font-light text-center">Bain nordique</h3>
+                    <div class="flex items-center mb-4">
+                        <figure class="w-[40%] lg:w-1/4 ml-4">
+                            <img src="{{ asset( 'assets/img/bain-nordique.jpeg' ) }}" 
+                                alt="Expérience relaxante dans un bain nordique en Alsace" 
+                                class="aspect-square object-cover overflow-hidden m-auto" />
+                        </figure>
+                        <p class="w-[60%] p-2">
+                            Offrez-vous un moment de détente unique dans notre <strong class="">bain nordique</strong> chauffé au feu de bois, face à une vue imprenable sur la vallée. <br>
+                            Préparé et chauffé dès 19h, il vous attend pour une soirée inoubliable sous le ciel étoilé.
+                            Une expérience parfaite pour se ressourcer après une journée active.    
+                        </p>
+                    </div>
+                </div>
+
+                <div id="myCarousel" class="carousel-gite lg:w-1/2">
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-salle-de-bain.webp' ) }}" alt="Chambre spacieuse du gîte en Alsace avec lit 160x200 et salle de bain privative" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-cuisine.webp' ) }}" alt="Location gîte à Orbey avec cuisine équipée et espace convivial pour préparer vos repas en Alsace" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-sejour.webp' ) }}" alt="Espace détente du gîte à Orbey avec coin salon et décoration chaleureuse" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-montagne.webp' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-hebergement.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-location.jpg' ) }}" alt="Séjour avec vue panoramique sur les Vosges, idéal pour un moment de détente en montagne" class="f-carousel__slide aspect-square object-cover" />
+                </div>
+            </div>     
+        </div>
+    </section>
+
+    <section class="relative h-[500px] bg-cover bg-center bg-fixed text-white flex items-center justify-center transition-transform duration-500 ease-in-out" style="background-image: url('{{ asset('assets/img/banniere.jpg') }}');">
+        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="relative text-center bg-opacity-50 p-6">
+            <p class="font-medium text-2xl lg:text-3xl lg:leading-[1.5]">
+                Réservez votre<strong class="font-medium"> hébergement tout équipé à Orbey</strong>
+                dès aujourd'hui <br>et profitez d'un séjour inoubliable<br> entre randonnées au Lac Blanc,<br> ski et détente dans notre
+                <strong class="font-medium"> gîte de charme en montagne</strong>.
+            </p>
+        </div>
+    </section>
+
+    <section class="my-6 p-4 lg:px-40 lg:py-8">
+        <div class="galerie-contain">
+            <div class="mb-4">
+                <h2>En image</h2>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {% for categoryName, cover in picturesByCategory %}
+                    <div class="text-center group">
+                        <a href="{{ path('app_galery') }}#{{ categoryName | lower | replace({' ': '-'}) }}">
+                            <div class="relative aspect-square bg-gray-200 rounded-lg overflow-hidden">
+                                <img src="{{ asset('assets/img/' ~ cover.url) }}" alt="{{ cover.alt }}" class="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-110">
+                                <div class="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                                    <i class="fa-solid fa-magnifying-glass text-white"></i>
+                                </div>
+                            </div>
+                            <p class="mt-2 font-thin uppercase ">{{ categoryName }}</p>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+     </section>
+
+    <section class="my-6 p-4 lg:p-0">
+        <h2 class="lg:text-center">Actualités</h2>
+        <div class="flex flex-col items-center my-4 lg:px-10">
+            <h3 class="lg:text-xl">Suivez-nous !</h3>
+            <div class="lg:pb-2">
+                <a href="https://www.instagram.com/giteraindupair/" class="mr-2 lg:text-3xl" target="_blank">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+                <a href="https://www.facebook.com/profile.php?id=61555292307736" class="lg:text-3xl" target="_blank">
+                    <i class="fa-brands fa-facebook"></i>
+                </a>
+            </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl lg:max-w-full mx-auto">
+            <div class="instagram_post  rounded-lg " postid="DES0eKuMxp3" width="width" height="500px"></div>
+            <div class="instagram_post  rounded-lg " postid="DBWzz59MKSL" width="width" height="500px"></div>
+            <div class="instagram_post  rounded-lg " postid="DA_hkwsMxC4" width="width" height="500px"></div>
+            <div class="instagram_post  rounded-lg " postid="C1nBOjStKDe" width="width" height="500px"></div>
+        </div>
+    </section>
+
+    <section id="avis" class="lg:px-40 lg:py-8 mb-4">
+        <h2 class="p-4 lg:p-0 lg:mb-4">Avis</h2>
+        <div id="splide" class="splide">
+            <div class="splide__track">
+                <ul class="splide__list">
+                    {% for review in reviews %}
+                        <li class="splide__slide ">
+                            <div class="flex flex-col p-6 bg-white1 w-4/5 lg:w-full rounded-lg m-auto">
+                                <div>
+                                    <p class="uppercase">
+                                        {{ review.reservation.firstName }}
+                                    </p>
+                                    <p>
+                                        {{ review.creationDate|date('m-Y') }}
+                                    </p>
+                                   
+                                <div class="rating" data-rating="{{ review.rating }}"></div>
+
+                                </div>
+                                <div class="py-4">
+                                    <h5 class="font-medium mb-2 lg:text-lg">{{ review.title }}</h5>
+                                    <p class="">
+                                        {{ review.comment }}
+                                    </p>
+                                </div>
+                                {# <p class="mt-4 italic">Réponse du propriétaire :</p>
+                                <p class="italic">{{ review.response }}</p> #}
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
+</div>
+
+    {% include "_partials/_footer.html.twig" %}
+
+    {% block custom_javascripts %}
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/js/splide.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>  
+
+        <script>
+            function adjustHeroHeight() {
+                const header = document.querySelector('header');
+                const heroSection = document.getElementById('hero-section');
+                if (header && heroSection) {
+                    const headerHeight = header.offsetHeight; 
+                    heroSection.style.height = `calc(100vh - ${headerHeight}px)`; 
+                }
+            }
+
+            window.addEventListener('load', adjustHeroHeight); // Exécute au chargement
+            window.addEventListener('resize', adjustHeroHeight); // Ajuste si la fenêtre est redimensionnée
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const container = document.getElementById("myCarousel");
+                const options = {
+                    infinite: true,
+                    Dots: false,
+                };
+                new Carousel(container, options);
+            })
+
+            document.addEventListener('DOMContentLoaded', function () {
+                const splideElement = document.querySelector('#splide');
+                if (splideElement) {
+                    // Vérifier et supprimer la pagination existante pour éviter les doublons
+                    const existingPagination = splideElement.querySelector('.splide__pagination');
+                    if (existingPagination) {
+                        existingPagination.remove();
+                    }
+                }
+                    new Splide(splideElement, {
+                        type: 'slide',
+                        perPage: 3,
+                        arrows: true,
+                        pagination: true,
+                        speed: 600,
+                        gap: '1rem',
+                        rewind: false,
+                        breakpoints: {
+                            1024: { perPage: 2 },
+                            768: { perPage: 1 }, 
+                        },
+                        classes: {
+                            arrows: 'splide__arrows your-custom-arrows-class',
+                        },
+                    }).mount();
+                    splideElement.splide.refresh();
+                });
+
+            document.querySelectorAll('.rating').forEach(function (element) {
+                const rating = parseFloat(element.getAttribute('data-rating')) || 0;
+                $(element).rateYo({
+                    rating: rating,
+                    readOnly: true,
+                    starWidth: "20px",
+                    normalFill: "#ddd",
+                    ratedFill: "#f6c600"
+                });
+            });
+        
+        </script>
+
+    {% endblock %}
+{% endblock %}                                          
+                                                    

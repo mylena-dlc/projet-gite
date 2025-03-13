@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+        <div class="mb-4">
+            <a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
+            <i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+        </div>
+
+		<h1 class="mb-6">Laissez votre avis</h1>
+		<h2 class="mb-6">Merci d'avoir choisi notre gîte pour votre séjour !</h2>
+
+		<p> Votre retour nous aide à comprendre ce que vous avez aimé et comment nous pouvons améliorer notre service.<br> 
+        Que vous ayez eu une expérience exceptionnelle ou que vous ayez des suggestions pour nous aider à nous améliorer,
+         nous sommes impatients de les entendre.</p>
+        Nous apprécions sincèrement le temps que vous prenez pour partager votre expérience.
+        Nous sommes impatients de vous accueillir à nouveau et de rendre votre prochain séjour aussi agréable que possible.</p>
+
+        <div class="line"></div>
+
+        <div class="mt-4">
+            {{ form_start(form) }}
+            <p class="font-bold"> Note <div id="rating"></div> </p>
+            {{ form_row(form.rating) }}
+            
+            <div class="flex flex-col my-4">
+                <p class="font-bold">{{ form_label(form.comment) }}</p>
+                {{ form_widget(form.comment, { 'attr': { 'class': 'bg-white1 h-40 border focus:border-terracota1 p-2 rounded-xl' } }) }}
+            </div>
+
+
+            <button type="submit" class="btn-secondary">Ajouter</button>
+            {{ form_end(form) }}    
+
+        </div>
+    
+
+	</section>
+
+	{% include "_partials/_footer_user.html.twig" %}
+
+    {% block custom_javascripts %}
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>
+        <script src="{{ asset('assets/js/rating.js') }}"></script>
+    {% endblock %}
+
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin{% endblock %}
+
+{% block body %}
+
+{% include "_partials/_header.html.twig" %}
+
+<section class="p-6 mt-24 pb-[160px]"> 
+
+    <h1 class="mb-6 lg:p-12">Confirmer une réservation</h1>
+
+        <div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+            <div class="flex items-center">
+                <div class="w-1/2">
+                    <p class="font-bold pt-2 pl-4">{{ reservation.firstName }}
+                        {{ reservation.lastName }}</p>
+                    <p class="font-bold pb-2 pl-4">{{ reservation.arrivalDate|format_date(locale: 'fr') }}
+                        -
+                        {{ reservation.departureDate|format_date(locale: 'fr') }}
+                    </p>
+                    <p class="pl-4 pb-4">
+                        {{ reservation.numberAdult + reservation.numberKid }}
+                        voyageur{{ (reservation.numberAdult + reservation.numberKid) > 1 ? 's' : '' }}</p>
+                </div>
+
+            </div>
+            
+            <div class="flex justify-around border-t border-terracota2">
+                <a href="" class="p-4 border-r border-terracota2 w-1/2 text-center">Contacter</a>
+                <a href="{{ path('admin_reservation', {'id': reservation.id }) }}" class="p-4 w-1/2 text-center">Détails</a>
+            </div>
+        </div>
+
+        <div class="line my-6" ></div>
+
+        <div class="my-6">
+            <a href="{{ path('admin_confirm_reservation', {'id':reservation.id }) }}" class="btn-secondary w-auto m-auto ">Confirmer la réservation</a>
+        </div>
+
+        <div class="line my-6"></div>
+
+        <div class="my-6">
+            <h3>Refuser la réservation</h3>
+            <form method="POST" action="{{ path('admin_refuse_reservation', {'id': reservation.id}) }}">
+            <div class="mb-4">
+                <label for="reason" class="block text-sm font-medium my-2">Raison du refus :</label>
+                <textarea id="reason" name="reason" rows="4" class="mt-1 block w-full border border-gray1 rounded-md shadow-sm p-2"></textarea>
+            </div>
+            <button type="submit" class="btn-secondary w-full m-auto">Refuser la réservation</button>
+            </form>
+        </div>
+
+</section>
+
+{% include "_partials/_footer_admin.html.twig" %}
+
+{% endblock %}

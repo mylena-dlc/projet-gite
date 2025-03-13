@@ -1,0 +1,179 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activités aux alentours du gîte{% endblock %}
+
+{% block body %}
+
+{% include "_partials/_header.html.twig" %}
+
+<section id="alentours" class="p-6 mt-24 lg:p-12">
+
+    {# Affichage du fil d'Ariane #}
+    {{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+
+    <h1 class="mb-4 mt-2">Aux alentours</h1>
+
+    <p>Retrouvez ici des idées d'activités autour du <strong>gîte</strong>, pour que chacun trouve son bonheur : 
+        randonnées, escapades, découvertes, loisirs en famille… De quoi profiter pleinement de votre <strong>séjour</strong> ! </p>
+
+    <div class="alentours-containt pt-64">
+        <div id="map-activity" class="sticky top-0 left-0 w-full h-[300px] z-10 my-4" style="height: 300px;"></div> 
+
+        <div class="flex justify-end">
+            <span id="gite" class=" bg-gray1 text-white px-4 py-2 rounded-xl cursor-pointer hover:bg-gray-700 transition duration-300 ease-in-out">Voir le Gîte</span>
+        </div>
+
+        <!-- Boutons de catégories -->
+        <div id="category-filters" class="flex flex-wrap gap-2 justify-center my-6">
+            {% for category in categories %}
+                <span class="category-filter cursor-pointer px-4 py-2 bg-terracota1 text-white rounded-xl border-2 border-terracota1 hover:bg-terracota2 transition duration-300 ease-in-out"
+                        data-category="{{ category.nameCategory }}">
+                    {{ category.nameCategory }}
+                </span>
+            {% endfor %}
+        </div>
+
+        <div id="map-carousel">
+            {% for category in categories %}
+                <div class="activity-group hidden" data-category="{{ category.nameCategory }}">
+                    {% for activity in category.activities %}
+                        <div class="activity-card item item-activity bg-white1 rounded-xl p-4 my-4 flex flex-col justify-center items-center cursor-pointer" 
+                            data-lat="{{ activity.latitude }}" 
+                            data-lng="{{ activity.longitude }}" 
+                            data-image="{{ asset(activity.image) }}" 
+                            data-name="{{ activity.name }}">
+                            
+                            <figure class="activity-picture">  
+                                <img src="{{ asset(activity.image) }}" alt="Photo de {{ activity.name }}" class="modal-trigger w-32 aspect-square object-cover rounded"/>
+                            </figure>
+
+                            <div class="activity-content flex flex-col justify-center items-center">
+                                <p class="activity-name font-bold pt-4">{{ activity.name }}</p>
+                                <p class="activity-description py-4 text-center">{{ activity.description }}</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+
+{% include "_partials/_footer.html.twig" %}
+
+{% block custom_javascripts %}
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Vérifier si la carte est déjà initialisée
+        if (document.getElementById("map-activity") && document.getElementById("map-activity")._leaflet_id) {
+            console.warn("Carte déjà initialisée !");
+            return;
+        }
+
+        // Initialisation de la carte centrée sur Orbey
+        var map = L.map('map-activity').setView([48.116933, 7.140431], 12);
+
+        // Ajout du fond de carte OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Icône personnalisée pour le gîte
+        var giteIcon = L.icon({
+            iconUrl: '{{ asset("assets/img/marker-terracota.png") }}', 
+            iconSize: [32, 32],
+            iconAnchor: [16, 32],
+            popupAnchor: [0, -32]
+        });
+
+        // Ajout du marqueur pour le gîte
+        var giteMarker = L.marker([48.116933, 7.140431], {icon: giteIcon}).addTo(map);
+        giteMarker.bindPopup("<b>Le Gîte</b>").openPopup();
+
+        // Clique sur "voir le gite"
+        document.getElementById("gite").addEventListener("click", function () {
+            map.setView([48.116933, 7.140431], 14); 
+            giteMarker.openPopup(); 
+        });
+
+        // Icône pour les activités
+        var activityIcon = L.icon({
+            iconUrl: '{{ asset("assets/img/marker-gris.png") }}', 
+            iconSize: [32, 32],
+            iconAnchor: [15, 45],
+            popupAnchor: [0, -45]
+        });
+
+        // Stockage des marqueurs
+        var markers = [];
+
+        // Récupération des activités et ajout des marqueurs
+        document.querySelectorAll(".activity-card").forEach(function (card) {
+            var lat = parseFloat(card.getAttribute("data-lat"));
+            var lng = parseFloat(card.getAttribute("data-lng"));
+            var imageUrl = card.getAttribute("data-image");
+            var activityName = card.getAttribute("data-name");
+
+            if (!isNaN(lat) && !isNaN(lng)) {
+                // Création du marqueur
+                var marker = L.marker([lat, lng], {icon: activityIcon}).addTo(map);
+                marker.bindPopup('<img src="' + imageUrl + '" alt="Photo de ' + activityName + '" width="150"/><br><b>' + activityName + '</b>');
+
+                // Stocker le marqueur
+                markers.push({ marker: marker, lat: lat, lng: lng });
+
+                // Gestion du clic sur la carte
+                card.addEventListener("click", function () { 
+                    map.setView([lat, lng], 14); // Centre la carte sur le marqueur
+                    marker.openPopup(); // Ouvre le popup correspondant
+                });
+            } else {
+                console.warn(" Coordonnées invalides pour", activityName);
+            }
+        });
+
+        // Forcer l'affichage correct de la carte si elle est cachée au chargement
+        setTimeout(function() {
+            map.invalidateSize();
+        }, 500);
+
+        // Filtre des catégories
+        const categoryFilters = document.querySelectorAll(".category-filter");
+        const activityGroups = document.querySelectorAll(".activity-group");
+
+        // Fonction pour afficher une catégorie spécifique
+        function showCategory(selectedCategory) {
+            // Retirer la classe active de tous les boutons
+            categoryFilters.forEach(filter => filter.classList.remove("border-gray", "bg-terracota2"));
+            
+            // Ajouter la classe active au bouton sélectionné
+            document.querySelector(`.category-filter[data-category="${selectedCategory}"]`).classList.add("border-gray1", "bg-terracota2");
+
+            // Masquer toutes autres les activités
+            activityGroups.forEach(group => group.classList.add("hidden"));
+
+            // Afficher uniquement les activités de la catégorie sélectionnée
+            document.querySelectorAll(`.activity-group[data-category="${selectedCategory}"]`).forEach(group => group.classList.remove("hidden"));
+        }
+
+        // Ajout des écouteurs d'événements aux filtres de catégories
+        categoryFilters.forEach(filter => {
+            filter.addEventListener("click", function () {
+                const selectedCategory = this.getAttribute("data-category");
+                showCategory(selectedCategory);
+            });
+        });
+
+        // Afficher la 1ère catégorie au chargement de la page
+        if (categoryFilters.length > 0) {
+            showCategory(categoryFilters[0].getAttribute("data-category"));
+        }
+    });
+</script>
+
+{% endblock %}
+
+{% endblock %}

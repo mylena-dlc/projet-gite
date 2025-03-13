@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+		<div>
+			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
+				<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+		</div>
+
+		<h1 class="my-4">Avis à confirmer</h1>
+
+            {% for review in reviews %}
+            <div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+                <div class="flex flex-col pl-4">
+                    <div class="">
+                        <p class="font-bold pt-2 ">{{ review.reservation.firstName }} {{ review.reservation.lastName }}</p>
+                         <p class="pb-4"> référence : {{ review.reservation.reference }}</p>
+                    </div>
+                    <div class="">
+                        <p class="font-bold">Note : </p>
+                        <p>{{ review.rating}}</p>
+                        <p class="font-bold mt-2 pb-2">Commentaire :</p>
+                        <p> {{ review.comment}}</p>
+
+                        <div class="line my-6"></div>
+
+                        {# Formulaire pour valider l'avis et ajouter une réponse #}
+                        <form method="post" action="{{ path('admin_review_verify', {'id': review.id}) }}">
+                        <div class="flex flex-col">
+                          <label for="response" class="font-bold">Réponse du propriétaire : </label>
+                            <textarea id="response" name="response" class="my-4 p-2"></textarea>
+                        </div>
+                          
+                            
+                            <div class="flex">
+                                <button type="submit" class="btn-secondary w-auto mb-4">Confirmer l'avis</button>
+                                <a href="{{ path('delete_review', {'id': review.id}) }}" class="btn-secondary w-auto mb-4">Supprimer l'avis</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            
+            {% endfor %}
+
+</section>
+{% include "_partials/_footer_admin.html.twig" %}
+
+
+{% endblock %}

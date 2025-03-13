@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Nouvel avis</title>
+</head>
+<body>
+    <h1>Nouvel avis</h1>
+    
+    <p>Un avis a été laissé sur votre gîte. Voici les détails :</p>
+    
+    <ul>
+        <li>Email du client : {{ review.user.email }}</li>
+        <li>Note : {{ review.rating }}</li>
+        <li>Avis : {{ review.comment }}</li>
+    </ul>
+    
+    <p>Merci de vous connecter à votre tableau de bord afin de le valider et de laisser une réponse.</p>
+</body>
+</html>

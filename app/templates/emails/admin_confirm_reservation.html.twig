@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Réservation confirmée</title>
+</head>
+<body>
+    <h1>Réservation confirmée</h1>
+    
+    <p>Nouvelle réservation en date du  : {{ reservation.reservationDate|date('Y-m-d') }} </p>
+    <p>Voici les détails :</p>
+    
+    <ul>
+        <li>Numéro de réservation : {{ reservation.reference }}</li>
+        <li>Nom du client : {{ reservation.lastname }} {{ reservation.firstname }}</li>
+        <li>Email du client : {{ reservation.email }}</li>
+        <li>Adresse : {{ reservation.address }}</li>
+        <li>Code postal : {{ reservation.cp }}</li>
+        <li>Pays : {{ reservation.country }}</li>
+        <li>Numéro de téléphone : {{ reservation.phone }}</li>
+        <li>Date d'arrivée : {{ reservation.arrivalDate|date('Y-m-d') }}</li>
+        <li>Date de départ : {{ reservation.departureDate|date('Y-m-d') }}</li>
+        <li>Nombre d'adultes : {{ reservation.numberAdult }}</li>
+        <li>Nombre d'enfants : {{ reservation.numberKid }}</li>
+        <li>Prix total : {{ reservation.totalPrice }} €</li>
+    </ul>
+    
+    <p>Merci de prendre les dispositions nécéssaires pour l'accueil de ces nouveaux voyageurs !</p>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    {# On boucle sur les URLs #}
+    {% for url in urls %}
+        <url>
+            <loc>
+                {{ hostname ~ url['loc'] | replace({ hostname: '' }) | default('') }}
+            </loc>
+            <lastmod>{{ 'now'|date('Y-m-d') }}</lastmod>
+        </url>
+    {% endfor %}
+</urlset>

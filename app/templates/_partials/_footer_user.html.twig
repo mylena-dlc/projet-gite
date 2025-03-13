@@ -1,0 +1,24 @@
+<footer class="fixed bottom-0 left-0 w-full z-50 p-8 text-xl font-light" style="background-image: url('/assets/img/fond-banner.jpg'); background-size: cover; background-position: center;">
+	<nav>
+		<ul class="flex justify-around">
+			<li>
+				<a href="{{ path('app_profil', {'id': app.user.id}) }}" class="flex flex-col justify-center items-center hover:text-terracota1 transition duration-300 group">
+					<p>
+						<i class="fa-solid fa-calendar-days"></i>
+					</p>
+					<p>Mes réservations</p>
+				</a>
+			</li>
+            <li>
+				<a href="{{ path('app_profil_account', {'id': app.user.id}) }}" class="flex flex-col justify-center items-center hover:text-terracota1 transition duration-300 group">
+					<p>
+                        <i class="fa-regular fa-circle-user"></i>
+					</p>
+					<p>Mon compte</p>
+				</a>
+			</li>
+
+		</ul>
+
+	</nav>
+</footer>

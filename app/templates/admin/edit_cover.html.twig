@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin{% endblock %}
+
+{% block body %}
+
+{% include "_partials/_header.html.twig" %}
+
+<section class="p-6 mb-32 mt-24 lg:p-12">
+
+    <h3 class="mb-6">Modifier l'image de couverture </h3>
+
+    <h2 class="mb-2">Catégorie: {{ category.name }}</h2>
+    <div class="current-cover mb-4">
+        {% if currentCover %}
+            <img src="{{ asset('assets/img/' ~ currentCover.url) }}" alt="{{ currentCover.alt }}" class="w-64 h-64 object-cover rounded-lg">
+        {% else %}
+            <p>Aucune image de couverture actuelle.</p>
+        {% endif %}
+    </div>
+
+    <div class="new-cover-form mb-6">
+        {{ form_start(form) }}
+            {{ form_row(form.picture) }}
+            {{ form_row(form.alt) }}
+            <button type="submit" class="btn-primary my-4">Mettre à jour</button>
+        {{ form_end(form) }}
+    </div>
+</section>
+
+{% include "_partials/_footer_admin.html.twig" %}
+
+{% endblock %}

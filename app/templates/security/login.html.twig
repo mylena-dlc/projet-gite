@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 lg:mb-6 mt-24 lg:p-12">
+	
+		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+
+		<div class="lg:flex">
+			<div class="flex flex-col gap-3.5 lg:w-1/2 lg:border-r lg:border-gray-300 lg:p-8">
+				{% if app.user %}
+					<div class="mb-3 text-center">
+						<p>Vous êtes déjà connecté(e) en tant que <span class="underline">{{ app.user.userIdentifier }}</span></p>
+						<p class="btn-secondary lg:m-0"><a href="{{ path('app_logout') }}">Me déconnecter</a></p>
+					</div>
+				{% endif %}
+				
+				{% if error %}
+					<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+				{% endif %}
+				<h2>Nouveau client</h2>
+				<p>Créez un compte pour réserver votre séjour en toute simplicité et accéder à vos informations à tout moment.</p>
+				<a href="{{ path('app_register')}}" class="btn-primary">Créer un compte</a>
+				<div class="line lg:hidden"></div>
+			</div>
+
+			<div class="flex flex-col gap-3.5 lg:w-1/2 lg:p-8">
+				<h1 class="">Connectez-vous à votre compte</h1>
+
+				<div class="flex flex-col items-center justify-center p-3 my-2 border rounded-lg text-xl">
+					<a href="{{ path('auth_oauth_connect', {service: 'google'}) }}" class="flex flex-col items-center justify-center">
+						<img src="{{ asset('assets/img/logo_google.png') }}" alt="Logo de connexion Google" class="w-12"/>se connecter avec Google
+					</a>
+				</div>
+
+				<form method="post" class="flex flex-col gap-3.5">
+					<label for="inputEmail">Email</label>
+					<input type="email" value="{{ last_username }}" name="email" id="inputEmail" class="form-control" autocomplete="email" required autofocus>
+					<label for="inputPassword">Mot de passe</label>
+					<div class="relative w-3/4">
+						<input type="password" name="password" id="inputPassword" class="form-control input-password relative w-full" autocomplete="current-password" required>
+						<button type="button" class="absolute right-1 bottom-2 flex items-center justify-center w-6 h-6" onclick="togglePassword()">
+							<span id="eye-icon-container">
+								<i id="eye-icon" class="fa-solid fa-eye text-gray-500 cursor-pointer w-5 h-5 flex items-center justify-center pt-1"></i>
+							</span>
+						</button>
+					</div>
+
+					<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+					<div class="checkbox mb-3">
+						<label class="flex">
+							<input type="checkbox" name="_remember_me" class="w-auto mr-2"> Se souvenir de moi
+						</label>
+					</div>
+
+					<input type="hidden" name="_target_path" value="{{ app.request.getSession().get('_security.main.target_path', path('app_home')) }}">
+
+					<button class="btn-primary" type="submit"> Connexion</button>
+					<p class="text-center hover:underline">
+						<a href="{{ path ('app_reset_password') }}">Mot de passe oublié ?</a>
+					</p>
+				</form>
+			</div>
+		</div>
+	</section>
+
+	{% include "_partials/_footer.html.twig" %}
+
+	{% block custom_javascripts %}
+
+	<script>
+		function togglePassword() {
+			const passwordInput = document.querySelector('.input-password');
+			const eyeIcon = document.getElementById('eye-icon');
+			if (passwordInput.type === "password") {
+				passwordInput.type = "text";
+				eyeIcon.classList.remove("fa-eye");
+				eyeIcon.classList.add("fa-eye-slash");
+			} else {
+				passwordInput.type = "password";
+				eyeIcon.classList.remove("fa-eye-slash");
+				eyeIcon.classList.add("fa-eye");
+			}
+		}
+	</script>
+	{% endblock %}
+{% endblock %}

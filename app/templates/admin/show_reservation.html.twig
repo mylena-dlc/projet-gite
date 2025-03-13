@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord admin
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+		<div>
+			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
+				<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+		</div>
+
+		<div class="flex justify-end">
+			<span class="bg-terracota1 px-2 py-1 rounded-lg text-white text-sm"> réservation {{ reservation.isConfirm.status }}</span>
+		</div>
+
+		<h2 class="py-4">{{ reservation.firstName }}
+			{{ reservation.lastName }}</h2>
+		<div class="m-4">
+			<p>{{ reservation.arrivalDate|format_date(locale: 'fr') }}
+				-
+				{{ reservation.departureDate|format_date(locale: 'fr') }}</p>
+			<p class="">{{ reservation.numberAdult + reservation.numberKid }}
+				voyageur{{ (reservation.numberAdult + reservation.numberKid) > 1 ? 's' : '' }}
+				-
+				{{ reservation.totalPrice }}
+				€</p>
+		</div>
+
+		<h2 class="pt-8 pb-4">détails de la réservation</h2>
+		<div class="m-4">
+
+			<h3>voyageurs</h3>
+			<p>{{ reservation.numberAdult }}
+				adulte{{ reservation.numberAdult  > 1 ? 's' : '' }}
+			</p>
+			{% if reservation.numberKid > 0 %}
+				<p>{{ reservation.numberKid }}
+					enfant{{ reservation.numberKid > 1 ? 's' : '' }}
+				</p>
+			{% endif %}
+
+			<div class="line"></div>
+
+			<h3>Arrivée</h3>
+			<p>{{ reservation.arrivalDate|date('d-m-Y') }}</p>
+
+			<div class="line"></div>
+
+			<h3>Départ</h3>
+			<p>{{ reservation.departureDate|date('d-m-Y') }}</p>
+
+			<div class="line"></div>
+
+			<h3>Référence de la réservation</h3>
+			<p>{{ reservation.reference }}</p>
+
+			<div class="line"></div>
+
+			<h3>Message laissé par le voyageur</h3>
+			<div class="mx-8">
+				<p class="p-6 bg-white1 rounded-xl">{{ reservation.message }}</p>
+			</div>
+
+			<div class="line"></div>
+
+			<h3>Extras</h3>
+			<div class="mx-8">
+				{% if reservation.reservationExtras is not empty %}
+					<ul class="p-6 ">
+						{% for extra in reservation.reservationExtras %}
+							<p>
+								<strong>{{ extra.extra.name }}</strong> - {{ extra.date|date('d/m/Y') }} - {{ extra.extra.price }} €
+							</p>
+						{% endfor %}
+					</ul>
+				{% else %}
+					<p class="p-6">Aucun extra ajouté pour cette réservation.</p>
+				{% endif %}			
+			</div>
+
+			<div class="line"></div>
+
+			<h3>Paiement</h3>
+			<div class="mx-8">
+				<div class="flex justify-between">
+					<p>{{ reservation.priceNight|number_format(2, ',', ' ') }} €
+						x
+						{{ reservation.totalNight }}
+						nuits</p>
+					<p>{{ (reservation.priceNight * reservation.totalNight)|number_format(2, ',', ' ') }} €</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Supplément</p>
+					<p>{{ reservation.supplement|number_format(2, ',', ' ') }} €</p>
+				</div>
+				<div class="flex justify-between">
+					<p class="italic text-xs">Un supplément peut s’apliquer en fonction des dates (les week-ends ou pendant les vacances scolaires par exemple)</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Forfait ménage</p>
+					<p>{{ reservation.cleaningCharge|number_format(2, ',', ' ') }} €</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Taxes de séjour</p>
+					<p>{{ reservation.tourismTax|number_format(2, ',', ' ') }} €</p>
+				</div>
+				{% if reservation.reservationExtras is not empty %}
+				<div class="flex justify-between">
+					{% for extra in reservation.reservationExtras %}
+						<p>Extras - {{ extra.extra.name }}</p>
+						<p> {{ extra.extra.price }} €</p>	
+					{% endfor %}
+				</div>
+				{% endif %}			
+				<div class="flex justify-between">
+					<p>TVA (20%)</p>
+					<p>{{ reservation.tva|number_format(2, ',', ' ') }} €</p>
+				</div>
+				<div class="flex justify-between font-bold">
+					<p>Total :</p>
+					<p>{{ reservation.totalPrice|number_format(2, ',', ' ') }} €
+						<span class="italic text-xs">TTC</span>
+					</p>
+				</div>
+			</div>
+			<div class="line"></div>
+		</div>
+
+		{% if reservation.isConfirm.status == "refusée" %}
+			<p class="font-bold text-center text-xl"><i class="fa-solid fa-triangle-exclamation pr-2"></i> La réservation a été refusée par le propriétaire</p>
+		{% elseif reservation.isConfirm.status == "en attente" %}
+		<p class="font-bold text-center text-xl"><i class="fa-solid fa-triangle-exclamation pr-2"></i> La réservation n'a pas encore été validée par le propriétaire</p>
+		{% else %}
+			<a href="{{ path('admin_reservation_export', {'slug': reservation.slug}) }}" class="btn-primary my-6 mt-8">Télécharger la facture</a>
+	
+		{% endif %}
+	</div>
+</section>
+
+{% include "_partials/_footer_admin.html.twig" %}{% endblock %}

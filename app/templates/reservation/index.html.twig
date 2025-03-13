@@ -1,0 +1,248 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gîte à Orbey, Alsace | Réservation et tarifs
+{% endblock %}
+
+{% block meta_description %}
+	{{ description }}
+{% endblock %}
+
+{% block body %}
+	{% include "_partials/_header.html.twig" %}
+
+	<div class="p-4 mt-24 lg:p-12">
+
+		{# Affichage du fil d'Ariane #}
+		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+
+		<h1 class="mb-4 mt-2">Demande de réservation</h1>
+		<section class="flex justify-between">
+			<div class="w-1/2">
+				<h3>vos dates</h3>
+				<p>Date d'arrivée :</p>
+				<p class="font-bold">{{ startDate|format_date(locale: 'fr') }}</p>
+				<p>Date de départ :</p>
+				<p class="font-bold">{{ endDate|format_date(locale: 'fr') }}</p>
+			</div>
+			<div class="w-1/2">
+				<h3>Nombre de personne(s)</h3>
+				<p><strong>{{ numberAdult }}</strong> adulte(s)</p>
+					{% if numberKid > 1 %}
+						<p><strong>{{ numberKid }}</strong> enfant(s)</p>
+					{% endif %}
+			</div>
+		</section>
+
+		<section class="py-2">
+			<h3>informations</h3>
+			<p>Arrivée à partir de 16h00</p>
+			<p>Départ avant 11h00</p>
+			<div class="line mx-0"></div>
+			<p>Les lits sont faits à l'arrivée et le linge de bain est inclus.</p>
+			<p>Arrivée autonome grâce à une boîte à clés.</p>
+			<div class="line mx-0"></div>
+			<p>Logement non fumeur</p>
+			<p>Animaux non admis</p>
+			<p>Fête interdite</p>
+		</section>
+
+		<section class="py-2">
+			<h3>Ce que propose ce logement</h3>
+
+			<p>Chauffage au sol au rez de chaussé</p>
+			<p>Radiateur électrique à l’étage</p>
+			<p>Sèche-serviette électrique</p>
+			<p>Lave-vaisselle</p>
+			<p>Four</p>
+			<p>Micro-onde</p>
+			<p>Plaque de cuisson induction</p>
+			<p>Réfrigirateur</p>
+			<p>Machine à café Senseo</p>
+			<p>Bouilloir électrique</p>
+			<p>Grille-pain</p>
+			<p>Appareil à raclette</p>
+			<p>Appareil à fondue</p>
+			<div class="line mx-0"></div>
+			<p>Aspirateur</p>
+			<p>Lave-linge et étendoir</p>
+			<p>Sèche-cheveux</p>
+			<p>Télévision</p>
+			<p>Wifi</p>
+			<p>Détecteur de fumée</p>
+
+			<div class="line mx-0"></div>
+
+			<p>Parking privé</p>
+			<p>Coin repas extérieur</p>
+			<p>Plancha à gaz</p>
+			<p>Bain nordique (en supplément)</p>
+		</section>
+		<div class="line mx-0"></div>
+		<section class="py-2">
+			<h3>Conditions d'annulation</h3>
+			<p>Annulation gratuite pendant 48 heures.</p>
+			<p>Si vous annulez 7 jours avant la date d'arrivée, vous aurez droit à un remboursement partiel.</p>
+			<p>Consultez les conditions d'utilisations pour en savoir plus.</p>
+		</section>
+		<div class="line mx-0"></div>
+		<section class="pb-4">
+			<h3>Extra</h3>
+			<p>La terasse du logement dispose d'un bain nordique privatif.
+				Pour en profiter, la réservation est obligatoire.</p>
+			<p>Choissiez une date pendant votre séjour : le bain sera chauffé et prêt à partir de 19h ce jour là, et vous pourrez en profiter de manière illimitée tout au long de la soirée.</p>
+		
+			<p class="font-bold"><i class="fa-solid fa-circle-info"></i> Vous pouvez ajouter le bain nordique à votre réservation, sur la page suivante.</p>
+			<div class="flex items-center my-4">
+				<figure class="p-2 w-1/2 lg:w-1/3">
+					<img src="{{ asset( 'assets/img/bain-nordique.jpeg' ) }}" alt="bain nordique en Alsace" class="aspect-square object-cover rounded-lg"/>
+				</figure>
+				<div class="p-2 w-1/2">
+					<h3>Bain nordique</h3>
+					<p>4 à 6 personnes</p>
+					<p>Projecteur led</p>
+					<p>Sytème hydro-massage</p>
+					<p class="font-bold">59 € la soirée <span class="italic">(ilimitée)</span>
+					</p>
+				</div>
+			</div>
+		</section>
+
+		<section class="flex flex-col items-center justify-around bg-white1 sticky bottom-0 z-10 p-4 -mx-4 -mb-4 lg:-mb-12 lg:-mx-12">
+			<div id="btn-detail" class="cursor-pointer border-b border-gray-500 border-opacity-70 hover:border-opacity-100 transition duration-300 mb-2">Voir les détails</div>
+			<div id="vue-detail" class="overflow-hidden max-h-0 transition-max-h duration-500 ease-in-out">
+				<div class="">
+					<div class="flex justify-between">
+						{% set totalNightPrice = nightPrice * totalNight %}
+						<p>{{ nightPrice|number_format(2, ',', ' ') }} € x {{ totalNight }} nuits </p>
+						<p>{{ totalNightPrice|number_format(2, ',', ' ') }} € </p>
+					</div>
+					{% if supplement > 0 %}
+						<div class="flex justify-between">
+							<p>Supplément</p>
+							<p>{{ supplement|number_format(2, ',', ' ') }} €</p>
+						</div>
+						<div class="flex justify-between">					
+							<p class="italic text-xs">Un supplément peut s'apliquer en fonction des dates (les week-ends ou pendant les vacances scolaires par exemple)</p>
+						</div>
+					{% endif %}
+				
+					<div class="flex justify-between">
+						<p>Forfait ménage</p>
+						<p>{{ cleaningCharge|number_format(2, ',', ' ') }} €</p>
+					</div>
+					<div class="flex justify-between">
+						<p>Taxe de séjour</p>
+						<p>{{ tax|number_format(2, ',', ' ') }} €</p>
+					</div>
+					<div class="flex justify-between">
+						<p>TVA</p>
+						<p>{{ tva|number_format(2, ',', ' ') }} €</p>
+					</div>
+
+					<div class="flex justify-between">
+						<p>Code promo</p>
+						<div class="flex flex-col justify-end mr-4">
+							<input type="text" id="promoCodeInput" placeholder="Entrez votre code" class=" text-sm bg-white border border-terracota2 p-1 w-full" />
+							<button id="applyPromoCode" class="btn-span mt-2">Appliquer</button>
+						</div>
+					</div>
+					<div id="promoMessage" class="text-red-500 text-sm mt-2 hidden"></div>
+
+					<div id="promoLine" class="hidden"></div> <!-- Conteneur pour la ligne de réduction -->
+				</div>
+			</div>
+				<div class="flex justify-between font-bold my-2 text-lg">
+					<p class="mr-2">Total : </p>
+					<p>
+						<span id="originalTotalPrice" class="hidden line-through decoration-red-500 mr-2">{{ totalPrice|number_format(2, ',', ' ') }} €</span> <!-- Prix barré -->
+						<span id="totalPrice">{{ totalPrice|number_format(2, ',', ' ') }} €</span> <!-- Nouveau prix -->
+						<span class="italic text-xs">TTC</span>
+					</p>				
+				</div>
+
+			<div class="">
+				<a href="{{ path('new_reservation') }}" class="btn-primary w-full mt-2 px-2">Réserver</a>
+			</div>
+		</section>
+	</div>
+
+	{% include "_partials/_footer.html.twig" %}
+
+	<script>
+		document.getElementById('applyPromoCode').addEventListener('click', function () {
+			const promoCode = document.getElementById('promoCodeInput').value;
+			const promoMessage = document.getElementById('promoMessage');
+			const promoLine = document.getElementById('promoLine');
+			const totalPriceElement = document.getElementById('totalPrice');
+			const originalTotalPriceElement = document.getElementById('originalTotalPrice');
+
+			// Réinitialiser les messages
+			promoMessage.classList.add('hidden');
+			promoMessage.textContent = '';
+
+			fetch('/check_token', {
+				method: 'POST',
+				headers: {
+					'X-Requested-With': 'XMLHttpRequest',
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ code: promoCode })
+			})
+			.then(response => response.json())
+			.then(data => {
+				if (data.success) {
+					// Mettre à jour le message de succès
+					promoMessage.textContent = 'Code promo appliqué avec succès !';
+					promoMessage.classList.remove('hidden');
+					promoMessage.classList.remove('text-red-500');
+					promoMessage.classList.add('text-green-500');
+
+					// Ajouter la ligne du code promo
+					promoLine.innerHTML = `
+						<div class="flex justify-between">
+							<p>Code promo (${promoCode})</p>
+							<p>- ${data.discount}%</p>
+						</div>
+					`;
+					promoLine.classList.remove('hidden');
+
+					// Mettre à jour le prix total
+					totalPriceElement.textContent = `${data.newTotalPrice} €`;
+					originalTotalPriceElement.classList.remove('hidden');
+				} else {
+					promoMessage.textContent = data.message || 'Code promo invalide.';
+					promoMessage.classList.remove('hidden');
+					promoMessage.classList.remove('text-green-500');
+					promoMessage.classList.add('text-red-500');
+				}
+			})
+			.catch(error => {
+				console.error('Erreur:', error);
+				promoMessage.textContent = 'Une erreur est survenue. Veuillez réessayer.';
+				promoMessage.classList.remove('hidden');
+				promoMessage.classList.remove('text-green-500');
+				promoMessage.classList.add('text-red-500');
+			});
+		});
+
+		document.addEventListener("DOMContentLoaded", function () {
+			const btnDetail = document.getElementById("btn-detail");
+			const vueDetail = document.getElementById("vue-detail");
+
+			btnDetail.addEventListener("click", function () {
+				if (vueDetail.classList.contains("max-h-0")) {
+					vueDetail.classList.remove("max-h-0");
+					vueDetail.classList.add("max-h-[500px]"); 
+					btnDetail.textContent = "Voir moins"; 
+				} else {
+					vueDetail.classList.remove("max-h-[500px]");
+					vueDetail.classList.add("max-h-0");
+					setTimeout(() => {
+					btnDetail.textContent = "Voir les détails"; 
+				}, 500); 
+				}
+			});
+		});
+
+	</script>
+{% endblock %}

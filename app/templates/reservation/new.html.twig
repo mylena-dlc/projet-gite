@@ -1,0 +1,419 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Gîte à Orbey, Alsace | Réservation et tarifs
+{% endblock %}
+
+{% block meta_description %}
+	{{ description }}
+{% endblock %}
+
+{% block body %}
+	{% include "_partials/_header.html.twig" %}
+
+	<div class="p-4 mt-24 lg:p-12">
+
+		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+
+		<h1 class="mb-4 mt-2">confirmer votre demande de réservation</h1>
+
+		{% if not app.user  %}
+			<p class="font-bold">Veuillez vous connecter pour confirmer votre réservation 
+			<a aria-current="page" href="{{ path('app_login') }}"> ici <i class="fa-solid fa-circle-arrow-right"></i></a>
+			Ou créer un compte <a aria-current="page" href="{{ path('app_register') }}"> par ici<i class="fa-solid fa-circle-arrow-right"></i></a></p>      
+		{% endif %}  
+
+		<section class="py-4">
+			<h3>Ajoutez l'accès au bain nordique<br> à votre réservation</h3>
+			{{ form_start(extraForm, { 'attr': { 'id': 'extraForm' } }) }}
+			{{ form_row(extraForm.date, { 'label': 'Choisissez une soirée' }) }}
+				<button type="submit" id="addExtraButton" class="btn-secondary my-4 w-full">Ajouter à la réservation</button>
+			{{ form_end(extraForm) }}
+			<div id="extraMessage" class="text-green-500 hidden mt-4"></div>
+		</section>
+
+		<section class="py-4">
+			<h3>Extras ajoutés</h3>
+				<div id="extrasList">
+					{% if reservationExtras is not empty %}
+						{% for extra in reservationExtras %}
+							<div class="flex items-center space-x-4" data-extra-id="{{ extra.extra_id }}">
+								<p>{{ extra.date }} - {{ extra.price|number_format(2, ',', ' ') }} €</p>
+								<button class="delete-extra" data-extra-id="{{ extra.extra_id }}">
+									<i class="fa-solid fa-trash"></i>
+								</button>
+							</div>
+						{% endfor %}
+					{% else %}
+						<p>Aucun extra ajouté.</p>
+					{% endif %}
+				</div>
+			<p>Total des extras : <span id="totalExtrasPrice">{{ totalExtraPrice|number_format(2, ',', ' ') }}</span> € HT</p>
+		</section>
+		<div class="line"></div>
+		<section class="flex my-4 justify-between">
+			<div>
+				<h3>connexion</h3>
+				<p>Vous êtes connecter avec ce compte:</p>
+				<p class="font-bold">{{ app.user.email }}</p>
+				<p>Connectez-vous avec un autre compte
+					<a class="underline" href="{{ path('app_login') }}">ici</a>
+				</p>
+			</div>
+		</section>
+		<section class="py-4">
+			<h3>Vos coordonnées</h3>
+			<p class="my-2 italic text-sm">* Ces champs sont obligatoires</p>
+			{{ form_start(form) }}
+
+			<div class="pb-4">
+				{{ form_row(form.last_name, {'label_attr': {'class': 'input-required'}}) }}
+			</div>
+			<div class="pb-4">
+				{{ form_row(form.first_name, {'label_attr': {'class': 'input-required'}}) }}
+			</div>
+			<div class="my-4 pb-4">
+				{{ form_row(form.country, {'attr': {'id': 'reservation_country'}}) }}
+			</div>
+			<div class="pb-4">
+				{{ form_row(form.address, {'label_attr': {'class': 'input-required'}}) }}
+			</div>
+
+			<div class="pb-4">
+				{{ form_row(form.cp, {'label_attr': {'class': 'input-required'}, 'attr': {'id': 'reservation_cp'}}) }}
+			</div>
+			<div class="pb-4">
+				{{ form_row(form.city, {'label_attr': {'class': 'input-required mr-4'}, 'attr': {'id': 'reservation_city'}}) }}
+			</div>
+
+
+			<div class="pb-4">
+				{{ form_row(form.phone) }}
+			</div>
+			<div class="my-4 flex items-center pb-4">
+				{{ form_widget(form.is_major, {'attr': {'class': 'mr-2 w-1/12'}}) }}
+				{{ form_label(form.is_major, null, {'label_attr': {'class': 'mb-0 input-required'}}) }}
+			</div>
+		</section>
+
+		<section class="py-4">
+			<h3>Envoyer un message à l'hôte</h3>
+			{{ form_row(form.message, {
+				'attr': {
+					'class': 'bg-white1 w-full p-2',
+					'placeholder': 'Dites-nous en un peu plus à propos de votre demande de réservation',
+					'rows': 20,
+					'cols': 30,
+					'style': 'height: 200px;',
+				}
+			}) }}
+		</section>
+
+		<section class="py-4">
+			<h3>important</h3>
+			<p>Votre réservation ne sera pas confirmée tant que le propriétaire n'aura pas accepté votre demande, dans les 24 heures maximun.
+				Le montant de votre réservation ne sera débité qu'à cette date.</p>
+		</section>
+
+		<section class="py-4">
+			<h3>Détails du prix</h3>
+			<div class="px-14">
+				<div class="flex justify-between">
+					{% set totalNightPrice = nightPrice * totalNight %}
+					<p>{{ nightPrice|number_format(2, ',', ' ') }}
+						€ x
+						{{ totalNight }}
+						nuits
+					</p>
+					<p>{{ totalNightPrice|number_format(2, ',', ' ') }}
+						€
+					</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Supplément</p>
+					<p>{{ supplement|number_format(2, ',', ' ') }}
+						€</p>
+				</div>
+				<div class="flex justify-between">
+					<p class="italic text-xs">Un supplément peut s’apliquer en fonction des dates (les week-ends ou pendant les vacances scolaires par exemple)</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Forfait ménage</p>
+					<p>{{ cleaningCharge|number_format(2, ',', ' ') }}€</p>
+				</div>
+				<div class="flex justify-between">
+					<p>Taxe de séjour</p>
+					<p>{{ tax|number_format(2, ',', ' ') }}€</p>
+				</div>
+				<div class="flex justify-between">
+					<p>TVA</p>
+					<p>{{ tva|number_format(2, ',', ' ') }}€</p>
+				</div>
+
+				<div class="flex justify-between">
+					<p>Code promo
+						{% if promoCode %}
+							<span class="italic">({{ promoCode }})</span>
+						</p>
+					{% endif %}
+					{% if promoCode %}
+						<p>-
+							{{ discount }}
+							%</p>
+					{% else %}
+						<p class="italic">Vous n'avez pas de code promo</p>
+					{% endif %}
+				</div>
+				<div id="promoMessage" class="text-red-500 text-sm mt-2 hidden"></div>
+
+				<div class="flex justify-between font-bold pt-4">
+					{% if reservationExtras is not empty %}
+						<ul>
+							{% for extraData in reservationExtras %}
+								<li>
+									{{ extraData.extraName }}
+									-
+									{{ extraData.date }}
+									-
+									{{ extraData.price|number_format(2, ',', ' ') }}
+									€
+								</li>
+							{% endfor %}
+						</ul>
+						<p>Total des extras :
+							{{ totalExtraPrice|number_format(2, ',', ' ') }}
+							€</p>
+					{% endif %}
+
+					<p>Total TTC :</p>
+					<p id="totalPrice">
+						{% set finalTotal = totalPrice + totalExtraPrice %}
+						{% if promoCode %}
+							<span class="line-through decoration-red-500 mr-2 inline">{{ totalPrice|number_format(2, ',', ' ') }}
+								€</span>
+							<span class="inline">{{ finalTotal|number_format(2, ',', ' ') }}
+								€</span>
+						{% else %}
+							{{ finalTotal|number_format(2, ',', ' ') }}
+							€
+						{% endif %}
+					</p>
+				</div>
+			</div>
+
+			<div class="line mx-0"></div>
+
+			<div class="my-6">
+				<h3>Méthodes de paiement
+				</h3>
+				<div class="payment-methods px-6">
+					<div class="flex">
+						<img src="{{ asset( 'assets/img/stripe-logo.png' ) }}" alt="Stripe" class="w-1/2 mr-4"/>
+
+						<img src="{{ asset( 'assets/img/paypal.png' ) }}" alt="Stripe" class="w-1/2"/>
+					</div>
+					<p class="text-center">Paiement par carte bancaire ou Paypal</p>
+				</div>
+			</div>
+			<div class="">
+				<div class="line mx-0"></div>
+				<p class="text-center">En cliquant sur le bouton ci-dessous, j'accepte
+					<a href="{{ path('app_condition_generales_vente') }}" target="_blank" class="underline">les conditions générales de ventes</a>.
+				</p>
+				<button type="submit" class="btn-primary my-4 w-full">Demande de réservation</button>
+				{{ form_end(form) }}	
+		</div>
+		</section>
+
+		<section class="flex items-center justify-between bg-white1 sticky bottom-0 z-10 p-6 -mx-4 px-4 -mb-4 text-xl">
+			<div class="">
+				<div class="flex flex-col ">
+					<p class="font-bold">Dates</p>
+					<p>{{ arrivalDate|date("d-m-Y") }}
+						au
+					{{ departureDate|date("d-m-Y") }}</p>
+				</div>
+			</div>
+
+			<div class="flex flex-col items-end">
+				<p class="font-bold">Total :</p>
+				{% if promoCode %}
+					<div class="flex flex-row space-x-2 items-center">
+						<p class="line-through decoration-red-500 mr-2">{{ totalPrice }}
+							€</p>
+						<!-- Prix barré -->
+						<p>{{ newTotalPrice|number_format(2, ',', ' ') }}
+							€</p>
+						<!-- Nouveau prix -->
+					</div>
+				{% else %}
+					<p>{{ totalPrice|number_format(2, ',', ' ') }}€</p>
+				{% endif %}
+			</div>
+		</section>
+	</div>
+
+	{% include "_partials/_footer.html.twig" %}
+
+	{% block custom_javascripts %}
+		<script>
+		
+			document.addEventListener('DOMContentLoaded', () => {
+				const addExtraButton = document.getElementById('addExtraButton');
+					if (addExtraButton) {
+						addExtraButton.addEventListener('click', function (e) {
+						e.preventDefault();
+
+						const form = document.getElementById('extraForm');
+
+						if (! form) {
+							console.error('Formulaire d\'extra introuvable.');
+							return;
+						}
+
+					const formData = new FormData(form);
+					const date = formData.get('reservation_extra[date]'); // Récupérer la date choisie
+
+					fetch('{{ path("add_reservation_extra") }}', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+							'X-Requested-With': 'XMLHttpRequest'
+						},
+						body: JSON.stringify({date})
+						})
+						.then(response => response.json())
+						.then(data => {
+
+						if (data.success) {
+							document.getElementById('extraMessage').textContent = data.message;
+							document.getElementById('extraMessage').classList.remove('hidden');
+
+							// Mettre à jour la liste des extras
+							extrasList.innerHTML = ''; // Réinitialise la liste avant de la remplir
+								data.reservationExtras.forEach(extra => {
+									const div = document.createElement('div');
+									div.classList.add('flex', 'items-center', 'space-x-4');
+									div.setAttribute('data-extra-id', extra.extra_id);
+
+									const extraText = document.createElement('p');
+									extraText.textContent = ` - ${extra.date} - ${extra.price} €`;
+
+									const deleteButton = document.createElement('button');
+									deleteButton.classList.add('delete-extra');
+									deleteButton.setAttribute('data-extra-id', extra.extra_id);
+									deleteButton.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+
+									div.appendChild(extraText);
+									div.appendChild(deleteButton);
+									extrasList.appendChild(div);
+								});
+
+
+							// Mettre à jour le total des extras
+							const totalExtrasPriceElement = document.getElementById('totalExtrasPrice');
+							totalExtrasPriceElement.textContent = data.totalExtraPrice;
+
+							// Mettre à jour le total TTC
+							const totalPriceElement = document.getElementById('totalPrice');
+							const newTotalPrice = data.newTotalPrice;
+							totalPriceElement.textContent = `${newTotalPrice} €`;
+						} else {
+							alert(data.message || 'Erreur lors de l\'ajout de l\'extra.');
+						}
+					}).catch(error => console.error('Erreur:', error));
+				});
+			}	
+				// Gestionnaire pour supprimer un extra
+				extrasList.addEventListener('click', function (e) {
+					if (e.target.closest('.delete-extra')) {
+						const button = e.target.closest('.delete-extra');
+						const extraId = button.getAttribute('data-extra-id');
+
+						fetch('{{ path("remove_reservation_extra") }}', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+								'X-Requested-With': 'XMLHttpRequest'
+							},
+							body: JSON.stringify({ extra_id: extraId })
+						})
+							.then(response => response.json())
+							.then(data => {
+								if (data.success) {
+									document.querySelector(`div[data-extra-id="${extraId}"]`).remove();
+
+									// Mettre à jour le total des extras
+									const totalExtrasPriceElement = document.getElementById('totalExtrasPrice');
+									totalExtrasPriceElement.textContent = data.totalExtraPrice;
+
+									// Mettre à jour le total TTC
+									const totalPriceElement = document.getElementById('totalPrice');
+									const newTotalPrice = data.newTotalPrice;
+									totalPriceElement.textContent = `${newTotalPrice} €`;
+								} else {
+									alert(data.message || 'Erreur lors de la suppression de l\'extra.');
+								}
+							})
+							.catch(error => console.error('Erreur:', error));
+					}
+				});
+			});
+
+	// Ajout dynamique des villes et du pays en fonction du code postal renseigné
+
+// 	document.addEventListener("DOMContentLoaded", function() {
+//     const postalCodeInput = document.getElementById('reservation_cp');
+//     const citySelect = document.getElementById('reservation_city');
+//     const countrySelect = document.getElementById('reservation_country');
+
+// 	citySelect.addEventListener('change', function() {
+//         if (this.multiple) {
+//             this.value = this.selectedOptions[0].value; // 🔥 Prend une seule valeur
+//         }
+// 								})
+//     postalCodeInput.addEventListener('change', function() {
+//         let postalCode = this.value.trim();
+//         let country = countrySelect.value.trim(); 
+
+//         if (postalCode.length >= 4) {
+//             let url = "/api/get-cities?postalCode=" + encodeURIComponent(postalCode) + "&country=" + encodeURIComponent(country);
+
+//             fetch(url)
+//                 .then(response => response.json())
+//                 .then(data => {
+//                     citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>'; // Réinitialisation
+
+//                     if (data.error) {
+//                         alert(data.error);
+//                         return;
+//                     }
+
+//                     // Ajout des villes récupérées depuis l'API
+//                     data.cities.forEach(city => {
+//                         let option = document.createElement('option');
+//                         option.value = city;
+//                         option.textContent = city;
+//                         citySelect.appendChild(option);
+//                     });
+
+//                     // Sélectionne automatiquement la première ville
+//                     if (data.cities.length > 0) {
+//                         citySelect.value = data.cities[0];
+//                     }
+
+//                     citySelect.removeAttribute('disabled'); // Active le champ
+//                 })
+//                 .catch(error => console.error("Erreur lors de la récupération des villes :", error));
+//         } else {
+//             citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>';
+//             citySelect.setAttribute('disabled', 'disabled');
+//         }
+//     });
+// });
+
+	
+
+
+	</script>
+	{% endblock %}
+{% endblock %}

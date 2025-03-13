@@ -1,0 +1,230 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Code promo{% endblock %}
+
+{% block body %}
+
+{% include "_partials/_header.html.twig" %}
+	<section class="p-6 mt-24 mb-32 lg:p-12">
+
+        <h1>Code promo</h1>
+
+        <h3 class="my-4">Toutes les réductions actives</h3>    
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th class="text-left">Code</th>
+                    <th class="text-left">Réduction</th>
+                    <th class="text-left">Date d'expiration</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for findActiveToken in findActiveTokens %}
+                <tr>
+                    <td>{{ findActiveToken.code }}</td>
+                    <td>{{ findActiveToken.discount }} %</td>
+                    <td>{{ findActiveToken.expirationDate|date('d-m-Y') }}</td>
+                    <td>   
+                        <button onclick="openDeleteModal('{{ findActiveToken.id }}', '{{ csrf_token('delete' ~ findActiveToken.id) }}')" 
+                        class="font-bold">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                    </td>
+                </tr>
+            {% else %}
+                <tr class="my-4">
+                    <td colspan="6">Aucun code promo actif en ce moment.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="line my-8"></div>
+
+        <h3 class="my-4">Toutes les réductions inactives</h3>  
+        
+        <table class="table w-full" id="findInactiveTokens">
+            <thead>
+                <tr>
+                    <th class="text-left">Code</th>
+                    <th class="text-left">Réduction</th>
+                    <th class="text-left">Date d'expiration</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for findInactiveToken in findInactiveTokens %}
+                <tr>
+                    <td>{{ findInactiveToken.code }}</td>
+                    <td>{{ findInactiveToken.discount }} %</td>
+                    <td>{{ findInactiveToken.expirationDate|date('d-m-Y') }}</td>
+                    <td class="flex items-center">   
+                        <button onclick="openDeleteModal('{{ findInactiveToken.id }}', '{{ csrf_token('delete' ~ findInactiveToken.id) }}')" 
+                            class="font-bold">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button onclick="activateToken('{{ findInactiveToken.id }}')" 
+                            class="btn-span ml-2">
+                            Activer
+                        </button>
+                    </td>
+                </tr>
+            {% else %}
+                <tr class="my-4">
+                    <td colspan="6">Aucun code promo inactif en ce moment.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <div class="line my-8"></div>
+
+        <h3 class="my-4">Ajouter un nouveau code promo</h3>   
+            {{ form_start(form, {'attr': {'id': 'ajaxTokenForm'}}) }}
+                {{ form_widget(form) }}
+                <button type="button" id="submitAjaxForm" class="btn-primary mt-4">Enregistrer</button>
+            {{ form_end(form) }}
+
+        <div class="line my-8"></div>
+
+        <h3 class="my-4">Toutes les réductions expirées</h3>    
+        <table class="table w-full">
+            <thead>
+                <tr>
+                    <th class="text-left">Code</th>
+                    <th class="text-left">Réduction</th>
+                    <th class="text-left">Date d'expiration</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for findExpirateToken in findExpirateTokens %}
+                <tr>
+                    <td>{{ findExpirateToken.code }}</td>
+                    <td>{{ findExpirateToken.discount }} %</td>
+                    <td>{{ findExpirateToken.expirationDate|date('d-m-Y') }}</td>
+                    <td>   
+                        <a href="{{ path('app_token_delete', {id: findExpirateToken.id}) }}" 
+                            class=" font-bold"
+                            onclick="return confirm('Êtes-vous sûr de vouloir supprimer ce code promo ?');">
+                        <i class="fa-solid fa-trash-can"></i> 
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr class="my-4">
+                    <td colspan="6">Aucun code promo expiré en ce moment.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Modale de suppression -->
+        <div id="deleteTokenModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center hidden">
+            <div class="bg-white p-6 rounded-lg shadow-lg w-4/5 relative z-10">
+                <h2 class="text-xl font-bold mb-4">Confirmer la suppression</h2>
+                <p>Êtes-vous sûr de vouloir supprimer ce code promo ?</p>
+                <form id="deleteTokenForm" method="post">
+                    <!-- Ajout du jeton CSRF -->
+                    <input type="hidden" name="_token" id="csrfToken">
+                    <button type="button" onclick="closeDeleteModal()" class="btn-primary mt-4">Annuler</button>
+                    <button type="submit" class="btn-primary mt-4">Supprimer</button>
+                </form>
+            </div>
+        </div>
+</section>
+
+{% include "_partials/_footer_admin.html.twig" %}
+
+<script>
+    function activateToken(id) {
+        fetch(`activate/${id}`, {
+            method: 'POST',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Supprime la ligne du tableau des inactifs
+                const row = document.querySelector(`#findInactiveTokens tr[data-id="${tokenId}"]`);
+                if (row) {
+                    row.remove();
+                }
+
+                // Ajoute la ligne au tableau des actifs
+                const activeTable = document.querySelector('#findActiveTokens tbody');
+                const newRow = `
+                <tr data-id="${data.token.id}">
+                    <td>${data.token.code}</td>
+                    <td>${data.token.discount} %</td>
+                    <td>${data.token.expirationDate}</td>
+                    <td class="flex items-center">
+                        <button onclick="openDeleteModal('${data.token.id}', '${data.csrfToken}')" class="font-bold">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button onclick="activateToken('${data.token.id}')" class="btn-primary ml-4">
+                            Activer
+                        </button>
+                    </td>
+                </tr>
+                `;
+                activeTable.insertAdjacentHTML('beforeend', newRow);
+
+            } else {
+                alert('Une erreur est survenue.');
+            }
+        })
+        .catch(error => console.error('Erreur:', error));
+    }
+
+    document.getElementById('submitAjaxForm').addEventListener('click', function (e) {
+    e.preventDefault(); // Empêche le rechargement de la page
+
+    const form = document.getElementById('ajaxTokenForm');
+    const formData = new FormData(form);
+
+    fetch('{{ path('app_token_index') }}', { // Remplacez par la route d'ajout AJAX
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Réinitialise le formulaire
+            form.reset();
+
+            // Ajoute le token dans la section "Réductions inactives"
+            const inactiveSection = document.querySelector('#findInactiveTokens tbody');
+            const newRow = `
+                <tr data-id="${data.token.id}">
+                    <td>${data.token.code}</td>
+                    <td>${data.token.discount} %</td>
+                    <td>${data.token.expirationDate}</td>
+                    <td class="flex items-center">
+                        <button onclick="openDeleteModal('${data.token.id}', '${data.csrfToken}')" class="font-bold">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        <button onclick="activateToken('${data.token.id}')" class="btn-span ml-2">
+                            Activer
+                        </button>
+                    </td>
+                </tr>
+            `;
+            inactiveSection.insertAdjacentHTML('beforeend', newRow);
+
+        } else {
+            alert('Erreur lors de l\'ajout du code promo.');
+        }
+    })
+    .catch(error => console.error('Erreur:', error));
+});
+
+</script>
+{% endblock %}

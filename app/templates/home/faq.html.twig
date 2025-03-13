@@ -1,0 +1,211 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Foire Aux Questions{% endblock %}
+
+{% block meta_description %} {{ description }} {% endblock %}
+
+{% block body %}
+{% include "_partials/_header.html.twig" %}
+
+<div class="p-4 mb-6 mt-24 lg:p-12">
+
+    {# Fil d'Ariane #}
+    {{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+
+    <h1 class="mb-4 mt-2">Foire Aux Questions</h1>
+
+    <!-- Section FAQ -->
+    <section class="max-w-4xl mx-auto">
+        
+        <!-- Réservations -->
+        <h2 class="pl-4 mt-10 text-center"> Réservations</h2>
+        
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Comment puis-je réserver le gîte ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Pour réserver, il vous suffit de sélectionner la période souhaitée sur notre calendrier, de remplir vos informations personnelles, puis de procéder au paiement en ligne. Une fois la réservation confirmée, vous recevrez un e-mail avec les détails de votre séjour.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Est-ce que je peux modifier ma réservation après l'avoir effectuée ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Oui, vous pouvez modifier votre réservation en vous connectant à votre compte, dans la section "Mes réservations".  Vous pouvez faire une demande de modification de réservation. Vous pourrez ajuster les dates ou ajouter des services supplémentaires, sous réserve de disponibilité. Envoyer votre demande, elle sera étudiée dans les plus brefs délais.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Puis-je réserver pour une seule nuit ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> La durée minimale de séjour est de 2 nuits ou plus selon la période choisie.</p>
+        </div>
+
+        <div class="border-b py-4">
+        <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+            Comment puis-je annuler ma réservation ?
+            <span class="text-xl">+</span>
+        </button>
+        <p class="faq-answer hidden mt-2"> Pour annuler votre réservation, connectez-vous à votre compte, allez dans "Mes réservations" et cliquez sur le bouton "Annuler". Vous recevrez ensuite un e-mail de confirmation d'annulation.</p>
+    </div>
+
+        <!-- Paiements et Facturation -->
+        <h2 class="pl-4 mt-10 text-center"> Paiements et Facturation</h2>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Quels moyens de paiement acceptez-vous ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Nous acceptons les paiements par carte bancaire (Visa, MasterCard, etc.) ainsi que PayPal.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Puis-je payer en plusieurs fois ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Pour le moment, nous n'offrons pas de paiement en plusieurs fois.  Le montant total de la réservation doit être réglé lors de la réservation.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Comment puis-je télécharger ma facture ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Vous pouvez télécharger votre facture directement depuis votre compte utilisateur, dans la section "Mes réservations". Vous y trouverez un bouton pour télécharger la facture au format PDF.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Comment fonctionne le remboursement en cas d'annulation ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Si vous annulez une réservation dans les délais prévus par notre politique d'annulation (généralement 7 jours avant la date d'arrivée), vous serez remboursé intégralement. Passé ce délai, vous serez facturé pour la totalité du séjour.</p>
+        </div>
+
+        <!-- Services et Équipements -->
+        <h2 class="pl-4 mt-10 text-center"> Services et Équipements</h2>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Le gîte est-il équipé de Wi-Fi ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Oui, le gîte est équipé d'une connexion Wi-Fi gratuite. Les informations de connexion sont disponible directement dans le logement.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Est-ce que le linge de lit et les serviettes sont fournis ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Oui, le linge de lit et les serviettes sont fournis dans le gîte.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Puis-je demander des services supplémentaires, comme un lit bébé ou une chaise haute?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Oui, vous pouvez demander des équipements supplémentaires comme un lit bébé, ou une chaise haute sans supplément. Veilliez simplement le notifié au moment de la réservation.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Le gîte est-il accessible aux personnes à mobilité réduite ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2">Malheureusement le gîte n’est pas adapté aux personnes à mobilité réduite.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Puis-je apporter des animaux de compagnie ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2">Nous comprenons que vos animaux de compagnie font partie de la famille, mais malheureusement, notre gîte n’est pas adapté pour accueillir des animaux.</p>
+        </div>
+
+        <!-- Sécurité et Conditions -->
+        <h2 class="pl-4 mt-10 text-center"> Sécurité et Conditions</h2>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Le site est-il sécurisé pour les paiements en ligne ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Oui, notre site utilise un système de paiement sécurisé (SSL) pour garantir la protection de vos informations de paiement. Nous utilisons également un prestataire de paiement de confiance pour traiter vos transactions.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                 Que faire en cas de problème avec ma réservation ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Si vous rencontrez un problème avec votre réservation (par exemple, un problème de paiement ou une question sur la disponibilité), contactez-nous  via le formulaire de contact ou par e-mail. Nous sommes là pour vous aider.</p>
+        </div>
+
+        <!-- Avis et évaluations -->
+        <h2 class="pl-4 mt-10 text-center">Avis et évaluations</h2>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Comment puis-je laisser un avis sur un gîte après mon séjour ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2">Après votre séjour, vous recevrez un e-mail vous invitant à laisser un avis. Vous pouvez évaluer le gîte en ajoutant une note et un commentaire. Nous apprécions vos retours pour améliorer nos services.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Les avis sont-ils vérifiés ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2">Oui, tous les avis laissés sur notre site sont vérifiés pour garantir leur authenticité. Les avis sont publiés une fois que le séjour a été effectué et que l’avis a été confirmé.</p>
+        </div>
+
+        <!-- Compte et authentification -->
+        <h2 class="pl-4 mt-10 text-center">Compte et authentification</h2>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                Dois-je créer un compte pour réserver le gîte ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2"> Oui, la création d'un compte est obligatoire pour effectuer une réservation. Cela nous permet de vous offrir une expérience plus personnalisée, de suivre vos réservations et de vous envoyer toutes les informations nécessaires concernant votre séjour. La création de votre compte est rapide et vous pourrez également accéder à toutes vos réservations et à votre historique facilement.</p>
+        </div>
+
+        <div class="border-b py-4">
+            <button class="faq-question w-full text-left font-semibold text-lg flex justify-between items-center" onclick="toggleFaq(this)">
+                J'ai oublié mon mot de passe, comment puis-je le réinitialiser ?
+                <span class="text-xl">+</span>
+            </button>
+            <p class="faq-answer hidden mt-2">Si vous avez oublié votre mot de passe, cliquez sur "Mot de passe oublié" sur la page de connexion. Un lien de réinitialisation vous sera envoyé par e-mail.</p>
+        </div>
+        
+    </section>
+</div>
+
+{% include "_partials/_footer.html.twig" %}
+
+<!-- Effet accordéon -->
+<script>
+    function toggleFaq(element) {
+        const answer = element.nextElementSibling;
+        const icon = element.querySelector('span');
+
+        if (answer.classList.contains('hidden')) {
+            answer.classList.remove('hidden');
+            icon.textContent = '-';
+        } else {
+            answer.classList.add('hidden');
+            icon.textContent = '+';
+        }
+    }
+</script>
+
+{% endblock %}

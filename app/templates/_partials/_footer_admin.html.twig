@@ -1,0 +1,54 @@
+<footer class="fixed bottom-0 left-0 w-full z-50 p-8 text-xl font-light" style="background-image: url('/assets/img/fond-banner.jpg'); background-size: cover; background-position: center;">
+	<nav>
+		<ul class="flex justify-around">
+		<li>
+			<a href="{{ path('admin_dashboard') }}" 
+			   class="flex flex-col justify-center items-center hover:text-terracota1 transition duration-300 group 
+			   {% if app.request.get('_route') == 'admin_dashboard' %} text-terracota1 font-normal {% endif %}" 
+			   aria-current="{% if app.request.get('_route') == 'admin_dashboard' %}page{% endif %}">
+			   
+				<p>
+					<i class="fa-solid fa-house text-inherit 
+							  group-hover:text-terracota1 
+							  {% if app.request.get('_route') == 'admin_dashboard' %} text-terracota1 {% endif %}">
+					</i>
+				</p>
+				<p class="text-inherit 
+						  group-hover:text-terracota1 
+						  {% if app.request.get('_route') == 'admin_dashboard' %} text-terracota1 {% endif %}">
+					Accueil
+				</p>
+			</a>
+		</li>
+		
+
+			<li>
+				<a href="{{ path('admin_calendar') }}" class="flex flex-col justify-center items-center hover:text-terracota1 transition duration-300 group">
+					<p>
+						<i class="fa-solid fa-calendar-days"></i>
+					</p>
+					<p>Calendrier</p>
+				</a>
+			</li>
+			<li>
+				<a href="{{ path('admin_gite') }}" class="flex flex-col justify-center items-center hover:text-terracota1 transition duration-300 group">
+					<p>
+						<i class="fa-regular fa-pen-to-square"></i>
+					</p>
+					<p>Gite</p>
+				</a>
+			</li>
+			<li>
+				<a href="{{ path('admin_menu') }}" class="flex flex-col justify-center items-center hover:text-terracota1 transition duration-300 group">
+					<p><i class="fa-solid fa-bars"></i></p>
+					<p>Menu</p>
+				</a>
+			</li>
+
+
+		</ul>
+
+	</nav>
+
+
+</div></footer>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation de réservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color:#504f4b;            
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .invoiceLogo {
+            width: 200px; 
+        }
+
+        .signature {
+            display: flex;
+            align-items: center;
+        }  
+
+        .signature-p {
+            color: #85634d;
+            font-weight: 600;
+            margin-left: 30px;
+        }
+
+        .btn-invoice {
+            height: 60px;
+            width: 200px;
+            border-radius: 5px;
+            background:linear-gradient(to bottom, #85634d, #b58869);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-align: center;
+            border: none;
+        }
+
+        .btn-invoice a {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Confirmation de réservation</h1>
+        <p>Bonjour {{ reservation.firstName }} {{ reservation.lastName }},</p>
+        <p>Nous sommes ravis de vous confirmer votre réservation dans notre gîte de charme à Orbey en Alsace.</p>
+        <p>Voici un récapitulatif de votre réservation :</p>
+        <ul>
+            <li>Date d'arrivée : {{ reservation.arrivalDate|date('d-m-Y') }} (arrivée à partir de 17H00)</li>
+            <li>Date de départ : {{ reservation.departureDate|date('d-m-Y') }} (départ à 11H00 maximun)</li>
+            <li>Nombre d'adultes : {{ reservation.numberAdult }}</li>
+            <li>Nombre d'enfants : {{ reservation.numberKid }}</li>
+            <li>Montant total : {{ reservation.totalPrice }} €</li>
+        </ul>
+        <p>Merci de votre confiance. Nous sommes impatients de vous accueillir!</p>
+        <p>N'hésitez pas à nous contacter pour tout autre renseignement.</p>
+        <div class="signature">
+            <figure>
+                <img src="{{ logo }}" alt="logo" class="invoiceLogo"> 
+            </figure>
+            <p class="signature-p">Cordialement,<br>
+            L'équipe du Gîte Rain du Pair</p>
+        </div>
+        <br>
+        <button class="btn-invoice"> 
+            <a href="data:application/pdf;base64,{{ pdfBase64 }}" download="FACTURE.pdf">Télécharger votre facture</a>
+        </button>
+    </div>
+    
+</body>
+</html>

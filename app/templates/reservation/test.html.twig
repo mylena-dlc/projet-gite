@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Facture de Réservation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            line-height: 10px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .invoiceLogo {
+            width: 120px; 
+        }
+
+        .giteInfo {
+            background-color: #fcf7f1;
+            padding: 10px;
+            border-radius: 30px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            width: 70%;
+        }
+
+        .customerInfo {
+            display: flex;
+            justify-content: flex-end; 
+        }
+
+        .title {
+            margin-bottom: 20px; 
+        }
+    
+        .textEnd {
+            text-align: center;
+            color: rgb(181, 136, 105);
+            margin-top: 50px;
+        }
+        .details-section {
+            margin: 20px 100px 0 100px;
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .details-section .row:last-child {
+            border-bottom: none; 
+        }
+
+        .details-section .label {
+            font-weight: bold;
+        }
+
+        .details-section .value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #c76c57;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+
+        <div class="giteInfo"> 
+            <figure>
+                                {# <img src="{{ logo }}" alt="logo" class="invoiceLogo">  #}
+               <p> test logo</p> 
+            </figure>
+            <div>
+                <p>{{ gite.name }}</p>
+                <p>{{ gite.address }}</p>
+                <p>{{ gite.cp }} {{ gite.city }}</p>
+                <p>contact@leraindupair.fr</p>
+            </div>
+        </div>
+
+        <div class="customerInfo">
+            <p> {{ reservation.lastName }} {{ reservation.firstName }}</p>
+            <p>Adresse: {{ reservation.address }} {{ reservation.cp }} {{ reservation.country }}</p>
+            <p>Téléphone: {{ reservation.phone }}</p>
+            <p>Email: {{ reservation.user.email }}</p>
+        </div>
+    </div>
+
+    <div class="title">
+        <h1>FACTURE</h1>
+            <div class="info-resa">
+                <p>Référence : {{ reservation.reference }}</p>
+                <p>Réservation effectuée le {{ reservation.reservationDate|date('d-m-Y')  }} </p>
+                <p>Séjour de {{ reservation.totalNight }} nuit(s) pour {{ reservation.numberAdult }} adulte(s) 
+                {% if reservation.numberKid > 1 %}
+                    et {{ reservation.numberKid }} enfant(s)
+                {% endif %}
+                <p> Du {{ reservation.arrivalDate|date('d-m-Y') }} au {{ reservation.departureDate|date('d-m-Y') }} </p>
+            </div>
+    </div>
+
+<h2>Détails du prix</h2>
+    <div class="details-section">
+        <div class="row">
+            <span class="label">{{ reservation.priceNight|number_format(2, ',', ' ') }} € x {{ reservation.totalNight }} nuits </span>
+            <span class="value">{{ (reservation.priceNight * reservation.totalNight)|number_format(2, ',', ' ') }} €</span>
+        </div>
+        <div class="row">
+            <span class="label">Supplément</span>
+            <span class="value">{{ reservation.supplement|number_format(2, ',', ' ') }} €</span>
+        </div>
+        <div class="row">
+            <span class="label">Frais de ménage</span>
+            <span class="value">{{ reservation.cleaningCharge|number_format(2, ',', ' ') }} €</span>
+        </div>
+        <div class="row">
+            <span class="label">Taxes de séjour</span>
+            <span class="value">{{ reservation.tourismTax|number_format(2, ',', ' ') }} €</span>
+        </div>
+        <div class="row">
+            <span class="label">TVA (20%)</span>
+            <span class="value">{{ reservation.tva|number_format(2, ',', ' ') }} €</span>
+        </div>
+    </div>
+
+    <div class="total">
+        Montant total : {{ reservation.totalPrice|number_format(2, ',', ' ') }} € TTC
+    </div>
+
+    <p class="textEnd">Nous vous remercions de votre confiance.</p>
+</body>
+</html>

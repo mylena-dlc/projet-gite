@@ -1,0 +1,116 @@
+<header>
+	<nav id="header" class="bg-gray-100 fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase shadow-sm" style="background-image: url('/assets/img/fond-banner.webp');">
+		<div class="p-2 flex items-center justify-between flex-wrap " id="header-nav">
+			 <div id="logo-container" class="w-32 ml-4 sm:w-36 md:w-40 lg:w-44 xl:w-48 transition-all duration-300">
+				<figure id="logo">
+					<a href="{{ path('app_home') }}">
+						<img src="{{ asset('assets/img/logo-gite-rain-du-pair.png') }}" alt="Logo gîte du Rain du pair"/>
+					</a>
+				</figure>
+		 	</div>
+
+			<div id="menu-burger" class="lg:hidden">
+				<button data-collapse-toggle="#main-nav">
+					<svg class="w-7 h-7 mr-4 text-gray1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 17 14">
+						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
+					</svg>
+				</button>
+			</div>
+
+			<div class="w-full hidden lg:block lg:w-max" id="main-nav">
+				<ul class="bg-gray-50 font-medium p-6 lg:p-0 border border-gray-200 flex flex-col lg:flex-row lg:bg-transparent lg:border-0 lg:mt-0">
+					<li class="nav-item">
+						<a href="https://www.instagram.com/giteraindupair/" target="_blank" class="text-xl hover:text-[var(--color1)]">
+							<i class="fa-brands fa-instagram pr-2"></i>
+						</a>
+						<a href="https://www.facebook.com/profile.php?id=61555292307736" target="_blank" class="text-xl hover:text-[var(--color1)]">
+							<i class="fa-brands fa-facebook"></i>
+						</a>
+					</li>
+
+					<li class="nav-item">
+						<a href="{{ path('app_search_reservation', { 'slug': 'recherche-reservation' }) }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+							Réservation
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ path('app_galery') }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+							Galerie
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ path('app_activity') }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+							Aux alentours
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ path('app_faq') }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+							FAQ
+						</a>
+					</li>
+					<li class="nav-item">
+						<a href="{{ path('app_contact') }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+							Contact
+						</a>
+					</li>
+					{% if app.user %}
+					<li class="nav-item">
+						<a href="{{ path('app_profil', {'id': app.user.id}) }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+							Mon profil
+						</a>
+					</li>
+						{% if is_granted('ROLE_ADMIN') %}
+						<li class="nav-item">
+							<a href="{{ path('admin_dashboard') }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+								Tableau de bord
+							</a>
+						</li>
+						{% endif %} 
+
+						{% else %}
+						<li class="nav-item">
+							<a href="{{ path('app_login') }}" class="relative after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1px] after:bg-gray1 after:transition-all after:duration-500 hover:after:w-full">
+								Compte
+							</a>
+						</li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+	</nav>
+</header>
+{% block custom_javascripts %}
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const header = document.getElementById("header");
+		const logo = document.getElementById("logo");
+		const logoContainer = document.getElementById("logo-container");
+		const headerNav = document.getElementById('header-nav');
+		const burger = document.getElementById('menu-burger');
+
+		window.addEventListener("scroll", function () {
+			if (window.scrollY > 100) { 
+				// Version mobile
+				header.classList.add("h-10");
+				logo.style.display = "none";
+				logoContainer.style.width = "0"; 
+				headerNav.classList.remove("p-2");
+				headerNav.classList.add("lg:justify-center");
+				headerNav.classList.remove("lg:justify-between");
+				burger.classList.add("mt-2");
+			} else {
+				// Version desktop
+				header.classList.remove("h-10");
+				header.classList.add("pt-2");
+				logo.style.display = "block";
+				logoContainer.style.width = "10rem"; 
+				headerNav.classList.add("p-2");
+				headerNav.classList.add("lg:justify-between");
+				headerNav.classList.remove("lg:justify-center");
+				burger.classList.remove("mt-2");
+			}
+		});
+	});
+</script>
+
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte
+{% endblock %}
+
+{% block body %}
+
+	{% include "_partials/_header.html.twig" %}
+
+	<section class="p-6 mb-32 mt-24 lg:p-12">
+
+		<h1 class="mb-6">Bienvenue sur votre profil</h1>
+		<h2 class="mb-6">mon compte</h2>
+
+		{% if app.user.googleId is null %}
+
+			<div class="mb-6 lg:w1/2">
+				<p class="font-bold text-lg mb-4">Mettre à jour mon email</p>
+				<p>Actuellement vous êtes connecté avec cette adresse :</p>
+				<p class="font-bold mb-4">{{ app.user.email }}</p>
+
+				{{ form_start(emailForm) }}
+				{{ form_row(emailForm.email) }}
+				<button type="submit" class="btn-secondary m-0 mt-4">Enregister</button>
+
+				{{ form_end(emailForm) }}
+			</div>
+			<div class="line"></div>
+
+			<div class="lg:w1/2">
+				<p class="font-bold text-lg mb-4">Changer mon mot de passe</p>
+				{{ form_start(passwordForm) }}
+
+				<div class="relative flex items-center">
+					{{ form_row(passwordForm.currentPassword, {'attr': {'class': 'mt-2 pr-10 pl-3 border rounded-lg w-full input-password'}}) }}
+					<button type="button" class="absolute right-0 bottom-2 flex items-center justify-center w-6 h-6" onclick="togglePassword()">
+						<span id="eye-icon-container">
+							<i id="eye-icon" class="fa-solid fa-eye text-gray-500 cursor-pointer w-5 h-5 flex items-center justify-center pt-1"></i>
+						</span>
+					</button>
+				</div>
+
+				<div class="relative flex items-center">
+					{{ form_row(passwordForm.newPassword, {'attr': {'class': 'mt-2 pr-10 pl-3 border rounded-lg w-full input-new-password'}}) }}
+					<button type="button" class="absolute right-0 bottom-2 flex items-center justify-center w-6 h-6" onclick="toggleNewPassword()">
+						<span id="eye-icon-container">
+							<i id="eye-icon-new" class="fa-solid fa-eye text-gray-500 cursor-pointer w-5 h-5 flex items-center justify-center"></i>
+						</span>
+					</button>
+				</div>
+
+				<button type="submit" class="btn-secondary m-0 mt-4 w-auto">Changer le mot de passe</button>
+				{{ form_end(passwordForm) }}
+			</div>
+		{% endif %}
+
+		<div class="line my-8"></div>
+
+		<div class="flex flex-col justify-between my-4 lg:w1/2">
+			<a href="{{ path('app_logout') }}" class="btn-primary w-full">
+				<i class="fa-solid fa-power-off"></i>
+				déconnexion
+			</a>
+			<a href="{{ path('delete_account', {'id': app.user.id}) }}" class="mt-6 text-center">
+				<i class="fa-solid fa-trash-can"></i>
+				Supprimer mon compte
+			</a>
+		</div>
+	</section>
+
+	{% include "_partials/_footer_user.html.twig" %}
+
+	{% block custom_javascripts %}
+		<script>
+			function togglePassword() {
+				const passwordInput = document.querySelector('.input-password');
+				const eyeIcon = document.getElementById('eye-icon');
+				if (passwordInput.type === "password") {
+					passwordInput.type = "text";
+					eyeIcon.classList.remove("fa-eye");
+					eyeIcon.classList.add("fa-eye-slash");
+				} else {
+					passwordInput.type = "password";
+					eyeIcon.classList.remove("fa-eye-slash");
+					eyeIcon.classList.add("fa-eye");
+				}
+			}
+
+			function toggleNewPassword() {
+				const passwordInput = document.querySelector('.input-new-password');
+				const eyeIcon = document.getElementById('eye-icon-new');
+				if (passwordInput.type === "password") {
+					passwordInput.type = "text";
+					eyeIcon.classList.remove("fa-eye");
+					eyeIcon.classList.add("fa-eye-slash");
+				} else {
+					passwordInput.type = "password";
+					eyeIcon.classList.remove("fa-eye-slash");
+					eyeIcon.classList.add("fa-eye");
+				}
+			}
+		</script>
+	{% endblock %}
+{% endblock %}

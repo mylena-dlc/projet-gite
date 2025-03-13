@@ -1,0 +1,59 @@
+<footer class="relative flex flex-col items-center justify-center bg-gray1 text-white1 p-6 text-lg w-full lg:px-44">
+
+    <div class="absolute top-0 left-0 w-full h-full z-0" 
+        style="background-image: url('/assets/img/fond.jpg'); background-size: cover; background-position: center; opacity: 0.3;">
+    </div>
+
+    <div class="relative z-10 flex flex-col justify-center items-center w-full">
+        <div class="flex flex-col items-center lg:flex-row lg:justify-between lg:items-center lg:w-full p-4">
+            <figure class="max-w-xs lg:w-80 flex justify-center lg:justify-start">
+                <img src="{{ asset( 'assets/img/logo-blanc.png' ) }}" 
+                     alt="Logo du gîte du Rain du Pair à Orbey sur les hauteurs alsaciennes" class=""/>
+            </figure>
+
+            <div class="flex flex-col items-center lg:items-end p-6 text-xl tracking-wider font-thin">
+                <p class="mb-4">
+                    <i class="fa-solid fa-envelope pr-2"></i>
+                    <a href="mailto:contact@giteraindupair.fr" target="_blank">
+                        contact@giteraindupair.fr
+                    </a>
+                </p>
+                <p>
+                    <i class="fa-solid fa-phone pr-2"></i>
+                    <a href="tel:0636296222">06 36 29 62 22</a>
+                </p>
+                <p class="pt-4">
+                    <a href="https://www.instagram.com/giteraindupair/" target="_blank">
+                        <i class="fa-brands fa-instagram pr-2"></i>
+                    </a>
+                    <a href="https://www.facebook.com/profile.php?id=61555292307736" target="_blank">
+                        <i class="fa-brands fa-facebook"></i>
+                    </a>
+                </p>
+            </div>
+        </div>
+
+        <div class="line_footer"></div>
+
+        <div class="flex flex-col items-center py-4 lg:flex-row lg:justify-between lg:items-start lg:w-full">
+            <div class="flex flex-col items-center lg:items-start lg:w-1/2">
+                <p>
+                    <a href="{{ path('app_condition_generales_vente') }}">Conditions générales de vente</a>
+                </p>
+                <p>
+                    <a href="{{ path('app_politique_confidentialite') }}">Politique de confidentialité</a>
+                </p>
+                <p>
+                    <a href="{{ path('app_mentions_legales') }}">Mentions légales</a>
+                </p>
+            </div>
+
+            <div class="flex flex-col items-center lg:items-end lg:w-1/2 mt-4 lg:mt-0 ">
+                <p>
+                    <a href="{{ path('app_sitemap') }}">Plan du site</a>
+                </p>
+                <p class="text-center lg:text-right">&copy; 2025 Gîte du Rain du Pair - Tous droits réservés.</p>
+            </div>
+        </div>
+    </div>
+</footer>

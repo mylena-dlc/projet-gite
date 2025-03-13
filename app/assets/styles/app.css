@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+      @apply font-catamaran text-gray1 min-h-screen;
+    }
+
+    h1, h2 {
+      @apply text-2xl font-light uppercase tracking-widest;
+    }
+
+    h3 {
+      @apply text-lg font-semibold uppercase tracking-widest pb-1;
+    }
+    
+    input {
+      @apply bg-white1 rounded-xl w-3/4 p-2 block;
+      outline: none; 
+      border: 1px solid var(--terracota1); 
+    }
+
+    input:focus, textarea:focus {
+      --tw-ring-color:var(--terracota1); 
+      --tw-ring-offset-width: 2px; 
+    }
+
+    ul {
+      display: inline-flex;
+    }
+  
+  }
+  
+
+  @layer components {
+    .btn-primary {
+      @apply w-1/2 m-auto block text-lg font-normal bg-terracota1 text-white1 font-catamaran rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+      @apply md:w-1/3 lg:w-1/4;
+    }
+
+    .btn-secondary {
+      @apply w-3/12 m-auto block text-sm font-normal bg-terracota1 text-white1 font-catamaran rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+    }
+
+    .btn-span {
+      @apply bg-terracota1 text-white1 font-catamaran rounded-xl;
+    }
+
+    .line {
+        @apply m-4;
+        border-top: 1px solid #504F4B;
+        opacity: 0.3;
+    }
+
+    .line_footer {
+      @apply m-2 w-full;
+        border-top: 1px solid #fcf7f1;
+        opacity: 0.5;
+    }
+
+    .container {
+        @apply mx-4 my-8;
+    }
+
+    input:focus {
+        border-color: var(--terracota1);
+        box-shadow: 0 0 4px var(--terracota1); 
+    }
+
+    .fc .fc-toolbar-title {
+      font-size: 1em !important;
+    }
+
+    .fc-today-button{
+      display: none !important;
+    }
+
+    #addCategory label  {
+      margin-right: 5px;
+    }
+
+    .fc .fc-daygrid-day.fc-day-today {
+      background-color: hsla(0,0%,82%,.3) !important; 
+    }
+
+    #reservation_payment_method_0 {
+      width: 5%;
+    }
+
+    .splide__arrow {
+      background: #b58869 !important;
+    }
+
+    .splide__arrow svg {
+      fill: white !important;
+    }
+
+    .carousel-gite .f-button {
+      background-color: #b58869 !important;
+      opacity: 0.7;
+      border-radius: 50%;
+    }
+
+    .carousel-gite .f-button:hover {
+      background-color: rgb(181, 136, 105) !important;
+    }
+
+    .carousel-gite .f-button svg {
+      stroke: white;
+    }
+
+    .splide__pagination__page.is-active {
+      background: #b58869 !important;
+    }
+
+    iframe {
+      margin: auto;
+    }
+
+    .leaflet-popup-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .fond-home {
+      height: 40%;
+    }
+
+    .fc .fc-button-primary,
+    .fc .fc-button-primary:hover {
+      background-color: #b58869 !important;
+      border-color: #b58869 !important;
+    }
+
+    .fc .fc-button-primary:disabled {
+      background-color: #85634d !important;
+      border-color: #85634d !important;
+    }
+
+    .fc .fc-highlight {
+      background: #a9b4a4 !important;
+    }
+
+    .custom-focus-ring:focus {
+      --tw-ring-color: #85634d !important; 
+    }
+
+    .f-button {
+      background: var(--terracota1);
+      border-radius: 50%;
+    }
+
+    .input-required {
+      position: relative; 
+    }
+
+    .input-required:after {
+      content: "*";
+      position: absolute;
+      top: 0;
+      right: -10px; 
+      font-size: 1.2em; 
+    }
+
+    #header {
+      font-size: clamp(0.8rem, 2vw, 1rem);
+    }
+
+    #main-nav ul {
+      gap: clamp(0.5rem, 2vw, 2rem);
+    }
+
+    .jq-ry-container {
+      padding: 0;
+    }
+
+    .sweet-candy {
+      opacity: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 0;
+      width: 0;
+      z-index: -1;
+    }
+
+    @media (min-width: 1024px) { 
+      .fond-home {
+        height: 100%;
+        width: 30% !important; 
+      }
+      .fond-home::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 80%);
+        pointer-events: none; 
+      }
+      p {
+        @apply text-lg;
+      }
+      .splide__arrow--prev {
+        left: -3rem;
+      }
+
+      .splide__arrow--next {
+        right: -3rem;
+      }
+  }
+    
+
+    
+
+}

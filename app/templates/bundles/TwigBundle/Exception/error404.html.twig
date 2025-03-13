@@ -1,0 +1,20 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page non trouvée{% endblock %}
+
+{% block body %}
+
+{% include "_partials/_header.html.twig" %}
+
+<div class="p-4 flex flex-col justify-center items-center">
+    <h1>Page non trouvée</h1>
+    <p>La page que vous recherchez n'a pas été trouvée.</p>
+
+    <a href="{{ path('app_home') }}" class="btn-primary my-4">Retour à l'accueil</a>
+</div>
+
+    {% include "_partials/_footer.html.twig" %}
+
+    
+{% endblock %}                                          
+                                                    

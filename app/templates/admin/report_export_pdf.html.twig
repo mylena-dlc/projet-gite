@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rapport de revenus</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+        }
+
+        header p {
+            text-align: right;
+            line-height: 10px;
+        }
+
+        h1, h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 40px;
+        }
+
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #f4f4f4;
+            font-weight: bold;
+        }
+
+        .table td.amount {
+            text-align: right;
+            font-weight: bold;
+            color: #c76c57;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+        }
+
+        .stats .box {
+            width: 48%;
+            background-color: #f9f9f9;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+        .stats .box p {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+
+        .stats .box .value {
+            font-size: 24px;
+            color: #c76c57;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <p>Gîte du Rain du Pair</p>
+        <p> 224 Rain du Pair</p>
+        <p>68370 Orbey</p>
+    </div>
+
+    <h1>Rapport de Revenus</h1>
+
+    <h2>{{ month }} {{ year }}</h2>
+
+    <table class="table">
+        <tr>
+            <th>Type</th>
+            <th>Montant</th>
+        </tr>
+        <tr>
+            <td>Revenus bruts</td>
+            <td class="amount">{{ totalHT }} €</td>
+        </tr>
+        <tr>
+            <td>TVA (20%)</td>
+            <td class="amount">{{ totalTVA }} €</td>
+        </tr>
+        <tr>
+            <td>Taxe de séjour</td>
+            <td class="amount">{{ totalTourismTax }} €</td>
+        </tr>
+        <tr>
+            <td><strong>Total TTC</strong></td>
+            <td class="amount"><strong>{{ totalTTC }} €</strong></td>
+        </tr>
+    </table>
+
+    <h2>Statistiques de Performances</h2>
+    <div class="stats">
+        <div class="box">
+            <p><strong>Nuits réservées</strong></p>
+            <p class="value">{{ totalNights }}</p>
+        </div>
+        <div class="box">
+            <p><strong>Durée moyenne du séjour</strong></p>
+            <p class="value">{{ averageStayDuration }} nuits</p>
+        </div>
+        <div class="box">
+            <p><strong>Nombres de réservations</strong></p>
+            <p class="value">{{ totalReservations }} réservations</p>
+        </div>
+    </div>
+
+</body>
+</html>
