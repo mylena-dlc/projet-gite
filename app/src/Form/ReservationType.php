@@ -3,10 +3,13 @@
 namespace App\Form;
 
 use App\Entity\Reservation;
+use Psr\Log\LoggerInterface;
+use App\Service\LocationService;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use App\Form\FormExtension\HoneyPotType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints\Regex;
 use Symfony\Component\Validator\Constraints\IsTrue;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -21,6 +24,14 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 class ReservationType extends HoneyPotType
 {
 
+    private LocationService $locationService;
+
+    public function __construct(LocationService $locationService, LoggerInterface $honeyPotLogger, RequestStack $requestStack)
+    {
+        parent::__construct($honeyPotLogger, $requestStack);
+        $this->locationService = $locationService;
+    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         parent::buildForm($builder, $options);
@@ -44,25 +55,25 @@ class ReservationType extends HoneyPotType
                     new NotBlank(['message' => 'Veuillez entrer un code postal.']),
                 ]
             ])
-            // ->add('city', ChoiceType::class, [
-            //     'label' => 'Ville',
-            //     "required" => true,
-            //     'placeholder' => 'Sélectionnez une ville',
-            //     'choices' => array_combine($options['available_cities'], $options['available_cities']), // 🔥 Passe les villes
-            //     'attr' => [
-            //         'class' => 'js-city-select', 
-            //         'id' => 'reservation_city'
-            //     ],
-            //     'invalid_message' => 'Veuillez sélectionner une ville valide probleme form.',
-            // ])
-            ->add('city', TextType::class, [
+            ->add('city', ChoiceType::class, [
                 'label' => 'Ville',
                 "required" => true,
-                // 'attr' => [
-                //     'class' => 'js-city-select', 
-                //     'id' => 'reservation_city'
-                // ],
+                'placeholder' => 'Sélectionnez une ville',
+                'choices' => array_combine($options['available_cities'], $options['available_cities']), // Passe les villes
+                'attr' => [
+                    'class' => 'js-city-select', 
+                    'id' => 'reservation_city'
+                ],
+                'invalid_message' => 'Veuillez sélectionner une ville valide probleme form.',
             ])
+            // ->add('city', TextType::class, [
+            //     'label' => 'Ville',
+            //     "required" => true,
+            //     // 'attr' => [
+            //     //     'class' => 'js-city-select', 
+            //     //     'id' => 'reservation_city'
+            //     // ],
+            // ])
             ->add('country', CountryType::class, [
                 'label' => 'Pays',
                 "required" => true,
@@ -98,15 +109,37 @@ class ReservationType extends HoneyPotType
                     ]),
                 ],
             ]);
-             // Ajout du PRE_SUBMIT 
-            // $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
-            //     $data = $event->getData();
-            //     if (isset($data['city']) && is_array($data['city'])) {
-            //         $data['city'] = reset($data['city']); // Prend la première valeur si c'est un tableau
-            //     }
-            //     $event->setData($data);
-            // });
+
+            // Ajout d'un écouteur d'événement pour mettre à jour `city` dynamiquement
+            $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+                $data = $event->getData();  // Récupère les données soumises par le formulaire
+                $form = $event->getForm();
+
+                if (!isset($data['cp']) || empty($data['cp'])) {
+                    return;
                 }
+
+                // Récupération dynamique des villes via l'API
+                $locationData = $this->locationService->getLocationData($data['cp'], $data['country'] ?? 'FR');
+
+                if (isset($locationData['cities']) && !empty($locationData['cities'])) {
+                    $availableCities = array_combine($locationData['cities'], $locationData['cities']);
+                } else {
+                    $availableCities = [];
+                }
+
+                // Mise à jour dynamique du champ `city` AVANT la validation
+                $form->add('city', ChoiceType::class, [
+                    'label' => 'Ville',
+                    'required' => true,
+                    'placeholder' => 'Sélectionnez une ville',
+                    'choices' => $availableCities,
+                    'attr' => ['id' => 'reservation_city'],
+                    'invalid_message' => 'Veuillez sélectionner une ville valide.',
+                ]);
+            });
+
+        }
 
     public function configureOptions(OptionsResolver $resolver): void
     {

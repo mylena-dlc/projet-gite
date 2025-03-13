@@ -361,55 +361,55 @@
 
 	// Ajout dynamique des villes et du pays en fonction du code postal renseigné
 
-// 	document.addEventListener("DOMContentLoaded", function() {
-//     const postalCodeInput = document.getElementById('reservation_cp');
-//     const citySelect = document.getElementById('reservation_city');
-//     const countrySelect = document.getElementById('reservation_country');
+ 	document.addEventListener("DOMContentLoaded", function() {
+     const postalCodeInput = document.getElementById('reservation_cp');
+     const citySelect = document.getElementById('reservation_city');
+     const countrySelect = document.getElementById('reservation_country');
 
-// 	citySelect.addEventListener('change', function() {
-//         if (this.multiple) {
-//             this.value = this.selectedOptions[0].value; // 🔥 Prend une seule valeur
-//         }
-// 								})
-//     postalCodeInput.addEventListener('change', function() {
-//         let postalCode = this.value.trim();
-//         let country = countrySelect.value.trim(); 
+ 	citySelect.addEventListener('change', function() {
+         if (this.multiple) {
+             this.value = this.selectedOptions[0].value;   //Prend une seule valeur
+         }
+ 								})
+     postalCodeInput.addEventListener('change', function() {
+         let postalCode = this.value.trim();
+         let country = countrySelect.value.trim(); 
 
-//         if (postalCode.length >= 4) {
-//             let url = "/api/get-cities?postalCode=" + encodeURIComponent(postalCode) + "&country=" + encodeURIComponent(country);
+         if (postalCode.length >= 4) {
+             let url = "/api/get-cities?postalCode=" + encodeURIComponent(postalCode) + "&country=" + encodeURIComponent(country);
 
-//             fetch(url)
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>'; // Réinitialisation
+             fetch(url)
+                 .then(response => response.json())
+                 .then(data => {
+                     citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>'; // Réinitialisation
 
-//                     if (data.error) {
-//                         alert(data.error);
-//                         return;
-//                     }
+                     if (data.error) {
+                         alert(data.error);
+                         return;
+                     }
 
-//                     // Ajout des villes récupérées depuis l'API
-//                     data.cities.forEach(city => {
-//                         let option = document.createElement('option');
-//                         option.value = city;
-//                         option.textContent = city;
-//                         citySelect.appendChild(option);
-//                     });
+                      //Ajout des villes récupérées depuis l'API
+                     data.cities.forEach(city => {
+                         let option = document.createElement('option');
+                         option.value = city;
+                         option.textContent = city;
+                         citySelect.appendChild(option);
+                     });
 
-//                     // Sélectionne automatiquement la première ville
-//                     if (data.cities.length > 0) {
-//                         citySelect.value = data.cities[0];
-//                     }
+                      //Sélectionne automatiquement la première ville
+                     if (data.cities.length > 0) {
+                         citySelect.value = data.cities[0];
+                     }
 
-//                     citySelect.removeAttribute('disabled'); // Active le champ
-//                 })
-//                 .catch(error => console.error("Erreur lors de la récupération des villes :", error));
-//         } else {
-//             citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>';
-//             citySelect.setAttribute('disabled', 'disabled');
-//         }
-//     });
-// });
+                     citySelect.removeAttribute('disabled'); // Active le champ
+                 })
+                 .catch(error => console.error("Erreur lors de la récupération des villes :", error));
+         } else {
+             citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>';
+             citySelect.setAttribute('disabled', 'disabled');
+         }
+     });
+ });
 
 	
 
