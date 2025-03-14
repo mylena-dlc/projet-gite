@@ -23,6 +23,7 @@ services:
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./app:/var/www
+      - ./app/.env:/var/www/.env
     depends_on:
       - database
 
