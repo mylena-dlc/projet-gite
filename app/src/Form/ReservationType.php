@@ -64,7 +64,7 @@ class ReservationType extends HoneyPotType
                     'class' => 'js-city-select', 
                     'id' => 'reservation_city'
                 ],
-                'invalid_message' => 'Veuillez sélectionner une ville valide probleme form.',
+                'invalid_message' => 'Veuillez sélectionner une ville valide.',
             ])
             // ->add('city', TextType::class, [
             //     'label' => 'Ville',
