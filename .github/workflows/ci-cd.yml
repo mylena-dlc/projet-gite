@@ -1,0 +1,59 @@
+name: CI/CD Workflow
+
+# Déclenche le workflow lors d'un push sur la branche develop
+on:
+  push:
+    branches:
+      - develop  # Tu peux ajuster cela si tu veux qu'il se déclenche pour d'autres branches
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Installer PHP et les extensions nécessaires
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'  # Remplace par la version PHP que tu utilises
+
+    # Installer les dépendances
+    - name: Install dependencies
+      run: |
+        composer install --no-interaction
+
+    # Exécuter les tests
+    - name: Run tests
+      run: |
+        vendor/bin/phpunit
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: success()  # Déploie uniquement si les tests ont réussi
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Installer PHP et les extensions nécessaires pour le déploiement
+    - name: Set up PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2'
+
+    # Déployer sur la branche main (production)
+    - name: Deploy to production (main branch)
+      run: |
+        git config --global user.email "mylena.delacote@laposte.net"
+        git config --global user.name "Mylena Delacote"
+        git checkout main
+        git pull origin main
+        git merge develop  # Merge develop dans main
+        git push origin main
+
+      env:
+        GITE_TOKEN: ${{ secrets.GITE_TOKEN }}
