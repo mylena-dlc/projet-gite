@@ -41,14 +41,16 @@ when@prod:
         orm:
             auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
-            query_cache_driver:
-                type: pool
-                pool: doctrine.system_cache_pool
-            result_cache_driver:
-                type: pool
-                pool: doctrine.result_cache_pool
-            entity_listeners:
-                auto_mapping: true
+            entity_managers:
+                default:
+                    mappings:
+                        default:
+                            type: attribute
+                            dir: '%kernel.project_dir%/src/Entity'
+                            prefix: 'App\Entity'
+                            is_bundle: false
+                            name: default
+                    auto_mapping: true
             
 
 
