@@ -18,30 +18,30 @@ class ReservationService
     /**
     * Calcule les détails de la réservation
     */
-    // public function calculateReservationDetails(array $reservationDetails, int $nightPrice, int $cleaningCharge): array
-    // {
-    //     $startDate = \DateTime::createFromFormat('d/m/Y', $reservationDetails['startDate']);
-    //     $endDate = \DateTime::createFromFormat('d/m/Y', $reservationDetails['endDate']);
-    //     $numberAdult = $reservationDetails['numberAdult'];
-    //     $numberKid = $reservationDetails['numberKid'];
+    public function calculateReservationDetails(array $reservationDetails, int $nightPrice, int $cleaningCharge): array
+    {
+        $startDate = \DateTime::createFromFormat('d/m/Y', $reservationDetails['startDate']);
+        $endDate = \DateTime::createFromFormat('d/m/Y', $reservationDetails['endDate']);
+        $numberAdult = $reservationDetails['numberAdult'];
+        $numberKid = $reservationDetails['numberKid'];
 
-    //     $totalNight = $this->calculateTotalNights($startDate, $endDate);
-    //     $supplement = $this->calculateSupplement($startDate, $endDate);
-    //     $price = $this->calculateBasePrice($totalNight, $nightPrice, $cleaningCharge, $supplement);
-    //     $tax = $this->calculateTax($price, $totalNight, $numberAdult, $numberKid);
-    //     $tva = $this->calculateTva($price);
-    //     $totalPrice = $price + $tva + $tax;
+        $totalNight = $this->calculateTotalNights($startDate, $endDate);
+        $supplement = $this->calculateSupplement($startDate, $endDate);
+        $price = $this->calculateBasePrice($totalNight, $nightPrice, $cleaningCharge, $supplement);
+        $tax = $this->calculateTax($price, $totalNight, $numberAdult, $numberKid);
+        $tva = $this->calculateTva($price);
+        $totalPrice = $price + $tva + $tax;
 
-    //     return [
-    //         'totalNight' => $totalNight,
-    //         'nightPrice' => $nightPrice,
-    //         'cleaningCharge' => $cleaningCharge,
-    //         'supplement' => $supplement,
-    //         'tax' => $tax,
-    //         'tva' => $tva,
-    //         'totalPrice' => $totalPrice
-    //     ];
-    // }
+        return [
+            'totalNight' => $totalNight,
+            'nightPrice' => $nightPrice,
+            'cleaningCharge' => $cleaningCharge,
+            'supplement' => $supplement,
+            'tax' => $tax,
+            'tva' => $tva,
+            'totalPrice' => $totalPrice
+        ];
+    }
 
     /**
     * Calcule le nombre total de nuits

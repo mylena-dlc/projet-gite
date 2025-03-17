@@ -332,29 +332,6 @@ class ReservationController extends AbstractController
         // Formulaire de réservation
         $reservation = new Reservation();
 
-        // Récupération des villes en session
-        // $availableCities = $session->get('available_cities', []);
-
-        // // Récupération du code postal soumis
-        // $submittedPostalCode = $request->request->get('reservation')['cp'] ?? null;
-        // $submittedCity = $request->request->get('reservation')['city'] ?? null;
-        // $submittedCountry = $request->request->get('reservation')['country'] ?? null;
-
-        // // Si un code postal a été soumis et qu'il a changé, on met à jour les villes
-        // if ($submittedPostalCode && $submittedCountry) {
-        //     $locationData = $locationService->getLocationData($submittedPostalCode, $submittedCountry);
-            
-        //     if (!empty($locationData['cities'])) {
-        //         $availableCities = $locationData['cities'];
-        //         $session->set('available_cities', $availableCities);
-        //     }
-        // }
-
-        // // Si la ville soumise n'est pas dans la liste, on l'ajoute temporairement
-        // if ($submittedCity && !in_array($submittedCity, $availableCities)) {
-        //     $availableCities[] = $submittedCity;
-        // }
-
         $reservationForm = $this->createForm(ReservationType::class, $reservation);
 
         $reservationForm->handleRequest($request);
@@ -384,7 +361,7 @@ class ReservationController extends AbstractController
             $reservationDetails['phone'] = $formattedPhone;
             $reservationDetails['email'] = $user->getEmail();
             $reservationDetails['userId'] = $user->getId();
-            // $reservationDetails['giteId'] = $giteRepository->find(1)->getId();
+            $reservationDetails['giteId'] = $giteRepository->find(1)->getId();
             $reservationDetails['giteName'] = $giteRepository->find(1)->getName();
 
             $reservationDetails['lastName'] = $reservation->getLastName();
@@ -404,29 +381,29 @@ class ReservationController extends AbstractController
             $reservationDetails['number_kid'] = $reservation->getnumberKid();
 
     
-              // Si un token a été renseigné, récupérer ses données
-            // if ($session->has('reservation_token')) {
-            //     $promoCode = $session->get('reservation_token')['promoCode'];
-            //     $discount = $session->get('reservation_token')['discount'];
-            //     $newTotalPrice = $session->get('reservation_token')['newTotalPrice'];
-            // } else {
-            //     $promoCode = null;
-            //     $discount = 0;
-            //     $newTotalPrice = null;
-            //     $reservationToken = [];
-            // }
+            // Si un token a été renseigné, récupérer ses données
+            if ($session->has('reservation_token')) {
+                $promoCode = $session->get('reservation_token')['promoCode'];
+                $discount = $session->get('reservation_token')['discount'];
+                $newTotalPrice = $session->get('reservation_token')['newTotalPrice'];
+            } else {
+                $promoCode = null;
+                $discount = 0;
+                $newTotalPrice = null;
+                $reservationToken = [];
+            }
 
-            // // On récupère le token (code promo)
-            // if(!$promoCode == null) {
-            //     $token = $tokenRepository->findOneBy(['code' => $promoCode]);
-            //     $reservation->setToken($token); 
-            // }
+            // On récupère le token (code promo)
+            if(!$promoCode == null) {
+                $token = $tokenRepository->findOneBy(['code' => $promoCode]);
+                $reservation->setToken($token); 
+            }
 
             // Créer la session de paiement Stripe et récupérer l'URL
-            // $paymentUrl = $stripePaymentService->createPaymentSession($reservationDetails);
+            $paymentUrl = $stripePaymentService->createPaymentSession($reservationDetails);
 
             // Rediriger directement vers Stripe
-            // return $this->redirect($paymentUrl);
+             return $this->redirect($paymentUrl);
 
             $reservation->setNumberAdult($reservationDetails['numberAdult']);
             $reservation->setNumberKid($reservationDetails['numberKid']);
@@ -448,12 +425,11 @@ class ReservationController extends AbstractController
             $reservation->setIsMajor($reservationDetails['isMajor']);
             $reservation->setMessage($reservationDetails['message'] ?? '');
 
-
             $reservation->setArrivalDate($arrivalDate);
             $reservation->setDepartureDate($departureDate);
 
-            $em->persist($reservation);
-            $em->flush();
+            // $em->persist($reservation);
+            // $em->flush();
             $description = 'Validez votre réservation pour notre gîte à Orbey. Vérifiez les détails, les tarifs, et complétez vos coordonnées en toute sécurité. Séjournez dans notre charmant hébergement en Alsace.';
 
         // return $this->render('reservation/confirm.html.twig', [
@@ -493,198 +469,6 @@ class ReservationController extends AbstractController
         ]);
     }
     
-
-
-    // /**
-    // * Fonction pour confirmer une réservation
-    // */
-    // #[Route('/reservation/new', name: 'new_reservation')]
-    // public function new(Reservation $reservation = null, Request $request, Security $security, FactoryInterface $factory, 
-    // TokenRepository $tokenRepository, ExtraRepository $extraRepository, EntityManagerInterface $em, 
-    // HoneypotService $honeypotService, PhoneNumberService $phoneNumberService): Response {
-    
-    //     // Vérifiez si l'utilisateur est connecté
-    //     if (!$security->isGranted('IS_AUTHENTICATED_FULLY')) {
-    //         // Stocker l'URL de redirection dans la session
-    //         $session = $request->getSession();
-    //         $session->set('redirect_after_login', $this->generateUrl('new_reservation'));
-
-    //         $this->addFlash('error', 'Vous devez créer un compte pour finaliser votre réservation.');
-    //         return $this->redirectToRoute('app_register');
-    //     }
-
-    //     // Créez un menu "breadcrumb"
-    //     $breadcrumb = $factory->createItem('root');
-    //     $breadcrumb->addChild('Accueil', ['route' => 'app_home']);
-    //     $breadcrumb->addChild('Demande de réservation', ['route' => 'app_reservation']);
-    //     $breadcrumb->addChild('Confirmation de réservation');  
-    
-    //     // Récupérez les données stockées en session
-    //     $session = $request->getSession();
-    //     $arrivalDate = $session->get('reservation_details')['startDate'];
-    //     $departureDate = $session->get('reservation_details')['endDate'];
-    //     $numberAdult = $session->get('reservation_details')['numberAdult'];
-    //     $numberKid = $session->get('reservation_details')['numberKid'];
-    //     $totalNight = $session->get('reservation_details')['totalNight'];
-    //     $nightPrice = $session->get('reservation_details')['nightPrice'];
-    //     $cleaningCharge = $session->get('reservation_details')['cleaningCharge'];
-    //     $supplement = $session->get('reservation_details')['supplement'];
-    //     $tva = $session->get('reservation_details')['tva'];
-    //     $tax = $session->get('reservation_details')['tax'];
-    //     $totalPrice = $session->get('reservation_details')['totalPrice'];
-
-    //     // Si un token a été renseigné, récupérer ses données
-    //     if ($session->has('reservation_details_token')) {
-    //         $promoCode = $session->get('reservation_details_token')['promoCode'];
-    //         $discount = $session->get('reservation_details_token')['discount'];
-    //         $newTotalPrice = $session->get('reservation_details_token')['newTotalPrice'];
-    //     } else {
-    //         $promoCode = null;
-    //         $discount = 0;
-    //         $newTotalPrice = null;
-    //     }
-
-    //     // Récupération des extras ajoutés
-    //     if($session->has('reservation_details_token')) {
-    //         $reservationExtras = $session->get('reservation_extras', []);
-    //         $totalExtraPrice = array_sum(array_column($reservationExtras, 'price'));
-    //     }
-
-    //     // Formulaire d'ajout d'extras
-    //     $reservationExtra = new ReservationExtra();
-    //     $extraForm = $this->createForm(ReservationExtraType::class, $reservationExtra);
-
-    //     // Créez une instance de l'entité Reservation 
-    //     $reservation = new Reservation();
-
-    //     $arrivalDateString = $arrivalDate; 
-    //     $arrivalDate = \DateTime::createFromFormat('d/m/Y', $arrivalDateString);
-    //     $reservation->setArrivalDate($arrivalDate);
-    //     $departureDateString = $departureDate; 
-    //     $departureDate = \DateTime::createFromFormat('d/m/Y', $departureDateString);
-    //     $reservation->setDepartureDate($departureDate);
-    //     $reservation->setNumberAdult($numberAdult);
-    //     $reservation->setNumberKid($numberKid);
-    //     $reservation->setTotalNight($totalNight);
-    //     $reservation->setpriceNight($nightPrice);
-    //     $reservation->setTourismTax($tax);
-    //     $reservation->setTva($tva);
-    //     $reservation->setTotalPrice($totalPrice);
-    //     $reservation->setSupplement($supplement);
-
-    //     // Générer une référence unique basée sur l'ID et la date de réservation
-    //     $randomCode = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
-    //     $reference = 'RES-' . $arrivalDate->format('Y') . '-' . str_pad($reservation->getId(), 3, '0', STR_PAD_LEFT) . '-' . $randomCode;
-        
-    //     // Associer la référence à la réservation
-    //     $reservation->setReference($reference);
-        
-    //     // Recupération des infos du gîte
-    //     $gite = $this->giteRepository->find(1);
-    //     $reservation->setGite($gite);
-    //     $reservation->setCleaningCharge($cleaningCharge);
-
-    //     // On récupère l'id de l'utilisateur connecté et son email
-    //     $user = $this->getUser();
-    //     $reservation->setUser($user);
-    //     $email = $user->getEmail();
-    //     $reservation->setEmail($email);
-
-    //     // On récupère le token (code promo)
-    //     if(!$promoCode == null) {
-    //         $token = $tokenRepository->findOneBy(['code' => $promoCode]);
-    //         $reservation->setToken($token); 
-    //     }
-    //       // Si un extra a été ajouté, récupérer ses données
-    //       if ($session->has('reservation_extras')) {
-    //         $reservationExtras = $session->get('reservation_extras', []);
-    //         $totalExtraPrice = 0;
-        
-    //         // Calcul du prix total des extras
-    //         foreach ($reservationExtras as $extraData) {
-    //             $extra = $extraRepository->find($extraData['extra_id']);
-    //             if ($extra) {
-    //                 $totalExtraPrice += $extra->getPrice(); 
-    //             }
-    //         }
-    //     } else {
-    //         $reservationExtras = [];
-    //         $totalExtraPrice = 0;
-    //     }
-
-    //     // Ajoutez le prix des extras au prix total
-    //     $totalPrice += $totalExtraPrice;
-    //     $reservation->setTotalPrice($totalPrice);
-
-    //     // Gérez la soumission du formulaire
-    //     $form = $this->createForm(ReservationType::class, $reservation);
-    //     $form->handleRequest($request);
-
-    //         if ($form->isSubmitted() && $form->isValid()) {
-    //             // Vérifier le honeypot
-    //             if ($honeypotService->isHoneypotTripped($form)) {
-    //                 // Bloquer le bot
-    //                 $this->addFlash('error', "Erreur lors de la réservation !");
-    //                 return $this->redirectToRoute('app_home');
-    //             }
-    //                 $reservation = $form->getData();
-    //                 $phone = $reservation->getPhone();
-    //                 $country = $reservation->getCountry();
-    //                 $formattedPhone = $phoneNumberService->formatPhoneNumber($phone, $country);
-
-    //                 if ($formattedPhone === null) {
-    //                     $this->addFlash('error', "Le numéro de téléphone fourni est invalide. Veuillez entrer un numéro valide.");
-    //                     return $this->redirectToRoute('new_reservation');
-    //                 }
-
-    //                 $reservation->setPhone($formattedPhone); 
-
-    //                 // Gestion des extras
-    //                 foreach ($reservationExtras as $extraData) {
-    //                     $extra = $extraRepository->find($extraData['extra_id']);
-    //                     if ($extra) {
-    //                         $reservationExtra = new ReservationExtra();
-    //                         $reservationExtra->setReservation($reservation);
-    //                         $reservationExtra->setExtra($extra);
-    //                         $reservationExtra->setDate(new \DateTime($extraData['date'])); // Date de l'extra
-    //                         $reservationExtra->setQuantity($extraData['quantity'] ?? 1); // Quantité (par défaut 1)
-
-    //                         $em->persist($reservationExtra);
-    //                     }
-    //                 }
-
-    //             $em->persist($reservation);
-    //             $em->flush();
-
-    //             return $this->redirectToRoute('paiement_stripe', ['id' => $reservation->getId()]);
-    //         }
-
-    //     $description = 'Validez votre réservation pour notre gîte à Orbey. Vérifiez les détails, les tarifs, et complétez vos coordonnées en toute sécurité. Séjournez dans notre charmant hébergement en Alsace.';
-        
-    //     // Affichez le formulaire dans la vue Twig
-    //     return $this->render('reservation/new.html.twig', [
-    //         'form' => $form,
-    //         'arrivalDate' => $arrivalDate->format('d-m-Y'),
-    //         'departureDate' => $departureDate->format('d-m-Y'),
-    //         'numberAdult' => $numberAdult,
-    //         'numberKid' => $numberKid,
-    //         'totalNight' => $totalNight,
-    //         'nightPrice' => $nightPrice,
-    //         'cleaningCharge' => $cleaningCharge,
-    //         'supplement' => $supplement,
-    //         'tva' => $tva,
-    //         'tax' => $tax,
-    //         'totalPrice' => $totalPrice,
-    //         'description' => $description,
-    //         'breadcrumb' => $breadcrumb,
-    //         'promoCode' => $promoCode,
-    //         'newTotalPrice' => $newTotalPrice,
-    //         'discount' => $discount,
-    //         'extraForm' => $extraForm->createView(),
-    //         'reservationExtras' => $reservationExtras,
-    //         'totalExtraPrice' => $totalExtraPrice,
-    //     ]);
-    // }   
 
 
     // /**
@@ -759,189 +543,49 @@ class ReservationController extends AbstractController
     //     return $this->redirect($paymentUrl);
     // }
     
-    #[Route('/test/session', name: 'test_session')]
-    public function testSession()
+
+    #[Route('/reservation/confirm', name: 'reservation_confirm', methods: ['GET'])]
+    public function confirm(Request $request, EntityManagerInterface $em): Response
     {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+        $sessionId = $request->query->get('session_id');
+
+        if (!$sessionId) {
+            return new Response('Erreur : Aucun identifiant de session Stripe fourni.', 400);
         }
 
-        // Vérifier la session
-        $_SESSION['test'] = 'Hello, session !';
-        dump($_SESSION);
-     
-        die;
-    }
-    
+        // Récupérer la session Stripe
+        $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
+        \Stripe\Stripe::setApiKey($stripeSecretKey);
 
-//     #[Route('/reservation/confirm', name: 'confirm_reservation')]
-//     public function confirm(Request $request, SendEmailService $mail, DompdfService $dompdfService, FactoryInterface $factory, EntityManagerInterface $em): Response 
-//     {
-//         // Récupérer l'ID de réservation depuis l'URL
-//         $tempReservationId = $request->query->get('session_id'); 
+        try {
+            $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
+            $paymentIntentId = $stripeSession->payment_intent;
+        } catch (\Exception $e) {
+            return new Response('Erreur Stripe : ' . $e->getMessage(), 400);
+        }
 
-//         if (!$tempReservationId) {
-//             $this->addFlash('error', 'ID de réservation manquant.');
-//             return $this->redirectToRoute('app_home');
-//         }
-
-//         // Récupérer la réservation en base
-//         $reservation = $this->reservationRepository->findOneBy(['reference' => $tempReservationId]);
-
-//         if (!$reservation) {
-//             $this->addFlash('error', 'La réservation n\'existe pas.');
-//             return $this->redirectToRoute('app_home');
-//         }
-
-//         // Nettoyer la session 
-//         $session = $request->getSession();
-//         $session->remove('reservation_details');
-//         $session->remove('reservation_token');
-
-//         // Envoyer l'email de confirmation avec la facture
-//         $gite = $this->giteRepository->findOneBy(['id' => 1]);
-//         $invoiceContent = $this->renderView('reservation/invoice.html.twig', [
-//             'reservation' => $reservation,
-//             'gite' => $gite,
-//         ]);
-
-//         $pdfContent = $dompdfService->generatePdf($invoiceContent);
-//         $pdfBase64 = base64_encode($pdfContent);
-
-//         $mail->send(
-//             'contact@giteraindupair.fr',
-//             $reservation->getEmail(),
-//             '[GITE RAIN DU PAIR] Confirmation de réservation',
-//             'request_reservation',
-//             ['reservation' => $reservation, 'pdfBase64' => $pdfBase64]
-//         );
-
-//         return $this->render('reservation/confirm.html.twig', [
-//             'description' => 'Votre réservation est confirmée !',
-//             'breadcrumb' => $factory->createItem('root')
-//         ]);
-// }
-
-    /**
-    * Fonction pour afficher la vue de confirmation d'une réservation
-    */
-    #[Route('/reservation/{slug}/confirmation', name: 'confirm_reservation')]
-    public function confirm($slug, Request $request, SendEmailService $mail, 
-    DompdfService $dompdfService, FactoryInterface $factory, EntityManagerInterface $em): Response {
-
-        // Créez un menu "breadcrumb"
-        $breadcrumb = $factory->createItem('root');
-        $breadcrumb->addChild('Accueil', ['route' => 'app_home']);
-        $breadcrumb->addChild('Demande de réservation', ['route' => 'app_reservation']);
-        $breadcrumb->addChild('Confirmation de réservation', ['route' => 'new_reservation']);
-        $breadcrumb->addChild('Demande envoyée');  
-
-        // Nettoyage des données en session
-        $session = $request->getSession();
-        $session->remove('reservation_details'); // Supprime les détails de la réservation
-        $session->remove('reservation_details_token'); // Supprime les informations liées au token
-
-        // Récupérer la réservation
-        $reservation = $this->reservationRepository->findOneBy(['slug' => $slug]);
-        $slug =$reservation->getSlug();
-
-        // Vérifier la méthode de paiement
-        // $paymentMethod = $reservation->getPaymentMethod();
-
-        // Récupérer l'id de la session Stripe
-        // $sessionId = $request->query->get('session_id');
-
-    //     if ($sessionId) {
-    //         // Configurez Stripe
-    //         $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
-    //         Stripe::setApiKey($stripeSecretKey);
-        
-    //         try {
-    //             // Récupérez la session Stripe
-    //             $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
-    
-    //             // Récupérez le payment_intent depuis la session Stripe
-    //             $paymentIntentId = $stripeSession->payment_intent;
-    
-    //             // Mettez à jour la réservation avec l'ID Stripe Payment Intent
-    //             $reservation->setStripePaymentId($paymentIntentId);
-    //             $em->persist($reservation);
-    //             $em->flush();
-    
-    //             $this->addFlash('success', 'Paiement confirmé et enregistré avec succès.');
-    //         } catch (\Exception $e) {
-    //             $this->addFlash('error', 'Erreur lors de la récupération des informations de paiement : ' . $e->getMessage());
-    //         }
-    //     } else {
-    //         $this->addFlash('error', 'Session Stripe ID non fourni.');
-    //         return $this->redirectToRoute('app_home');
-    //     }
-        
-    //     // Données à afficher dans le mail
-    //     $gite = $this->giteRepository->findOneBy(['id' => 1]);
-    //     $startDate = $reservation->getArrivalDate();
-    //     $endDate = $reservation->getDepartureDate();
-    //     $totalNight = $reservation->getTotalNight();
-    //     $cleaningCharge = $reservation->getCleaningCharge();
-    //     $riceNight = $reservation->getPriceNight();
-    //     $priceHt = $reservation->getTotalPrice() - $cleaningCharge;
-
-    //     // Récupérer le contenu du template de la facture
-    //     $invoiceContent = $this->renderView('reservation/invoice.html.twig', [
-    //     'reservation' => $reservation,
-    //     'totalNight' => $totalNight,
-    //     'gite' => $gite,
-    //     'priceHt' => $priceHt,
-    //     'cleaningCharge' => $cleaningCharge,
-    //     'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
-    //     . '/public/assets/img/logo-gite-rain-du-pair.png'),
-    // ]);
-
-    //     // Générez le PDF à partir du HTML
-    //     $pdfContent = $dompdfService->generatePdf($invoiceContent);
-
-    //     // Convertir le contenu du PDF en une chaîne Base64
-    //     $pdfBase64 = base64_encode($pdfContent);
-
-    //     // Envoyer le mail de confirmation
-    //     $mail->send(
-    //         'contact@giteraindupair.fr',
-    //         $reservation->getEmail(), 
-    //         '[GITE RAIN DU PAIR] Demande de réservation envoyée',
-    //         'request_reservation',
-    //         [
-    //             'reservation' => $reservation,
-    //             'pdfBase64' => $pdfBase64, 
-    //             'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
-    //             . '/public/assets/img/logo-gite-rain-du-pair.png'),
-    //         ],
-    //     );
-
-    //     // Envoyer un e-mail à l'administrateur
-    //     $mail->sendAdminNotification(
-    //         'contact@giteraindupair.fr',
-    //         'admin@giteraindupair.com',
-    //         'Nouvelle demande de réservation',
-    //         'admin_request_reservation',
-    //         [
-    //             'reservation' => $reservation,
-    //         ],
-    //     );
-
-        $description = 'Votre réservation dans notre gîte de charme à Orbey en Alsace est confirmée. Préparez-vous à vivre une expérience exceptionnelle dans notre maison de vacances!';
-    
-        return $this->render('reservation/confirm.html.twig', [
-            'description' => $description,
-            'breadcrumb' => $breadcrumb
+        // Récupérer la réservation associée
+        $reservation = $em->getRepository(Reservation::class)->findOneBy([
+            'stripePaymentId' => $paymentIntentId
         ]);
-}
+
+        if (!$reservation) {
+            return new Response('Erreur : Aucune réservation trouvée.', 404);
+        }
+
+        return $this->render('reservation/confirm.html.twig', [
+            'reservation' => $reservation
+        ]);
+    }
+
+    
 
 
 //     /**
 //     * Fonction pour afficher la vue de confirmation d'une réservation
 //     */
-//     #[Route('/reservation/{id}/confirm', name: 'confirm_reservation')]
-//     public function confirm(int $id, Request $request, SendEmailService $mail, 
+//     #[Route('/reservation/{slug}/confirmation', name: 'confirm_reservation')]
+//     public function confirm($slug, Request $request, SendEmailService $mail, 
 //     DompdfService $dompdfService, FactoryInterface $factory, EntityManagerInterface $em): Response {
 
 //         // Créez un menu "breadcrumb"
@@ -957,90 +601,91 @@ class ReservationController extends AbstractController
 //         $session->remove('reservation_details_token'); // Supprime les informations liées au token
 
 //         // Récupérer la réservation
-//         $reservation = $this->reservationRepository->findOneBy(['id' => $id]);
-        
+//         $reservation = $this->reservationRepository->findOneBy(['slug' => $slug]);
+//         $slug =$reservation->getSlug();
+
 //         // Vérifier la méthode de paiement
-//         $paymentMethod = $reservation->getPaymentMethod();
+//         // $paymentMethod = $reservation->getPaymentMethod();
 
 //         // Récupérer l'id de la session Stripe
-//         $sessionId = $request->query->get('session_id');
+//         // $sessionId = $request->query->get('session_id');
 
-//         if ($sessionId) {
-//             // Configurez Stripe
-//             $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
-//             Stripe::setApiKey($stripeSecretKey);
+//     //     if ($sessionId) {
+//     //         // Configurez Stripe
+//     //         $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
+//     //         Stripe::setApiKey($stripeSecretKey);
         
-//             try {
-//                 // Récupérez la session Stripe
-//                 $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
+//     //         try {
+//     //             // Récupérez la session Stripe
+//     //             $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
     
-//                 // Récupérez le payment_intent depuis la session Stripe
-//                 $paymentIntentId = $stripeSession->payment_intent;
+//     //             // Récupérez le payment_intent depuis la session Stripe
+//     //             $paymentIntentId = $stripeSession->payment_intent;
     
-//                 // Mettez à jour la réservation avec l'ID Stripe Payment Intent
-//                 $reservation->setStripePaymentId($paymentIntentId);
-//                 $em->persist($reservation);
-//                 $em->flush();
+//     //             // Mettez à jour la réservation avec l'ID Stripe Payment Intent
+//     //             $reservation->setStripePaymentId($paymentIntentId);
+//     //             $em->persist($reservation);
+//     //             $em->flush();
     
-//                 $this->addFlash('success', 'Paiement confirmé et enregistré avec succès.');
-//             } catch (\Exception $e) {
-//                 $this->addFlash('error', 'Erreur lors de la récupération des informations de paiement : ' . $e->getMessage());
-//             }
-//         } else {
-//             $this->addFlash('error', 'Session Stripe ID non fourni.');
-//             return $this->redirectToRoute('app_home');
-//         }
+//     //             $this->addFlash('success', 'Paiement confirmé et enregistré avec succès.');
+//     //         } catch (\Exception $e) {
+//     //             $this->addFlash('error', 'Erreur lors de la récupération des informations de paiement : ' . $e->getMessage());
+//     //         }
+//     //     } else {
+//     //         $this->addFlash('error', 'Session Stripe ID non fourni.');
+//     //         return $this->redirectToRoute('app_home');
+//     //     }
         
-//         // Données à afficher dans le mail
-//         $gite = $this->giteRepository->findOneBy(['id' => 1]);
-//         $startDate = $reservation->getArrivalDate();
-//         $endDate = $reservation->getDepartureDate();
-//         $totalNight = $reservation->getTotalNight();
-//         $cleaningCharge = $reservation->getCleaningCharge();
-//         $riceNight = $reservation->getPriceNight();
-//         $priceHt = $reservation->getTotalPrice() - $cleaningCharge;
+//     //     // Données à afficher dans le mail
+//     //     $gite = $this->giteRepository->findOneBy(['id' => 1]);
+//     //     $startDate = $reservation->getArrivalDate();
+//     //     $endDate = $reservation->getDepartureDate();
+//     //     $totalNight = $reservation->getTotalNight();
+//     //     $cleaningCharge = $reservation->getCleaningCharge();
+//     //     $riceNight = $reservation->getPriceNight();
+//     //     $priceHt = $reservation->getTotalPrice() - $cleaningCharge;
 
-//         // Récupérer le contenu du template de la facture
-//         $invoiceContent = $this->renderView('reservation/invoice.html.twig', [
-//         'reservation' => $reservation,
-//         'totalNight' => $totalNight,
-//         'gite' => $gite,
-//         'priceHt' => $priceHt,
-//         'cleaningCharge' => $cleaningCharge,
-//         'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
-//         . '/public/assets/img/logo-gite-rain-du-pair.png'),
-//     ]);
+//     //     // Récupérer le contenu du template de la facture
+//     //     $invoiceContent = $this->renderView('reservation/invoice.html.twig', [
+//     //     'reservation' => $reservation,
+//     //     'totalNight' => $totalNight,
+//     //     'gite' => $gite,
+//     //     'priceHt' => $priceHt,
+//     //     'cleaningCharge' => $cleaningCharge,
+//     //     'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
+//     //     . '/public/assets/img/logo-gite-rain-du-pair.png'),
+//     // ]);
 
-//         // Générez le PDF à partir du HTML
-//         $pdfContent = $dompdfService->generatePdf($invoiceContent);
+//     //     // Générez le PDF à partir du HTML
+//     //     $pdfContent = $dompdfService->generatePdf($invoiceContent);
 
-//         // Convertir le contenu du PDF en une chaîne Base64
-//         $pdfBase64 = base64_encode($pdfContent);
+//     //     // Convertir le contenu du PDF en une chaîne Base64
+//     //     $pdfBase64 = base64_encode($pdfContent);
 
-//         // Envoyer le mail de confirmation
-//         $mail->send(
-//             'contact@giteraindupair.fr',
-//             $reservation->getEmail(), 
-//             '[GITE RAIN DU PAIR] Demande de réservation envoyée',
-//             'request_reservation',
-//             [
-//                 'reservation' => $reservation,
-//                 'pdfBase64' => $pdfBase64, 
-//                 'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
-//                 . '/public/assets/img/logo-gite-rain-du-pair.png'),
-//             ],
-//         );
+//     //     // Envoyer le mail de confirmation
+//     //     $mail->send(
+//     //         'contact@giteraindupair.fr',
+//     //         $reservation->getEmail(), 
+//     //         '[GITE RAIN DU PAIR] Demande de réservation envoyée',
+//     //         'request_reservation',
+//     //         [
+//     //             'reservation' => $reservation,
+//     //             'pdfBase64' => $pdfBase64, 
+//     //             'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
+//     //             . '/public/assets/img/logo-gite-rain-du-pair.png'),
+//     //         ],
+//     //     );
 
-//         // Envoyer un e-mail à l'administrateur
-//         $mail->sendAdminNotification(
-//             'contact@giteraindupair.fr',
-//             'admin@giteraindupair.com',
-//             'Nouvelle demande de réservation',
-//             'admin_request_reservation',
-//             [
-//                 'reservation' => $reservation,
-//             ],
-//         );
+//     //     // Envoyer un e-mail à l'administrateur
+//     //     $mail->sendAdminNotification(
+//     //         'contact@giteraindupair.fr',
+//     //         'admin@giteraindupair.com',
+//     //         'Nouvelle demande de réservation',
+//     //         'admin_request_reservation',
+//     //         [
+//     //             'reservation' => $reservation,
+//     //         ],
+//     //     );
 
 //         $description = 'Votre réservation dans notre gîte de charme à Orbey en Alsace est confirmée. Préparez-vous à vivre une expérience exceptionnelle dans notre maison de vacances!';
     
@@ -1049,6 +694,7 @@ class ReservationController extends AbstractController
 //             'breadcrumb' => $breadcrumb
 //         ]);
 // }
+
 
 
     /**
