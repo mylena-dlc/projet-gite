@@ -25,6 +25,13 @@ jobs:
       with:
         php-version: '8.2'  # Remplace par la version PHP que tu utilises
 
+    - name: Create .env file
+      run: |
+        echo "APP_ENV=prod" >> app/.env
+        echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
+        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> app/.env
+        echo "OTHER_ENV_VARIABLE=${{ secrets.OTHER_ENV_VARIABLE }}" >> app/.env
+
     # Installer les dépendances
     - name: Install dependencies
       run: |
