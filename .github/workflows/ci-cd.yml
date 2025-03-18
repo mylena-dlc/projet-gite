@@ -74,10 +74,20 @@ jobs:
           git fetch origin
           git checkout develop
           git pull origin develop
-          git checkout main
-          git pull origin main --allow-unrelated-histories
+          
+          if git show-ref --verify --quiet refs/heads/main; then
+            git branch -D main
+          fi
+          
+          if git ls-remote --exit-code --heads origin main; then
+            git checkout -b main origin/main
+          else
+            git checkout -b main
+          fi
+
           git merge develop --no-ff -m "Merge automatique de develop dans main"
-          git push origin main
+       
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mylena-dlc/projet-gite.git main
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
