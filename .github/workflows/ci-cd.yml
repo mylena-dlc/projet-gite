@@ -74,12 +74,12 @@ jobs:
           git pull origin main
           git merge develop
           git push origin main
-          composer install --no-interaction --prefer-dist --no-dev
+          sudo chown -R www-data:www-data app/var
+          sudo chmod -R 775 app/var/cache app/var/log
+          sudo rm -rf app/var/cache/prod
           php bin/console cache:clear --env=prod
           php bin/console cache:warmup --env=prod
-          chown -R www-data:www-data /var/www/projet-gite/app/var
-          chmod -R 775 /var/www/projet-gite/app/var
-          systemctl restart apache2
+          sudo systemctl restart apache2
 
 
       env:
