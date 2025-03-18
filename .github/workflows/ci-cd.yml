@@ -72,8 +72,10 @@ jobs:
       - name: Merge develop into main
         run: |
           git fetch origin
+          git checkout develop
+          git pull origin develop
           git checkout main
-          git reset --hard origin/main  
+          git pull origin main --allow-unrelated-histories
           git merge develop --no-ff -m "Merge automatique de develop dans main"
           git push origin main
 
