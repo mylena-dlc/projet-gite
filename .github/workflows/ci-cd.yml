@@ -81,5 +81,6 @@ jobs:
           chmod -R 775 /var/www/projet-gite/app/var
           systemctl restart apache2
 
+
       env:
         GITE_TOKEN: ${{ secrets.GITE_TOKEN }}
