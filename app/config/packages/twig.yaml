@@ -2,7 +2,10 @@ twig:
     file_name_pattern: '*.twig'
     date:
         timezone: 'Europe/Paris'
-
+    default_path: '%kernel.project_dir%/templates'
+    twig_component:
+        anonymous_template_directory: components
+        
 when@test:
     twig:
         strict_variables: true
