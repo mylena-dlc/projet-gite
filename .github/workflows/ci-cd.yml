@@ -72,19 +72,13 @@ jobs:
       - name: Merge develop into main
         run: |
           git fetch origin
-
-          if git show-ref --verify --quiet refs/remotes/origin/main; then
-            git checkout main
-            git pull origin main
-          else
-            git checkout -b main
-            git push origin main
-          fi
+          git checkout main
+          git pull origin main --allow-unrelated-histories || true  
 
           if git merge-base --is-ancestor develop main; then
             echo "main est déjà à jour avec develop"
           else
-            git merge develop --no-ff -m "Fusion automatique de develop dans main"
+            git merge develop --allow-unrelated-histories --no-ff -m "Fusion forcée de develop dans main"
             git push origin main
           fi
 
