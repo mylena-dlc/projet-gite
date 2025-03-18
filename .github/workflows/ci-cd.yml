@@ -71,10 +71,12 @@ jobs:
 
       - name: Merge develop into main
         run: |
-          git fetch origin main
+          git fetch origin
           git checkout main
-          git merge --no-ff develop -m "Merge automatique de develop dans main"
+          git reset --hard origin/main  
+          git merge develop --no-ff -m "Merge automatique de develop dans main"
           git push origin main
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
