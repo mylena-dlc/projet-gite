@@ -1,10 +1,10 @@
 name: CI/CD Workflow
 
-# Déclenche le workflow lors d'un push sur la branche develop
+# Déclenchement du workflow lors d'un push sur la branche develop
 on:
   push:
     branches:
-      - develop  # Ajuste cela si nécessaire
+      - develop  # Lorsqu'un push est fait sur develop, ce workflow démarre
 
 jobs:
   test:
@@ -27,60 +27,80 @@ jobs:
           --health-retries=3
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    # Installer PHP et les extensions nécessaires
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
-      with:
-        php-version: '8.2'
+      # Installer PHP et ses extensions
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
 
-    # Créer le fichier .env pour les tests
-    - name: Create .env file
-      run: |
-        echo "APP_ENV=prod" >> app/.env
-        echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
-        echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env
+      # Créer le fichier .env pour les tests
+      - name: Create .env file
+        run: |
+          echo "APP_ENV=prod" >> app/.env
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
+          echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env
 
-    # Installer les dépendances
-    - name: Install dependencies
-      run: |
-        cd app && composer install --no-interaction --prefer-dist
+      # Installer les dépendances
+      - name: Install dependencies
+        run: |
+          cd app && composer install --no-interaction --prefer-dist
 
-    # Exécuter les tests
-    - name: Run tests
-      run: |
-        cd app && vendor/bin/phpunit || true
+      # Exécuter les tests
+      - name: Run tests
+        run: |
+          cd app && vendor/bin/phpunit || true
 
-  deploy:
+  merge-to-main:
     needs: test
     runs-on: ubuntu-latest
-    if: success()  # Déploie uniquement si les tests ont réussi
+    if: success()  # Exécute cette étape uniquement si les tests réussissent
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v3
+      - name: Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          ref: develop  # On récupère la branche develop
 
-    - name: Deploy to VPS
-      uses: appleboy/ssh-action@v0.1.6
-      with:
-        host: ${{ secrets.VPS_HOST }}
-        username: ${{ secrets.VPS_USER }}
-        key: ${{ secrets.SSH_PRIVATE_KEY }}
-        script: |
-          cd /var/www/projet-gite
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Merge develop into main
+        run: |
+          git fetch origin main
           git checkout main
-          git pull origin main
-          git merge develop
+          git merge --no-ff develop -m "Merge automatique de develop dans main"
           git push origin main
-          sudo chown -R www-data:www-data app/var
-          sudo chmod -R 775 app/var/cache app/var/log
-          sudo rm -rf app/var/cache/prod
-          php bin/console cache:clear --env=prod
-          php bin/console cache:warmup --env=prod
-          sudo systemctl restart apache2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  deploy:
+    needs: merge-to-main
+    runs-on: ubuntu-latest
+    if: success()  # Déploie uniquement si la fusion a réussi
 
-      env:
-        GITE_TOKEN: ${{ secrets.GITE_TOKEN }}
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/projet-gite
+            git pull origin main
+            sudo chown -R www-data:www-data app/var
+            sudo chmod -R 775 app/var/cache app/var/log
+            sudo rm -rf app/var/cache/prod
+            php bin/console cache:clear --env=prod
+            php bin/console cache:warmup --env=prod
+            sudo systemctl restart apache2
