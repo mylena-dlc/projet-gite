@@ -71,6 +71,7 @@ jobs:
 
       - name: Merge develop into main
         run: |
+
           git fetch origin
           git checkout main
           git pull origin main --allow-unrelated-histories || true  
