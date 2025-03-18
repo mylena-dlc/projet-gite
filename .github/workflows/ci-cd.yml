@@ -71,11 +71,15 @@ jobs:
 
       - name: Merge develop into main
         run: |
-          git fetch origin
-          git checkout main
-          git pull origin main
-          git merge develop --no-ff -m "Fusion automatique de develop dans main"
-          git push origin main
+          git checkout main || git checkout -b main origin/main
+          git pull origin main --allow-unrelated-histories || true  
+
+          if git merge-base --is-ancestor develop main; then
+            echo "main est déjà à jour avec develop"
+          else
+            git merge develop --no-ff -m "Fusion automatique de develop dans main"
+            git push origin main
+          fi
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
