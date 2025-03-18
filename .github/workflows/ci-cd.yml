@@ -14,6 +14,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    # Aller dans le dossier app
+    - name: Move to project directory
+      run: |
+        cd app
+
     # Installer PHP et les extensions nécessaires
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
@@ -23,12 +28,12 @@ jobs:
     # Installer les dépendances
     - name: Install dependencies
       run: |
-        composer install --no-interaction --prefer-dist --no-dev --no-progress --optimize-autoloader
+        cd app && composer install --no-interaction --prefer-dist
 
     # Exécuter les tests
     - name: Run tests
       run: |
-        vendor/bin/phpunit
+        cd app && vendor/bin/phpunit
 
   deploy:
     needs: test
