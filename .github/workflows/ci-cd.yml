@@ -74,13 +74,13 @@ jobs:
           git fetch origin
           git checkout develop
           git pull origin develop
-          
-          git checkout main || git checkout -b main origin/main
-          git pull origin main --allow-unrelated-histories || true
 
-          git rebase develop
-          
-          git push origin main --force
+          git checkout main || git checkout -b main origin/main
+          git pull origin main || true  # Ne pas bloquer si main est déjà à jour
+
+          git merge --no-ff develop -m "Merge automatique de develop dans main"
+
+          git push origin main
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
