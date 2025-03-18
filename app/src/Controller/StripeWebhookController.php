@@ -89,74 +89,74 @@ public function handleStripeWebhook(Request $request, LoggerInterface $logger): 
     */
     private function handleSuccessfulPayment($session)
     {
-    
         $metadata = $session->metadata;
         $tempReservationId = $metadata->temp_reservation_id;
-        $phpSessionId = $metadata->php_session_id;
     
-        // Restaurer la session de l'utilisateur
-        // if (session_status() === PHP_SESSION_NONE) {
-        //     session_id($phpSessionId); // 🔥 Utiliser l'ID de session existant
-        //     session_start();
-        // }
-
+        // Vérifier si la réservation existe déjà
+        $existingReservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
+            'reference' => $tempReservationId
+        ]);
     
-        //  Récupérer les détails de réservation stockés en session
+        if ($existingReservation) {
+            $this->logger->info("Réservation déjà existante en BDD, on ne la recrée pas.");
+            return;
+        }
+    
+        // Récupération des détails en session
         $reservationDetails = $_SESSION['reservation_ok_' . $tempReservationId] ?? null;
-        $this->logger->info($reservationDetails);
-
+        if (!$reservationDetails) {
+            $this->logger->error("Détails de réservation introuvables en session !");
+            return;
+        }
+    
         // Création de la réservation
-            $reservation = new Reservation();
-            $reservation->setArrivalDate(\DateTime::createFromFormat('d/m/Y', $reservationDetails['startDate']));
-            $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $reservationDetails['endDate']));
-            
-            $reservation->setNumberAdult($reservationDetails['numberAdult']);
-            $reservation->setNumberKid($reservationDetails['numberKid']);
-            $reservation->setTotalNight($reservationDetails['totalNight']);
-            $reservation->setPriceNight($reservationDetails['nightPrice']);
-            $reservation->setCleaningCharge($reservationDetails['cleaningCharge']);
-            $reservation->setSupplement($reservationDetails['supplement']);
-            $reservation->setTva($reservationDetails['tva']);
-            $reservation->setTourismTax($reservationDetails['tax']);
-            $reservation->setTotalPrice($reservationDetails['totalPrice']);
-            $reservation->setLastName($reservationDetails['lastName']);
-            $reservation->setFirstName($reservationDetails['firstName']);
-            $reservation->setaddress($reservationDetails['address']);
-            $reservation->setCp($reservationDetails['cp']);
-            $reservation->setCity($reservationDetails['city']);
-            $reservation->setCountry($reservationDetails['country']);
-            $reservation->setPhone($reservationDetails['phone']);
-            $reservation->setEmail($reservationDetails['email']);
-            $reservation->setIsMajor($reservationDetails['isMajor']);
-            $reservation->setMessage($reservationDetails['message']);
-            $reservation->setReference($tempReservationId);
-
-            // Récupération du Gîte et de l'Utilisateur
-            $gite = $this->entityManager->getRepository(\App\Entity\Gite::class)->find($metadata->gite_id);
-            $user = $this->entityManager->getRepository(\App\Entity\User::class)->find($metadata->user_id);
-            $reservation->setGite($gite);
-            $reservation->setUser($user);
-        
-            // Enregistrement en bdd
-            try {
-                $this->entityManager->persist($reservation);
-                $this->entityManager->flush();
-                $this->logger->info("Réservation confirmée !");
-            } catch (\Exception $e) {
-                $this->logger->error("Erreur lors de l'enregistrement : " . $e->getMessage());
-                // dump("ERREUR lors de la sauvegarde de la réservation !");
-                // dump($e->getMessage());
-                // dump($e->getTraceAsString());
-                // die; 
-                return;
-            }
-
+        $reservation = new Reservation();
+        $reservation->setArrivalDate(\DateTime::createFromFormat('d/m/Y', $reservationDetails['startDate']));
+        $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $reservationDetails['endDate']));
+        $reservation->setNumberAdult($reservationDetails['numberAdult']);
+        $reservation->setNumberKid($reservationDetails['numberKid']);
+        $reservation->setTotalNight($reservationDetails['totalNight']);
+        $reservation->setPriceNight($reservationDetails['nightPrice']);
+        $reservation->setCleaningCharge($reservationDetails['cleaningCharge']);
+        $reservation->setSupplement($reservationDetails['supplement']);
+        $reservation->setTva($reservationDetails['tva']);
+        $reservation->setTourismTax($reservationDetails['tax']);
+        $reservation->setTotalPrice($reservationDetails['totalPrice']);
+        $reservation->setLastName($reservationDetails['lastName']);
+        $reservation->setFirstName($reservationDetails['firstName']);
+        $reservation->setAddress($reservationDetails['address']);
+        $reservation->setCp($reservationDetails['cp']);
+        $reservation->setCity($reservationDetails['city']);
+        $reservation->setCountry($reservationDetails['country']);
+        $reservation->setPhone($reservationDetails['phone']);
+        $reservation->setEmail($reservationDetails['email']);
+        $reservation->setIsMajor($reservationDetails['isMajor']);
+        $reservation->setMessage($reservationDetails['message']);
+        $reservation->setReference($tempReservationId);
+        $reservation->setStripePaymentId($session->payment_intent); // On stocke l'ID Stripe
+    
+        // Récupération du Gîte et de l'Utilisateur
+        $gite = $this->entityManager->getRepository(\App\Entity\Gite::class)->find($metadata->gite_id);
+        $user = $this->entityManager->getRepository(\App\Entity\User::class)->find($metadata->user_id);
+        $reservation->setGite($gite);
+        $reservation->setUser($user);
+    
+        // Enregistrement en base de données
+        try {
+            $this->entityManager->persist($reservation);
+            $this->entityManager->flush();
+            $this->logger->info("Réservation confirmée et sauvegardée !");
+        } catch (\Exception $e) {
+            $this->logger->error("Erreur lors de la sauvegarde de la réservation : " . $e->getMessage());
+        }
     }
+    
 
     private function handlePaymentSucceeded($paymentIntent)
 {
     $this->logger->info("Paiement réussi pour PaymentIntent ID : " . $paymentIntent->id);
 
+    
     // Récupération de la réservation via Stripe PaymentIntent
     $reservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
         'stripePaymentId' => $paymentIntent->id
@@ -168,7 +168,7 @@ public function handleStripeWebhook(Request $request, LoggerInterface $logger): 
     }
 
     // Confirmer la réservation
-    $reservation->setIsConfirm(true);
+    // $reservation->setIsConfirm(true);
     $this->entityManager->persist($reservation);
     $this->entityManager->flush();
 
