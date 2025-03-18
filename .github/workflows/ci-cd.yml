@@ -4,33 +4,44 @@ name: CI/CD Workflow
 on:
   push:
     branches:
-      - develop  # Tu peux ajuster cela si tu veux qu'il se déclenche pour d'autres branches
+      - develop  # Ajuste cela si nécessaire
 
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: test_db
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
-    # Aller dans le dossier app
-    - name: Move to project directory
-      run: |
-        cd app
 
     # Installer PHP et les extensions nécessaires
     - name: Set up PHP
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2'  # Remplace par la version PHP que tu utilises
+        php-version: '8.2'
 
+    # Créer le fichier .env pour les tests
     - name: Create .env file
       run: |
         echo "APP_ENV=prod" >> app/.env
         echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
-        echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> app/.env
-        echo "OTHER_ENV_VARIABLE=${{ secrets.OTHER_ENV_VARIABLE }}" >> app/.env
+        echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env
 
     # Installer les dépendances
     - name: Install dependencies
@@ -50,7 +61,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
-
 
     - name: Deploy to VPS
       uses: appleboy/ssh-action@v0.1.6
