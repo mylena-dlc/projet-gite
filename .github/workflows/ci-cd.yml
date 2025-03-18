@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     # Installer PHP et les extensions nécessaires
     - name: Set up PHP
@@ -23,7 +23,7 @@ jobs:
     # Installer les dépendances
     - name: Install dependencies
       run: |
-        composer install --no-interaction
+        composer install --no-interaction --prefer-dist --no-dev --no-progress --optimize-autoloader
 
     # Exécuter les tests
     - name: Run tests
@@ -37,23 +37,27 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    # Installer PHP et les extensions nécessaires pour le déploiement
-    - name: Set up PHP
-      uses: shivammathur/setup-php@v2
+
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@v0.1.6
       with:
-        php-version: '8.2'
-
-    # Déployer sur la branche main (production)
-    - name: Deploy to production (main branch)
-      run: |
-        git config --global user.email "mylena.delacote@laposte.net"
-        git config --global user.name "Mylena Delacote"
-        git checkout main
-        git pull origin main
-        git merge develop  # Merge develop dans main
-        git push origin main
+        host: ${{ secrets.VPS_HOST }}
+        username: ${{ secrets.VPS_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /var/www/projet-gite
+          git checkout main
+          git pull origin main
+          git merge develop
+          git push origin main
+          composer install --no-interaction --prefer-dist --no-dev
+          php bin/console cache:clear --env=prod
+          php bin/console cache:warmup --env=prod
+          chown -R www-data:www-data /var/www/projet-gite/app/var
+          chmod -R 775 /var/www/projet-gite/app/var
+          systemctl restart apache2
 
       env:
         GITE_TOKEN: ${{ secrets.GITE_TOKEN }}
