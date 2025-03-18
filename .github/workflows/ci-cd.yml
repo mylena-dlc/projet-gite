@@ -75,19 +75,12 @@ jobs:
           git checkout develop
           git pull origin develop
           
-          if git show-ref --verify --quiet refs/heads/main; then
-            git branch -D main
-          fi
-          
-          if git ls-remote --exit-code --heads origin main; then
-            git checkout -b main origin/main
-          else
-            git checkout -b main
-          fi
+          git checkout main || git checkout -b main origin/main
+          git pull origin main --allow-unrelated-histories || true
 
-          git merge develop --no-ff -m "Merge automatique de develop dans main"
-       
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/mylena-dlc/projet-gite.git main
+          git rebase develop
+          
+          git push origin main --force
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
