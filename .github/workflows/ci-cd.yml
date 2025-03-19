@@ -38,10 +38,6 @@ jobs:
         with:
           php-version: '8.2'
 
-      - name: Install PHP dependencies
-        run: |
-          cd app && composer install --no-interaction --prefer-dist
-          cd app && composer dump-autoload
 
       - name: Create .env file
         run: |
@@ -51,6 +47,11 @@ jobs:
           echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> app/.env
           echo "MAILER_DSN=null://null" >> app/.env
           echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> app/.env
+          
+      - name: Install PHP dependencies
+        run: |
+          cd app && composer install --no-interaction --prefer-dist
+          cd app && composer dump-autoload
 
       - name: Create MySQL Database
         run: |
