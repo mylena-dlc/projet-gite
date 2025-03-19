@@ -68,7 +68,7 @@ jobs:
 
       - name: Installer les dépendances PHP
         run: |
-          docker-compose exec -T php composer install --no-interaction --prefer-dist
+          docker compose exec -T php composer install --no-interaction --prefer-dist
 
       - name: Vérifier si le dossier vendor existe après composer install
         run: |
@@ -83,8 +83,8 @@ jobs:
 
       - name: Créer et mettre à jour la base de données
         run: |
-          docker-compose exec -T php php bin/console doctrine:database:create --if-not-exists
-          docker-compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
+          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Installer Node.js
         uses: actions/setup-node@v3
@@ -93,19 +93,19 @@ jobs:
 
       - name: Installer les dépendances NPM
         run: |
-          docker-compose exec -T php npm install
+          docker compose exec -T php npm install
 
       - name: Compiler les assets
         run: |
-          docker-compose exec -T php npm run build
+          docker compose exec -T php npm run build
 
       - name: Debugger les routes Symfony
         run: |
-          docker-compose exec -T php php bin/console debug:router
+          docker compose exec -T php php bin/console debug:router
 
       - name: Lancer les tests PHPUnit
         run: |
-          docker-compose exec -T php php bin/phpunit
+          docker compose exec -T php php bin/phpunit
 
   merge-to-test:
     needs: test
