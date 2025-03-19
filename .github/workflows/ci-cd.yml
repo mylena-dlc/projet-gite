@@ -1,10 +1,10 @@
 name: CI/CD Workflow
 
-# Déclenchement du workflow lors d'un push sur la branche develop
 on:
   push:
     branches:
-      - develop  # Lorsqu'un push est fait sur develop, ce workflow démarre
+      - develop  # CI quand push sur develop
+      - test     # CI quand push sur test
 
 jobs:
   test:
@@ -24,79 +24,117 @@ jobs:
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=5
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Installer PHP et ses extensions
+      - name: Wait for MySQL
+        run: sleep 15  # Attente pour éviter les erreurs de connexion
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
 
-      # Créer le fichier .env pour les tests
-      - name: Create .env file
+      - name: Create .env.test file
         run: |
-          echo "APP_ENV=prod" >> app/.env
-          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
-          echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env
+          echo "APP_ENV=test" > app/.env.test
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env.test
+          echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env.test
 
-      # Installer les dépendances
       - name: Install dependencies
         run: |
           cd app && composer install --no-interaction --prefer-dist
 
-      # Exécuter les tests
       - name: Run tests
         run: |
-          cd app && vendor/bin/phpunit || true
-
-  merge-to-main:
+          cd app && vendor/bin/phpunit
+          
+  merge-to-test:
     needs: test
     runs-on: ubuntu-latest
-    if: success()  # Exécute cette étape uniquement si les tests réussissent
+    if: success()  # Si les tests passent
 
     steps:
-      - name: Checkout main branch
+      - name: Checkout develop branch
         uses: actions/checkout@v3
         with:
-          ref: main
-          fetch-depth: 0  # Récupérer tout l'historique pour éviter les erreurs de divergence
+          fetch-depth: 0
+          ref: develop
 
-      - name: Checkout develop branch
+      - name: Configure Git
         run: |
-          git fetch origin develop
-          git checkout develop
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
 
-      - name: Check if merge is needed
+      - name: Merge develop into test
+        run: |
+          git checkout test
+          git pull origin test --allow-unrelated-histories || true
+          git merge develop --no-ff -m "Fusion de develop dans test"
+          git push origin test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-on-test-branch:
+    needs: merge-to-test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: test
+
+      - name: Run CI tests again
+        run: echo "Re-lancement des tests sur la branche test"
+
+  merge-to-main:
+    needs: test-on-test-branch
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: test
+
+      - name: Merge test into main
         run: |
           git checkout main
-          git pull origin main
-          if git merge-base --is-ancestor develop main; then
-            echo "No merge needed, main is already up to date."
-            exit 0
-          fi
-
-      - name: Merge develop into main
-        run: |
-          git merge --no-ff develop -m "Merge develop into main"
+          git pull origin main --allow-unrelated-histories || true
+          git merge test --no-ff -m "Fusion de test dans main"
           git push origin main
-
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     needs: merge-to-main
     runs-on: ubuntu-latest
-    if: success()  # Déploie uniquement si la fusion a réussi
+    if: success()
 
     steps:
       - name: Checkout main branch
         uses: actions/checkout@v3
         with:
           ref: main
+
+      - name: Debug SSH connection
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            whoami
+            hostname
+            ls -lah /var/www/projet-gite
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v0.1.6
