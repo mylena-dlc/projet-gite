@@ -32,7 +32,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Vérifier les fichiers après checkout
+      - name: Vérifier l’arborescence après le checkout
         run: |
           echo "📂 Contenu du projet après checkout"
           ls -lah
@@ -41,6 +41,18 @@ jobs:
         run: |
           echo "📂 Contenu du dossier app/"
           ls -lah app || echo "❌ Le dossier app/ n'existe pas"
+
+      - name: Vérifier le dossier courant et `bin/console`
+        run: |
+          echo "📌 Chemin actuel :"
+          pwd
+          echo "📂 Contenu de bin/"
+          ls -lah app/bin
+          echo "🔧 Test exécution `bin/console`"
+          php app/bin/console --version || echo "❌ Erreur lors de l'exécution de bin/console"
+
+      - name: Corriger les permissions de `bin/console`
+        run: chmod +x app/bin/console
 
       - name: Détection du dossier du projet
         run: |
