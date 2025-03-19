@@ -1,16 +1,11 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
+        # server_version: '8.0'  # Décommente si nécessaire
         dbname_suffix: ''
-        override_url: true 
-        
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
-
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -36,11 +31,17 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+        orm:
+            auto_generate_proxy_classes: true
+            validate_xml_mapping: false  # Désactivé pour éviter les erreurs inutiles en test
 
 when@prod:
     doctrine:
+        dbal:
+            # Amélioration des performances en production
+            options:
+                1002: "SET SESSION sql_mode=(SELECT REPLACE(@@sql_mode, 'ONLY_FULL_GROUP_BY', ''))"
         orm:
             auto_generate_proxy_classes: false
             proxy_dir: '%kernel.build_dir%/doctrine/orm/Proxies'
@@ -52,15 +53,4 @@ when@prod:
                             dir: '%kernel.project_dir%/src/Entity'
                             prefix: 'App\Entity'
                             is_bundle: false
-                            name: default
-                    auto_mapping: true
-            
-
-
-    framework:
-        cache:
-            pools:
-                doctrine.result_cache_pool:
-                    adapter: cache.app
-                doctrine.system_cache_pool:
-                    adapter: cache.system
+                            

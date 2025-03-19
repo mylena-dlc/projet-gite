@@ -2,27 +2,25 @@
 
 namespace App\Tests\Controller;
 
-use App\Tests\TestTrait;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RegistrationControllerTest extends WebTestCase
 {
-    use TestTrait;
-    
     public function testGetRequestToRegistrationPageReturnSuccessfulResponse(): void 
     {
-        $this->clientGoesOnRegisterPage();
+        $client = static::createClient();
+        $client->request('GET', '/register');
 
-        $this->assertResponseIsSuccessFul();
-
+        $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Créer un compte');
-
     }
 
     public function testSpamBotsAreNotWelcome(): void
     {
-        $client = $this->clientGoesOnRegisterPage();
+        $client = static::createClient();
+        $client->request('GET', '/register');
+
         $client->submitForm(
             "s'inscrire",
             [
@@ -34,17 +32,11 @@ class RegistrationControllerTest extends WebTestCase
                 'registration_form[numberFax]' => 'booooob',
             ]
         );
+
+        // Vérifier si la réponse est un 403 "Forbidden"
         $this->assertResponseStatusCodeSame(403, 'Go away dirty bot !');
-        $this->assertRouteSame('app_register');
+
+        // Vérifier si on est bien redirigé vers "/"
+        $this->assertResponseRedirects('/');
     }
-
-    private function clientGoesOnRegisterPage(): KernelBrowser
-    {
-        $client = $this->createClientAndFollowRedirects();
-        
-        $client->request('GET', '/register');
-
-        return $client;
-    }
-
 }
