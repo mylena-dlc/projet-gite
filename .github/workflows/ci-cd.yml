@@ -10,7 +10,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     services:
       mysql:
         image: mysql:8.0
@@ -41,25 +40,25 @@ jobs:
 
       - name: Vérifier et créer .env manquant
         run: |
-          echo "📌 Le projet est dans : $PROJECT_DIR"
-          if [ ! -f "$PROJECT_DIR/app/.env" ]; then
+          echo "📌 Le projet est dans : /var/www"
+          if [ ! -f "/var/www/.env" ]; then
             echo "❌ .env introuvable, création en cours..."
-            touch "$PROJECT_DIR/app/.env"
-            echo "APP_ENV=test" > "$PROJECT_DIR/app/.env"
-            echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> "$PROJECT_DIR/app/.env"
-            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> "$PROJECT_DIR/app/.env"
-            echo "MAILER_DSN=null://null" >> "$PROJECT_DIR/app/.env"
-            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> "$PROJECT_DIR/app/.env"
+            touch "/var/www/.env"
+            echo "APP_ENV=test" > "/var/www/.env"
+            echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> "/var/www/.env"
+            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> "/var/www/.env"
+            echo "MAILER_DSN=null://null" >> "/var/www/.env"
+            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> "/var/www/.env"
             echo "✅ .env créé avec succès."
           else
             echo "✅ .env existe déjà."
           fi
-          ls -lah "$PROJECT_DIR/app/.env"
+          ls -lah "/var/www/.env"
 
       - name: Supprimer .env.local pour éviter les conflits
         run: |
-          if [ -f "$PROJECT_DIR/app/.env.local" ]; then
-            rm "$PROJECT_DIR/app/.env.local"
+          if [ -f "/var/www/.env.local" ]; then
+            rm "/var/www/.env.local"
             echo "❌ .env.local supprimé pour éviter conflits"
           fi
 
@@ -69,14 +68,14 @@ jobs:
 
       - name: Vérifier si le dossier vendor existe après composer install
         run: |
-          if [ ! -d "$PROJECT_DIR/app/vendor" ]; then
+          if [ ! -d "/var/www/vendor" ]; then
             echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
             exit 1
           fi
 
       - name: Donner les permissions au bin/console
         run: |
-          chmod +x "$PROJECT_DIR/app/bin/console"
+          chmod +x "/var/www/bin/console"
 
       - name: Créer et mettre à jour la base de données
         run: |
