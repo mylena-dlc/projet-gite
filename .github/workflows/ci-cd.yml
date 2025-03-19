@@ -30,33 +30,38 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug folder structure
+      - name: Debug Folder Structure
         run: |
           echo "🔍 Vérification de l'architecture du projet"
           ls -lah
+
+      - name: Detect Project Directory
+        run: |
+          if [ -d "app" ]; then echo "PROJECT_DIR=app" >> $GITHUB_ENV; else echo "PROJECT_DIR=." >> $GITHUB_ENV; fi
+          echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
 
       - name: Wait for MySQL
         run: sleep 15  # Attente pour éviter les erreurs de connexion
 
       - name: Ensure .env file exists
         run: |
-          touch app/.env
-          echo "APP_ENV=test" > app/.env
-          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
-          echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> app/.env
-          echo "MAILER_DSN=null://null" >> app/.env
-          echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> app/.env
+          touch ${{ env.PROJECT_DIR }}/.env
+          echo "APP_ENV=test" > ${{ env.PROJECT_DIR }}/.env
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> ${{ env.PROJECT_DIR }}/.env
+          echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> ${{ env.PROJECT_DIR }}/.env
+          echo "MAILER_DSN=null://null" >> ${{ env.PROJECT_DIR }}/.env
+          echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> ${{ env.PROJECT_DIR }}/.env
 
       - name: Verify .env file
         run: |
-          echo "🔍 Vérification de la présence du fichier .env"
-          ls -lah app/
-          cat app/.env
+          echo "🔍 Vérification du fichier .env"
+          ls -lah ${{ env.PROJECT_DIR }}
+          cat ${{ env.PROJECT_DIR }}/.env
 
       - name: Install PHP dependencies
         run: |
-          cd app && composer install --no-interaction --prefer-dist
-          cd app && composer dump-autoload
+          cd ${{ env.PROJECT_DIR }} && composer install --no-interaction --prefer-dist
+          cd ${{ env.PROJECT_DIR }} && composer dump-autoload
 
       - name: Create MySQL Database
         run: |
@@ -66,21 +71,21 @@ jobs:
 
       - name: Drop & Create Database Schema
         run: |
-          cd app && php bin/console doctrine:database:drop --force --if-exists
-          cd app && php bin/console doctrine:database:create --if-not-exists
-          cd app && php bin/console doctrine:schema:create
+          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:database:drop --force --if-exists
+          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:database:create --if-not-exists
+          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:schema:create
 
       - name: Debug Doctrine Schema
         run: |
-          cd app && php bin/console doctrine:schema:validate --skip-sync
+          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:schema:validate --skip-sync
 
       - name: Run database migrations
         run: |
-          cd app && php bin/console doctrine:migrations:migrate --no-interaction
+          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Run Messenger schema migration
         run: |
-          cd app && php bin/console messenger:setup-transports --no-interaction
+          cd ${{ env.PROJECT_DIR }} && php bin/console messenger:setup-transports --no-interaction
 
       - name: Install Node.js
         uses: actions/setup-node@v3
@@ -89,116 +94,16 @@ jobs:
 
       - name: Install NPM dependencies
         run: |
-          cd app && npm install
+          cd ${{ env.PROJECT_DIR }} && npm install
 
       - name: Build assets
         run: |
-          cd app && npm run build
+          cd ${{ env.PROJECT_DIR }} && npm run build
 
       - name: Debug routes
         run: |
-          cd app && php bin/console debug:router
+          cd ${{ env.PROJECT_DIR }} && php bin/console debug:router
 
       - name: Run tests
         run: |
-          cd app && vendor/bin/phpunit
-
-  merge-to-test:
-    needs: test
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout develop branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: develop
-
-      - name: Configure Git
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-
-      - name: Merge develop into test
-        run: |
-          git checkout test
-          git pull origin test --allow-unrelated-histories || true
-          git merge develop --no-ff -m "Fusion de develop dans test"
-          git push origin test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  test-on-test-branch:
-    needs: merge-to-test
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout test branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: test
-
-      - name: Run CI tests again
-        run: echo "Re-lancement des tests sur la branche test"
-
-  merge-to-main:
-    needs: test-on-test-branch
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout test branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: test
-
-      - name: Merge test into main
-        run: |
-          git checkout main
-          git pull origin main --allow-unrelated-histories || true
-          git merge test --no-ff -m "Fusion de test dans main"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy:
-    needs: merge-to-main
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v3
-        with:
-          ref: main
-
-      - name: Debug SSH connection
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            whoami
-            hostname
-            ls -lah /var/www/projet-gite
-
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/projet-gite/app
-            git pull origin main
-            sudo chown -R www-data:www-data var
-            sudo chmod -R 775 var/cache var/log
-            sudo rm -rf var/cache/prod
-            php bin/console cache:clear --env=prod
-            php bin/console cache:warmup --env=prod
-            sudo systemctl restart apache2
+          cd ${{ env.PROJECT_DIR }} && vendor/bin/phpunit
