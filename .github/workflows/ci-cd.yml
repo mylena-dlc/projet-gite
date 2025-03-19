@@ -3,8 +3,8 @@ name: CI/CD Workflow
 on:
   push:
     branches:
-      - develop  # CI quand push sur develop
-      - test     # CI quand push sur test
+      - develop
+      - test
 
 jobs:
   test:
@@ -67,14 +67,18 @@ jobs:
         run: |
           cd app && npm run build
 
+      - name: Debug routes
+        run: |
+          cd app && php bin/console debug:router
+
       - name: Run tests
         run: |
           cd app && vendor/bin/phpunit
-          
+
   merge-to-test:
     needs: test
     runs-on: ubuntu-latest
-    if: success()  # Si les tests passent
+    if: success()
 
     steps:
       - name: Checkout develop branch
