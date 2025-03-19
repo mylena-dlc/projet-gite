@@ -77,10 +77,17 @@ jobs:
           ls -lah ${{ env.PROJECT_DIR }}
           cat ${{ env.PROJECT_DIR }}/.env
 
-      - name: Install PHP dependencies
+      - name: Installer les dépendances PHP (composer)
         run: |
-          cd ${{ env.PROJECT_DIR }} && composer install --no-interaction --prefer-dist
-          cd ${{ env.PROJECT_DIR }} && composer dump-autoload
+          cd ${{ env.PROJECT_DIR }} && composer install --no-interaction --prefer-dist --no-progress
+          ls -lah ${{ env.PROJECT_DIR }}/vendor || echo "❌ Le dossier vendor/ est manquant !"
+
+      - name: Vérifier si les vendors sont bien installés
+        run: |
+          if [ ! -d "${{ env.PROJECT_DIR }}/vendor" ]; then
+            echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
+            exit 1
+          fi
 
       - name: Create MySQL Database
         run: |
