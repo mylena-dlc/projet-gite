@@ -79,6 +79,14 @@ jobs:
           done
           echo "✅ Conteneur PHP prêt !"
 
+      - name: Vérifier et corriger les permissions de /var/www
+        run: |
+          docker compose exec -T php bash -c "mkdir -p /var/www/vendor && chown -R www-data:www-data /var/www && chmod -R 777 /var/www"
+
+      - name: Réinitialiser le dossier vendor
+        run: |
+          docker compose exec -T php bash -c "rm -rf /var/www/vendor && mkdir -p /var/www/vendor && chown -R www-data:www-data /var/www && chmod -R 777 /var/www"
+
       - name: Installer les dépendances PHP
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
