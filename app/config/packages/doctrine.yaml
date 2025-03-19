@@ -2,6 +2,7 @@ doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
         dbname_suffix: ''
+        override_url: true 
         
 
         # IMPORTANT: You MUST configure your server version,
