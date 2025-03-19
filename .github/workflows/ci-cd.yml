@@ -66,6 +66,19 @@ jobs:
             echo "❌ .env.local supprimé pour éviter conflits"
           fi
 
+      - name: Démarrer les services Docker
+        run: |
+          docker compose up -d
+          docker compose ps
+
+      - name: Vérifier et attendre que le conteneur PHP démarre
+        run: |
+          until docker compose exec -T php php -v &>/dev/null; do
+            echo "⏳ En attente du démarrage du conteneur PHP..."
+            sleep 5
+          done
+          echo "✅ Conteneur PHP prêt !"
+
       - name: Installer les dépendances PHP
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
