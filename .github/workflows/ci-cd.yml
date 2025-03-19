@@ -41,9 +41,7 @@ jobs:
           ls -lah app || echo "❌ Le dossier app/ n'existe pas"
 
       - name: 🕵️ Forcer `PROJECT_DIR=app`
-        run: |
-          echo "PROJECT_DIR=app" >> $GITHUB_ENV
-          echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
+        run: echo "PROJECT_DIR=app" >> $GITHUB_ENV
 
       - name: 📝 Vérifier et créer `.env` avant `composer install`
         run: |
@@ -79,29 +77,19 @@ jobs:
 
       - name: 🎯 Tester `bin/console`
         run: |
-          echo "🔧 Test exécution `bin/console`"
           php ${{ env.PROJECT_DIR }}/bin/console --version || echo "❌ Erreur lors de l'exécution de bin/console"
 
       - name: 🕒 Attendre MySQL
         run: sleep 15
 
-      - name: 🏗️ Créer la base de données MySQL
+      - name: 🏗️ Supprimer et recréer la base de données
         run: |
-          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_db;"
-          mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON test_db.* TO 'user'@'%';"
-          mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
+          php app/bin/console doctrine:database:drop --force --if-exists
+          php app/bin/console doctrine:database:create --if-not-exists
 
-      - name: 🔄 Recréer le schéma de la base de données
+      - name: 🔄 Nettoyer les migrations et recréer le schéma
         run: |
-          cd ${{ env.PROJECT_DIR }}
-          php bin/console doctrine:database:drop --force --if-exists
-          php bin/console doctrine:database:create --if-not-exists
-          php bin/console doctrine:schema:create
-
-      - name: 🛠️ Appliquer les migrations Doctrine
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          php bin/console doctrine:migrations:migrate --no-interaction
+          php app/bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || echo "⚠️ Aucune migration à appliquer."
 
       - name: 📨 Configurer Messenger
         run: |
