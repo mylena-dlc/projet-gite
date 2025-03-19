@@ -50,9 +50,21 @@ jobs:
         run: |
           cd app && composer install --no-interaction --prefer-dist
 
-      - name: Run tests
-        run: |
-          cd app && vendor/bin/phpunit
+      - name: Install Node.js
+              uses: actions/setup-node@v3
+              with:
+                node-version: '18'
+
+            - name: Install NPM dependencies
+              run: |
+                cd app && npm install
+
+            - name: Build assets
+              run: |
+                cd app && npm run build
+            - name: Run tests
+              run: |
+                cd app && vendor/bin/phpunit
           
   merge-to-test:
     needs: test
