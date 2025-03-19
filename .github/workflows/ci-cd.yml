@@ -37,27 +37,59 @@ jobs:
           echo "📂 Contenu du projet après checkout"
           ls -lah
 
-      - name: Vérifier le contenu de app/
+      - name: Détection du dossier du projet
+        run: |
+          if [ -d "app" ]; then 
+            echo "PROJECT_DIR=app" >> $GITHUB_ENV
+          else 
+            echo "PROJECT_DIR=." >> $GITHUB_ENV
+          fi
+          echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
+
+      - name: Vérifier le contenu de `app/`
         run: |
           echo "📂 Contenu du dossier app/"
           ls -lah app || echo "❌ Le dossier app/ n'existe pas"
 
-      - name: Vérifier le dossier courant et `bin/console`
+      - name: Vérifier le dossier avant `composer install`
         run: |
-          echo "📌 Chemin actuel :"
+          echo "📌 Dossier courant :"
           pwd
-          echo "📂 Contenu de bin/"
-          ls -lah app/bin
-          echo "🔧 Test exécution `bin/console`"
-          php app/bin/console --version || echo "❌ Erreur lors de l'exécution de bin/console"
+          echo "📂 Contenu du dossier :"
+          ls -lah
+          echo "📂 Contenu de ${{ env.PROJECT_DIR }} :"
+          ls -lah ${{ env.PROJECT_DIR }} || echo "❌ Le dossier ${{ env.PROJECT_DIR }} n'existe pas"
+
+      - name: Vérifier `composer.json` et `composer.lock`
+        run: |
+          if [ ! -f "${{ env.PROJECT_DIR }}/composer.json" ]; then
+            echo "❌ ERREUR : `composer.json` est introuvable dans ${{ env.PROJECT_DIR }}"
+            exit 1
+          fi
+          if [ ! -f "${{ env.PROJECT_DIR }}/composer.lock" ]; then
+            echo "⚠️ Attention : `composer.lock` est introuvable. Le projet pourrait avoir des dépendances instables."
+          fi
+
+      - name: Installer les dépendances PHP (composer)
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          composer install --no-interaction --prefer-dist --no-progress || (echo "❌ ERREUR : Composer install a échoué !" && exit 1)
+          ls -lah vendor || echo "❌ Le dossier vendor/ est manquant !"
+
+      - name: Vérifier si les vendors sont bien installés
+        run: |
+          if [ ! -d "${{ env.PROJECT_DIR }}/vendor" ]; then
+            echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
+            exit 1
+          fi
 
       - name: Corriger les permissions de `bin/console`
-        run: chmod +x app/bin/console
+        run: chmod +x ${{ env.PROJECT_DIR }}/bin/console
 
-      - name: Détection du dossier du projet
+      - name: Tester `bin/console`
         run: |
-          if [ -d "app" ]; then echo "PROJECT_DIR=app" >> $GITHUB_ENV; else echo "PROJECT_DIR=." >> $GITHUB_ENV; fi
-          echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
+          echo "🔧 Test exécution `bin/console`"
+          php ${{ env.PROJECT_DIR }}/bin/console --version || echo "❌ Erreur lors de l'exécution de bin/console"
 
       - name: Wait for MySQL
         run: sleep 15  # Attente pour éviter les erreurs de connexion
@@ -76,18 +108,6 @@ jobs:
           echo "🔍 Vérification du fichier .env"
           ls -lah ${{ env.PROJECT_DIR }}
           cat ${{ env.PROJECT_DIR }}/.env
-
-      - name: Installer les dépendances PHP (composer)
-        run: |
-          cd ${{ env.PROJECT_DIR }} && composer install --no-interaction --prefer-dist --no-progress
-          ls -lah ${{ env.PROJECT_DIR }}/vendor || echo "❌ Le dossier vendor/ est manquant !"
-
-      - name: Vérifier si les vendors sont bien installés
-        run: |
-          if [ ! -d "${{ env.PROJECT_DIR }}/vendor" ]; then
-            echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
-            exit 1
-          fi
 
       - name: Create MySQL Database
         run: |
