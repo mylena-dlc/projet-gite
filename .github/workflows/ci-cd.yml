@@ -37,7 +37,10 @@ jobs:
 
       - name: Attendre que MySQL soit prêt
         run: sleep 15
-        
+
+      - name: Vérifier et corriger les permissions de /var/www
+        run: |
+          sudo chmod -R 777 /var/www    
 
       - name: Vérifier et créer .env manquant
         run: |
