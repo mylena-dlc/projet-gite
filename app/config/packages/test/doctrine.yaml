@@ -1,0 +1,5 @@
+doctrine:
+    dbal:
+        url: '%env(resolve:DATABASE_URL)%'
+        dbname_suffix: ''  # Désactive l'ajout automatique de "_test"
+        override_url: true
