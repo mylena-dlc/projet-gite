@@ -32,35 +32,18 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 📂 Vérification de la structure du projet en local et sur GitHub Actions
+      - name: 📂 Vérification de la structure du projet
         run: |
           echo "📌 Chemin actuel : $(pwd)"
           echo "📂 Contenu de la racine :"
           ls -lah
-          echo "📂 Contenu de app/ (si existant) :"
+          echo "📂 Contenu de app/ :"
           ls -lah app || echo "❌ Le dossier app/ n'existe pas"
 
-      - name: 🕵️ Détection automatique du dossier de projet
+      - name: 🕵️ Forcer `PROJECT_DIR=app`
         run: |
-          if [ -f "app/composer.json" ]; then 
-            echo "PROJECT_DIR=app" >> $GITHUB_ENV
-          elif [ -f "composer.json" ]; then
-            echo "PROJECT_DIR=." >> $GITHUB_ENV
-          else
-            echo "❌ ERREUR : `composer.json` est introuvable dans `app/` et à la racine !"
-            exit 1
-          fi
+          echo "PROJECT_DIR=app" >> $GITHUB_ENV
           echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
-
-      - name: 🗂 Vérifier `composer.json` et `composer.lock`
-        run: |
-          if [ ! -f "${{ env.PROJECT_DIR }}/composer.json" ]; then
-            echo "❌ ERREUR : `composer.json` est introuvable dans ${{ env.PROJECT_DIR }}"
-            exit 1
-          fi
-          if [ ! -f "${{ env.PROJECT_DIR }}/composer.lock" ]; then
-            echo "⚠️ Attention : `composer.lock` est introuvable. Le projet pourrait avoir des dépendances instables."
-          fi
 
       - name: 📝 Vérifier et créer `.env` avant `composer install`
         run: |
