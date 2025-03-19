@@ -30,11 +30,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Debug Folder Structure
+      - name: Debug folder structure
         run: |
-          echo "vericiation de l'architecture du projet"
+          echo "🔍 Vérification de l'architecture du projet"
           ls -lah
-          
+
       - name: Wait for MySQL
         run: sleep 15  # Attente pour éviter les erreurs de connexion
 
@@ -49,6 +49,7 @@ jobs:
 
       - name: Verify .env file
         run: |
+          echo "🔍 Vérification de la présence du fichier .env"
           ls -lah app/
           cat app/.env
 
@@ -193,11 +194,11 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/projet-gite
+            cd /var/www/projet-gite/app
             git pull origin main
-            sudo chown -R www-data:www-data app/var
-            sudo chmod -R 775 app/var/cache app/var/log
-            sudo rm -rf app/var/cache/prod
+            sudo chown -R www-data:www-data var
+            sudo chmod -R 775 var/cache var/log
+            sudo rm -rf var/cache/prod
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2
