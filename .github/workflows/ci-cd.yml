@@ -59,29 +59,30 @@ jobs:
     if: success()  # Exécute cette étape uniquement si les tests réussissent
 
     steps:
-      - name: Checkout develop branch
+      - name: Checkout main branch
         uses: actions/checkout@v3
         with:
-          ref: develop  # On récupère la branche develop
+          ref: main
+          fetch-depth: 0  # Récupérer tout l'historique pour éviter les erreurs de divergence
 
-      - name: Configure Git
+      - name: Checkout develop branch
         run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
+          git fetch origin develop
+          git checkout develop
+
+      - name: Check if merge is needed
+        run: |
+          git checkout main
+          git pull origin main
+          if git merge-base --is-ancestor develop main; then
+            echo "No merge needed, main is already up to date."
+            exit 0
+          fi
 
       - name: Merge develop into main
         run: |
-
-          git fetch origin
-          git checkout main
-          git pull origin main --allow-unrelated-histories || true  
-
-          if git merge-base --is-ancestor develop main; then
-            echo "main est déjà à jour avec develop"
-          else
-            git merge develop --allow-unrelated-histories --no-ff -m "Fusion forcée de develop dans main"
-            git push origin main
-          fi
+          git merge --no-ff develop -m "Merge develop into main"
+          git push origin main
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
