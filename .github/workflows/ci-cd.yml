@@ -27,15 +27,22 @@ jobs:
           --health-retries=5
 
     steps:
-      - name: Checkout code
+      - name: Checkout du code avec profondeur complète
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-      - name: Debug Folder Structure
+      - name: Vérifier les fichiers après checkout
         run: |
-          echo "🔍 Vérification de l'architecture du projet"
+          echo "📂 Contenu du projet après checkout"
           ls -lah
 
-      - name: Detect Project Directory
+      - name: Vérifier le contenu de app/
+        run: |
+          echo "📂 Contenu du dossier app/"
+          ls -lah app || echo "❌ Le dossier app/ n'existe pas"
+
+      - name: Détection du dossier du projet
         run: |
           if [ -d "app" ]; then echo "PROJECT_DIR=app" >> $GITHUB_ENV; else echo "PROJECT_DIR=." >> $GITHUB_ENV; fi
           echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
@@ -52,7 +59,7 @@ jobs:
           echo "MAILER_DSN=null://null" >> ${{ env.PROJECT_DIR }}/.env
           echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> ${{ env.PROJECT_DIR }}/.env
 
-      - name: Verify .env file
+      - name: Vérification du fichier .env
         run: |
           echo "🔍 Vérification du fichier .env"
           ls -lah ${{ env.PROJECT_DIR }}
