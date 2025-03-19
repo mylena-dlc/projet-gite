@@ -44,11 +44,15 @@ jobs:
           echo "APP_ENV=test" > app/.env
           echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
           echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env
-          echo "MAILER_DSN=smtp://localhost" >> app/.env
+          echo "MAILER_DSN=null://null" >> app/.env
 
-      - name: Install dependencies
+      - name: Install PHP dependencies
         run: |
           cd app && composer install --no-interaction --prefer-dist
+
+      - name: Run database migrations
+        run: |
+          cd app && php bin/console doctrine:migrations:migrate --no-interaction
 
       - name: Install Node.js
         uses: actions/setup-node@v3
@@ -62,6 +66,7 @@ jobs:
       - name: Build assets
         run: |
           cd app && npm run build
+
       - name: Run tests
         run: |
           cd app && vendor/bin/phpunit
