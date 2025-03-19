@@ -30,10 +30,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Installer Docker Compose
+      - name: Vérifier et attendre que le conteneur PHP démarre
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
+          echo "⏳ Vérification du conteneur PHP..."
+          docker-compose ps
+          until docker-compose exec -T php php -v &>/dev/null; do
+            echo "⏳ En attente de PHP..."
+            sleep 2
+          done
+          echo "✅ Conteneur PHP prêt !"
+
+      - name: Vérifier et installer Docker Compose si nécessaire
+        run: |
+          if ! docker-compose version &>/dev/null; then
+            sudo apt-get update && sudo apt-get install -y docker-compose
+          fi
 
       - name: Vérifier les conteneurs en cours d'exécution
         run: |
@@ -49,24 +60,19 @@ jobs:
 
       - name: Vérifier et corriger les permissions de /var/www
         run: |
-          docker-compose exec -T php ls -lah /var/www
-          docker-compose exec -T php bash -c "chown -R www-data:www-data /var/www && chmod -R 775 /var/www"
-          docker-compose exec -T php ls -lah /var/www
+          docker-compose exec -T php bash -c "chmod -R 777 /var/www"
+
 
       - name: Vérifier et créer .env manquant
         run: |
           docker-compose exec -T php bash -c "
             if [ ! -f '/var/www/.env' ]; then
-              echo '❌ .env introuvable, création en cours...'
-              touch /var/www/.env
               echo 'APP_ENV=test' > /var/www/.env
               echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
               echo 'DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0' >> /var/www/.env
               echo 'MAILER_DSN=null://null' >> /var/www/.env
-              echo '✅ .env créé avec succès.'
-            else
-              echo '✅ .env existe déjà.'
             fi
+            chown www-data:www-data /var/www/.env && chmod 660 /var/www/.env
           "
 
       - name: Supprimer .env.local pour éviter les conflits
