@@ -35,6 +35,10 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Vérifier les conteneurs en cours d'exécution
+        run: |
+          docker ps -a
+
       - name: Vérifier l'architecture du projet après checkout
         run: |
           echo "📌 Chemin actuel : $(pwd)"
@@ -45,7 +49,9 @@ jobs:
 
       - name: Vérifier et corriger les permissions de /var/www
         run: |
-          docker-compose exec -T php bash -c "sudo chown -R www-data:www-data /var/www && sudo chmod -R 775 /var/www"
+          docker-compose exec -T php ls -lah /var/www
+          docker-compose exec -T php bash -c "chown -R www-data:www-data /var/www && chmod -R 775 /var/www"
+          docker-compose exec -T php ls -lah /var/www
 
       - name: Vérifier et créer .env manquant
         run: |
