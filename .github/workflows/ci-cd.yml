@@ -38,16 +38,12 @@ jobs:
       - name: Attendre que MySQL soit prêt
         run: sleep 15
 
-      - name: Vérifier les permissions et ajuster sur /var/www
-        run: |
-          sudo chown -R www-data:www-data /var/www
-          sudo chmod -R 775 /var/www
-
       - name: Vérifier et créer .env manquant
         run: |
           echo "📌 Le projet est dans : /var/www"
           if [ ! -f "/var/www/.env" ]; then
             echo "❌ .env introuvable, création en cours..."
+            touch "/var/www/.env"
             echo "APP_ENV=test" > "/var/www/.env"
             echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> "/var/www/.env"
             echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> "/var/www/.env"
@@ -57,7 +53,7 @@ jobs:
           else
             echo "✅ .env existe déjà."
           fi
-          ls -lah "/var/www/.env"
+          ls -lah /var/www/.env
 
       - name: Supprimer .env.local pour éviter les conflits
         run: |
@@ -180,9 +176,9 @@ jobs:
           script: |
             cd /var/www/projet-gite
             git pull origin main
-            sudo chown -R www-data:www-data app/var
-            sudo chmod -R 775 app/var/cache app/var/log
-            sudo rm -rf app/var/cache/prod
+            sudo chown -R www-data:www-data /var/www
+            sudo chmod -R 775 /var/www/var/cache /var/www/var/log
+            sudo rm -rf /var/www/var/cache/prod
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2
