@@ -27,102 +27,98 @@ jobs:
           --health-retries=5
 
     steps:
+      # Checkout the repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Installer Docker et Docker Compose
-      - name: Set up Docker
+      # Update Docker
+      - name: Update Docker
         run: |
           sudo apt-get update
-          sudo apt-get install -y docker.io
-          sudo curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-          sudo chmod +x /usr/local/bin/docker-compose
+          sudo apt-get install --only-upgrade docker-ce docker-ce-cli containerd.io
 
-      # Vérification de l'arborescence du projet
-      - name: Vérifier l'arborescence du projet après checkout
+      # Check Docker version
+      - name: Check Docker version
+        run: docker --version
+
+      # Verify folder structure after checkout
+      - name: Debug Folder Structure
         run: |
-          echo "📂 Contenu du projet après checkout"
+          echo "📌 Chemin actuel : $(pwd)"
           ls -lah
 
-      # Attendre que MySQL soit opérationnel
+      # Wait for MySQL to be ready
       - name: Wait for MySQL
-        run: sleep 15  # Attente pour éviter les erreurs de connexion
+        run: sleep 15
 
-      # Vérifier la présence de .env
-      - name: Vérifier et créer .env manquant
+      # Ensure .env file exists and is correctly configured
+      - name: Ensure .env file exists
         run: |
           if [ ! -f "$PROJECT_DIR/.env" ]; then
             echo "❌ .env introuvable, création en cours..."
-            touch $PROJECT_DIR/.env
-            echo "APP_ENV=test" > $PROJECT_DIR/.env
-            echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> $PROJECT_DIR/.env
-            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> $PROJECT_DIR/.env
-            echo "MAILER_DSN=null://null" >> $PROJECT_DIR/.env
-            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> $PROJECT_DIR/.env
+            touch "$PROJECT_DIR/.env"
+            echo "APP_ENV=test" > "$PROJECT_DIR/.env"
+            echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> "$PROJECT_DIR/.env"
+            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> "$PROJECT_DIR/.env"
+            echo "MAILER_DSN=null://null" >> "$PROJECT_DIR/.env"
+            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> "$PROJECT_DIR/.env"
             echo "✅ .env créé avec succès."
           else
             echo "✅ .env existe déjà."
           fi
           ls -lah $PROJECT_DIR/.env
 
-      # Supprimer .env.local si présent pour éviter les conflits
-      - name: Supprimer .env.local pour éviter conflits
+      # Install PHP dependencies
+      - name: Install PHP dependencies
         run: |
-          if [ -f "$PROJECT_DIR/.env.local" ]; then
-            rm "$PROJECT_DIR/.env.local"
-            echo "❌ .env.local supprimé pour éviter conflits"
-          fi
-
-      # Installer les dépendances PHP
-      - name: Installer les dépendances PHP
-        run: |
-          docker-compose -f docker-compose.yml up -d
           docker-compose exec php composer install --no-interaction --prefer-dist
 
-      # Vérifier la présence de vendor après composer install
-      - name: Vérifier les vendor après composer install
+      # Verify vendor directory
+      - name: Verify vendor directory
         run: |
           if [ ! -d "$PROJECT_DIR/vendor" ]; then
             echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
             exit 1
           fi
 
-      # Donner les permissions à bin/console
-      - name: Donner les permissions à bin/console
-        run: |
-          chmod +x $PROJECT_DIR/bin/console
+      # Give permissions to bin/console
+      - name: Give permissions to bin/console
+        run: chmod +x $PROJECT_DIR/bin/console
 
-      # Créer et mettre à jour la base de données
-      - name: Créer et mettre à jour la base de données
+      # Create and update the database
+      - name: Create and update the database
         run: |
-          docker-compose exec php php bin/console doctrine:database:create --if-not-exists
-          docker-compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_db;"
+          mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON test_db.* TO 'user'@'%';"
+          mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
+          cd $PROJECT_DIR && php bin/console doctrine:database:create --if-not-exists
+          cd $PROJECT_DIR && php bin/console doctrine:migrations:migrate --no-interaction
 
-      # Installer Node.js
-      - name: Installer Node.js
+      # Install Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      # Installer les dépendances NPM
-      - name: Installer les dépendances NPM
+      # Install NPM dependencies
+      - name: Install NPM dependencies
         run: |
-          docker-compose exec php npm install
+          cd $PROJECT_DIR && npm install
 
-      # Compiler les assets
-      - name: Compiler les assets
+      # Build assets
+      - name: Build assets
         run: |
-          docker-compose exec php npm run build
+          cd $PROJECT_DIR && npm run build
 
-      # Debug des routes Symfony
-      - name: Debug des routes Symfony
+      # Debug Symfony routes
+      - name: Debug routes
         run: |
-          docker-compose exec php php bin/console debug:router
+          cd $PROJECT_DIR && php bin/console debug:router
 
-      # Lancer les tests PHPUnit
-      - name: Lancer les tests PHPUnit
+      # Run PHPUnit tests
+      - name: Run tests
         run: |
-          docker-compose exec php php vendor/bin/phpunit
+          cd $PROJECT_DIR && vendor/bin/phpunit
 
   merge-to-test:
     needs: test
