@@ -33,13 +33,7 @@ jobs:
       - name: Wait for MySQL
         run: sleep 15  # Attente pour éviter les erreurs de connexion
 
-      - name: Set up PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.2'
-
-
-      - name: Create .env file
+      - name: Ensure .env file exists
         run: |
           touch app/.env
           echo "APP_ENV=test" > app/.env
@@ -47,7 +41,12 @@ jobs:
           echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> app/.env
           echo "MAILER_DSN=null://null" >> app/.env
           echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> app/.env
-          
+
+      - name: Verify .env file
+        run: |
+          ls -lah app/
+          cat app/.env
+
       - name: Install PHP dependencies
         run: |
           cd app && composer install --no-interaction --prefer-dist
