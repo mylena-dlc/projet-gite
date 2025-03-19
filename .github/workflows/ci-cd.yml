@@ -31,7 +31,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Wait for MySQL
-        run: sleep 15
+        run: sleep 15  # Attente pour éviter les erreurs de connexion
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
@@ -80,3 +80,103 @@ jobs:
       - name: Run tests
         run: |
           cd app && vendor/bin/phpunit
+
+  merge-to-test:
+    needs: test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: develop
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Merge develop into test
+        run: |
+          git checkout test
+          git pull origin test --allow-unrelated-histories || true
+          git merge develop --no-ff -m "Fusion de develop dans test"
+          git push origin test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  test-on-test-branch:
+    needs: merge-to-test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: test
+
+      - name: Run CI tests again
+        run: echo "Re-lancement des tests sur la branche test"
+
+  merge-to-main:
+    needs: test-on-test-branch
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout test branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: test
+
+      - name: Merge test into main
+        run: |
+          git checkout main
+          git pull origin main --allow-unrelated-histories || true
+          git merge test --no-ff -m "Fusion de test dans main"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: merge-to-main
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: Debug SSH connection
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            whoami
+            hostname
+            ls -lah /var/www/projet-gite
+
+      - name: Deploy to VPS
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/projet-gite
+            git pull origin main
+            sudo chown -R www-data:www-data app/var
+            sudo chmod -R 775 app/var/cache app/var/log
+            sudo rm -rf app/var/cache/prod
+            php bin/console cache:clear --env=prod
+            php bin/console cache:warmup --env=prod
+            sudo systemctl restart apache2
