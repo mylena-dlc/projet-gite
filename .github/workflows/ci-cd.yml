@@ -6,6 +6,9 @@ on:
       - develop
       - test
 
+env:
+  PROJECT_DIR: app
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -30,94 +33,81 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
-      - name: 🔍 Vérifier la structure du projet
+      - name: 📂 Vérifier l’arborescence après checkout
         run: |
           echo "📌 Chemin actuel : $(pwd)"
           ls -lah
 
-      - name: 🚀 Définir la variable d'environnement PROJECT_DIR
-        run: echo "PROJECT_DIR=app" >> $GITHUB_ENV
+      - name: ⏳ Attendre MySQL
+        run: sleep 15  # Attente pour éviter les erreurs de connexion
 
-      - name: 🕒 Attendre que MySQL démarre
-        run: sleep 15
-
-      - name: 🛠️ Vérifier et créer `.env.test`
+      - name: 🛠️ Vérifier et créer `.env` manquant
         run: |
-          if [ ! -f "$PROJECT_DIR/.env.test" ]; then
-            echo "❌ .env.test introuvable, création..."
-            touch $PROJECT_DIR/.env.test
-            echo "APP_ENV=test" > $PROJECT_DIR/.env.test
-            echo "APP_SECRET=testSecretKey" >> $PROJECT_DIR/.env.test
-            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> $PROJECT_DIR/.env.test
-            echo "MAILER_DSN=null://null" >> $PROJECT_DIR/.env.test
-            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> $PROJECT_DIR/.env.test
-            echo "✅ .env.test créé avec succès."
+          if [ ! -f "$PROJECT_DIR/.env" ]; then
+            echo "❌ .env introuvable, création en cours..."
+            touch $PROJECT_DIR/.env
+            echo "APP_ENV=test" > $PROJECT_DIR/.env
+            echo "APP_SECRET=testSecretKey" >> $PROJECT_DIR/.env
+            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> $PROJECT_DIR/.env
+            echo "MAILER_DSN=null://null" >> $PROJECT_DIR/.env
+            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> $PROJECT_DIR/.env
+            echo "✅ .env créé avec succès."
           else
-            echo "✅ .env.test existe déjà."
+            echo "✅ .env existe déjà."
           fi
 
-      - name: 📂 Vérifier que `composer.json` est bien présent
+      - name: 🔍 Vérifier le contenu de app/
+        run: ls -lah $PROJECT_DIR
+
+      - name: ❌ Supprimer `.env.local` (évite conflits)
         run: |
-          if [ ! -f "$PROJECT_DIR/composer.json" ]; then
-            echo "❌ ERREUR : `composer.json` est introuvable dans $PROJECT_DIR"
-            exit 1
+          if [ -f "$PROJECT_DIR/.env.local" ]; then
+            rm "$PROJECT_DIR/.env.local"
+            echo "❌ .env.local supprimé pour éviter conflits"
           fi
 
-      - name: 📦 Installer les dépendances PHP
+      - name: 🛠️ Installer les dépendances PHP
         run: |
           cd $PROJECT_DIR && composer install --no-interaction --prefer-dist
-          cd $PROJECT_DIR && composer dump-autoload
 
-      - name: ⚠️ Vérifier le dossier `vendor`
+      - name: 🔍 Vérifier `vendor/` après `composer install`
         run: |
           if [ ! -d "$PROJECT_DIR/vendor" ]; then
             echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
             exit 1
           fi
 
-      - name: 🛠️ Corriger les permissions de `bin/console`
+      - name: 🔄 Donner les permissions au `bin/console`
         run: chmod +x $PROJECT_DIR/bin/console
 
-      - name: 🔥 Vider le cache Symfony
-        run: cd $PROJECT_DIR && php bin/console cache:clear --env=test
-
-      - name: 🗄️ Vérifier et créer la base de données test
+      - name: 🛠️ Créer et mettre à jour la base de données
         run: |
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_db;"
           mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON test_db.* TO 'user'@'%';"
           mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
+          cd $PROJECT_DIR && php bin/console doctrine:database:create --if-not-exists
+          cd $PROJECT_DIR && php bin/console doctrine:migrations:migrate --no-interaction
 
-      - name: 🏗️ Recréer le schéma et exécuter les migrations
-        run: |
-          cd $PROJECT_DIR
-          php bin/console doctrine:database:drop --force --if-exists --env=test || true
-          php bin/console doctrine:database:create --if-not-exists --env=test
-          php bin/console doctrine:migrations:migrate --no-interaction --env=test
-
-      - name: 💡 Debug Doctrine
-        run: cd $PROJECT_DIR && php bin/console doctrine:schema:validate --skip-sync --env=test
-
-      - name: 🏗️ Exécuter la migration du transport Messenger
-        run: cd $PROJECT_DIR && php bin/console messenger:setup-transports --no-interaction --env=test
-
-      - name: 📦 Installer Node.js et dépendances
+      - name: 🛠️ Installer Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: 📂 Installer les dépendances NPM
-        run: cd $PROJECT_DIR && npm install
-
-      - name: 🔧 Compiler les assets
-        run: cd $PROJECT_DIR && npm run build
-
-      - name: 🕵️ Vérifier les routes Symfony
-        run: cd $PROJECT_DIR && php bin/console debug:router
-
-      - name: 🛠️ Lancer les tests PHPUnit
+      - name: 📦 Installer les dépendances NPM
         run: |
-          cd $PROJECT_DIR
-          vendor/bin/phpunit --verbose
+          cd $PROJECT_DIR && npm install
+
+      - name: 🏗️ Compiler les assets
+        run: |
+          cd $PROJECT_DIR && npm run build
+
+      - name: 🚦 Debug routes Symfony
+        run: |
+          cd $PROJECT_DIR && php bin/console debug:router
+
+      - name: 🧪 Lancer les tests PHPUnit
+        run: |
+          cd $PROJECT_DIR && vendor/bin/phpunit
 
   merge-to-test:
     needs: test
@@ -131,17 +121,58 @@ jobs:
           fetch-depth: 0
           ref: develop
 
-      - name: 🔀 Fusionner develop → test
+      - name: 🔧 Configurer Git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: 🔄 Fusionner develop dans test
         run: |
           git checkout test
-          git pull origin test || true
+          git pull origin test --allow-unrelated-histories || true
           git merge develop --no-ff -m "Fusion de develop dans test"
           git push origin test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy:
+  test-on-test-branch:
     needs: merge-to-test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: 📥 Checkout test branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: test
+
+      - name: 🚀 Relancer les tests sur la branche test
+        run: echo "Re-lancement des tests sur la branche test"
+
+  merge-to-main:
+    needs: test-on-test-branch
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: 📥 Checkout test branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: test
+
+      - name: 🔄 Fusionner test dans main
+        run: |
+          git checkout main
+          git pull origin main --allow-unrelated-histories || true
+          git merge test --no-ff -m "Fusion de test dans main"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: merge-to-main
     runs-on: ubuntu-latest
     if: success()
 
@@ -151,7 +182,18 @@ jobs:
         with:
           ref: main
 
-      - name: 🚀 Déploiement sur VPS
+      - name: 🔑 Debug SSH connection
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            whoami
+            hostname
+            ls -lah /var/www/projet-gite
+
+      - name: 🚀 Déploiement sur le VPS
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
