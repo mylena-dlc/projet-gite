@@ -30,6 +30,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Debug Folder Structure
+        run: |
+          echo "vericiation de l'architecture du projet"
+          ls -lah
+          
       - name: Wait for MySQL
         run: sleep 15  # Attente pour éviter les erreurs de connexion
 
