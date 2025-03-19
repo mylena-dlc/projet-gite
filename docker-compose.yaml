@@ -1,6 +1,5 @@
-
 services:
-###> doctrine/doctrine-bundle ###
+  ###> doctrine/doctrine-bundle ###
   database:
     container_name: database
     image: mysql:8.0
@@ -27,6 +26,7 @@ services:
       - ./app/.env:/var/www/.env
     depends_on:
       - database
+    user: "www-data:www-data"  # Ajout de cette ligne pour garantir l'utilisateur
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -48,6 +48,6 @@ services:
       - 8025:8025 #boite mail
       
 volumes:
-###> doctrine/doctrine-bundle ###
+  ###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
+  ###< doctrine/doctrine-bundle ###
