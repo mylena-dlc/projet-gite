@@ -27,96 +27,142 @@ jobs:
           --health-retries=5
 
     steps:
-      - name: 📥 Checkout du code
+      - name: 📥 Checkout code
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
 
-      - name: 📂 Vérification de la structure du projet
+      - name: 🔍 Vérifier la structure du projet
         run: |
           echo "📌 Chemin actuel : $(pwd)"
-          echo "📂 Contenu de la racine :"
           ls -lah
-          echo "📂 Contenu de app/ :"
-          ls -lah app || echo "❌ Le dossier app/ n'existe pas"
 
-      - name: 🕵️ Forcer `PROJECT_DIR=app`
+      - name: 🚀 Définir la variable d'environnement PROJECT_DIR
         run: echo "PROJECT_DIR=app" >> $GITHUB_ENV
 
-      - name: 📝 Vérifier et créer `.env` avant `composer install`
+      - name: 🕒 Attendre que MySQL démarre
+        run: sleep 15
+
+      - name: 🛠️ Vérifier et créer `.env.test`
         run: |
-          if [ ! -f "${{ env.PROJECT_DIR }}/.env" ]; then
-            echo "❌ .env introuvable, création en cours..."
-            touch ${{ env.PROJECT_DIR }}/.env
-            echo "APP_ENV=test" > ${{ env.PROJECT_DIR }}/.env
-            echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> ${{ env.PROJECT_DIR }}/.env
-            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> ${{ env.PROJECT_DIR }}/.env
-            echo "MAILER_DSN=null://null" >> ${{ env.PROJECT_DIR }}/.env
-            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> ${{ env.PROJECT_DIR }}/.env
-            echo "✅ .env créé avec succès."
+          if [ ! -f "$PROJECT_DIR/.env.test" ]; then
+            echo "❌ .env.test introuvable, création..."
+            touch $PROJECT_DIR/.env.test
+            echo "APP_ENV=test" > $PROJECT_DIR/.env.test
+            echo "APP_SECRET=testSecretKey" >> $PROJECT_DIR/.env.test
+            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> $PROJECT_DIR/.env.test
+            echo "MAILER_DSN=null://null" >> $PROJECT_DIR/.env.test
+            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> $PROJECT_DIR/.env.test
+            echo "✅ .env.test créé avec succès."
           else
-            echo "✅ .env existe déjà."
+            echo "✅ .env.test existe déjà."
           fi
-          ls -lah ${{ env.PROJECT_DIR }}/.env
 
-      - name: 💾 Installer les dépendances PHP (composer)
+      - name: 📂 Vérifier que `composer.json` est bien présent
         run: |
-          cd ${{ env.PROJECT_DIR }}
-          composer install --no-interaction --prefer-dist --no-progress || (echo "❌ ERREUR : Composer install a échoué !" && exit 1)
-          ls -lah vendor || echo "❌ Le dossier vendor/ est manquant !"
+          if [ ! -f "$PROJECT_DIR/composer.json" ]; then
+            echo "❌ ERREUR : `composer.json` est introuvable dans $PROJECT_DIR"
+            exit 1
+          fi
 
-      - name: 🧐 Vérifier si `vendor/` est bien installé
+      - name: 📦 Installer les dépendances PHP
         run: |
-          if [ ! -d "${{ env.PROJECT_DIR }}/vendor" ]; then
+          cd $PROJECT_DIR && composer install --no-interaction --prefer-dist
+          cd $PROJECT_DIR && composer dump-autoload
+
+      - name: ⚠️ Vérifier le dossier `vendor`
+        run: |
+          if [ ! -d "$PROJECT_DIR/vendor" ]; then
             echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
             exit 1
           fi
 
-      - name: 🔧 Corriger les permissions de `bin/console`
-        run: chmod +x ${{ env.PROJECT_DIR }}/bin/console
+      - name: 🛠️ Corriger les permissions de `bin/console`
+        run: chmod +x $PROJECT_DIR/bin/console
 
-      - name: 🎯 Tester `bin/console`
+      - name: 🔥 Vider le cache Symfony
+        run: cd $PROJECT_DIR && php bin/console cache:clear --env=test
+
+      - name: 🗄️ Vérifier et créer la base de données test
         run: |
-          php ${{ env.PROJECT_DIR }}/bin/console --version || echo "❌ Erreur lors de l'exécution de bin/console"
+          mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_db;"
+          mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON test_db.* TO 'user'@'%';"
+          mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
 
-      - name: 🕒 Attendre MySQL
-        run: sleep 15
-
-      - name: 🏗️ Supprimer et recréer la base de données
+      - name: 🏗️ Recréer le schéma et exécuter les migrations
         run: |
-          php app/bin/console doctrine:database:drop --force --if-exists
-          php app/bin/console doctrine:database:create --if-not-exists
+          cd $PROJECT_DIR
+          php bin/console doctrine:database:drop --force --if-exists --env=test || true
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:migrations:migrate --no-interaction --env=test
 
-      - name: 🔄 Nettoyer les migrations et recréer le schéma
-        run: |
-          php app/bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || echo "⚠️ Aucune migration à appliquer."
+      - name: 💡 Debug Doctrine
+        run: cd $PROJECT_DIR && php bin/console doctrine:schema:validate --skip-sync --env=test
 
-      - name: 📨 Configurer Messenger
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          php bin/console messenger:setup-transports --no-interaction
+      - name: 🏗️ Exécuter la migration du transport Messenger
+        run: cd $PROJECT_DIR && php bin/console messenger:setup-transports --no-interaction --env=test
 
-      - name: 🔧 Installer Node.js
+      - name: 📦 Installer Node.js et dépendances
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: 📦 Installer les dépendances NPM
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          npm install
+      - name: 📂 Installer les dépendances NPM
+        run: cd $PROJECT_DIR && npm install
 
-      - name: 🎨 Construire les assets
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          npm run build
+      - name: 🔧 Compiler les assets
+        run: cd $PROJECT_DIR && npm run build
 
-      - name: 🗺️ Vérifier les routes
-        run: |
-          cd ${{ env.PROJECT_DIR }}
-          php bin/console debug:router
+      - name: 🕵️ Vérifier les routes Symfony
+        run: cd $PROJECT_DIR && php bin/console debug:router
 
-      - name: ✅ Exécuter les tests PHPUnit
+      - name: 🛠️ Lancer les tests PHPUnit
         run: |
-          cd ${{ env.PROJECT_DIR }}
-          vendor/bin/phpunit
+          cd $PROJECT_DIR
+          vendor/bin/phpunit --verbose
+
+  merge-to-test:
+    needs: test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: 📥 Checkout develop branch
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: develop
+
+      - name: 🔀 Fusionner develop → test
+        run: |
+          git checkout test
+          git pull origin test || true
+          git merge develop --no-ff -m "Fusion de develop dans test"
+          git push origin test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: merge-to-test
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: 📥 Checkout main branch
+        uses: actions/checkout@v3
+        with:
+          ref: main
+
+      - name: 🚀 Déploiement sur VPS
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/www/projet-gite
+            git pull origin main
+            sudo chown -R www-data:www-data app/var
+            sudo chmod -R 775 app/var/cache app/var/log
+            sudo rm -rf app/var/cache/prod
+            php bin/console cache:clear --env=prod
+            php bin/console cache:warmup --env=prod
+            sudo systemctl restart apache2
