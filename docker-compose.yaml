@@ -27,6 +27,12 @@ services:
     depends_on:
       - database
     user: "www-data:www-data"  # Ajout de cette ligne pour garantir l'utilisateur
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+     - |
+       chown -R www-data:www-data /var/www/vendor
+       chmod -R 775 /var/www/vendor
+       exec apache2-foreground
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
