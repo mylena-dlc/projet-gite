@@ -44,6 +44,7 @@ jobs:
           echo "APP_ENV=test" > app/.env
           echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> app/.env
           echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db" >> app/.env
+          echo "MAILER_DSN=smtp://localhost" >> app/.env
 
       - name: Install dependencies
         run: |
