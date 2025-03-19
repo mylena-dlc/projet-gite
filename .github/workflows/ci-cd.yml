@@ -27,40 +27,32 @@ jobs:
           --health-retries=5
 
     steps:
-      - name: Checkout du code avec profondeur complète
+      - name: 📥 Checkout du code
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Vérifier l’arborescence après le checkout
+      - name: 📂 Vérification de la structure du projet en local et sur GitHub Actions
         run: |
-          echo "📂 Contenu du projet après checkout"
+          echo "📌 Chemin actuel : $(pwd)"
+          echo "📂 Contenu de la racine :"
           ls -lah
+          echo "📂 Contenu de app/ (si existant) :"
+          ls -lah app || echo "❌ Le dossier app/ n'existe pas"
 
-      - name: Détection du dossier du projet
+      - name: 🕵️ Détection automatique du dossier de projet
         run: |
-          if [ -d "app" ]; then 
+          if [ -f "app/composer.json" ]; then 
             echo "PROJECT_DIR=app" >> $GITHUB_ENV
-          else 
+          elif [ -f "composer.json" ]; then
             echo "PROJECT_DIR=." >> $GITHUB_ENV
+          else
+            echo "❌ ERREUR : `composer.json` est introuvable dans `app/` et à la racine !"
+            exit 1
           fi
           echo "📌 Le projet est dans : ${{ env.PROJECT_DIR }}"
 
-      - name: Vérifier le contenu de `app/`
-        run: |
-          echo "📂 Contenu du dossier app/"
-          ls -lah app || echo "❌ Le dossier app/ n'existe pas"
-
-      - name: Vérifier le dossier avant `composer install`
-        run: |
-          echo "📌 Dossier courant :"
-          pwd
-          echo "📂 Contenu du dossier :"
-          ls -lah
-          echo "📂 Contenu de ${{ env.PROJECT_DIR }} :"
-          ls -lah ${{ env.PROJECT_DIR }} || echo "❌ Le dossier ${{ env.PROJECT_DIR }} n'existe pas"
-
-      - name: Vérifier `composer.json` et `composer.lock`
+      - name: 🗂 Vérifier `composer.json` et `composer.lock`
         run: |
           if [ ! -f "${{ env.PROJECT_DIR }}/composer.json" ]; then
             echo "❌ ERREUR : `composer.json` est introuvable dans ${{ env.PROJECT_DIR }}"
@@ -70,86 +62,90 @@ jobs:
             echo "⚠️ Attention : `composer.lock` est introuvable. Le projet pourrait avoir des dépendances instables."
           fi
 
-      - name: Installer les dépendances PHP (composer)
+      - name: 📝 Vérifier et créer `.env` avant `composer install`
+        run: |
+          if [ ! -f "${{ env.PROJECT_DIR }}/.env" ]; then
+            echo "❌ .env introuvable, création en cours..."
+            touch ${{ env.PROJECT_DIR }}/.env
+            echo "APP_ENV=test" > ${{ env.PROJECT_DIR }}/.env
+            echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> ${{ env.PROJECT_DIR }}/.env
+            echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> ${{ env.PROJECT_DIR }}/.env
+            echo "MAILER_DSN=null://null" >> ${{ env.PROJECT_DIR }}/.env
+            echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> ${{ env.PROJECT_DIR }}/.env
+            echo "✅ .env créé avec succès."
+          else
+            echo "✅ .env existe déjà."
+          fi
+          ls -lah ${{ env.PROJECT_DIR }}/.env
+
+      - name: 💾 Installer les dépendances PHP (composer)
         run: |
           cd ${{ env.PROJECT_DIR }}
           composer install --no-interaction --prefer-dist --no-progress || (echo "❌ ERREUR : Composer install a échoué !" && exit 1)
           ls -lah vendor || echo "❌ Le dossier vendor/ est manquant !"
 
-      - name: Vérifier si les vendors sont bien installés
+      - name: 🧐 Vérifier si `vendor/` est bien installé
         run: |
           if [ ! -d "${{ env.PROJECT_DIR }}/vendor" ]; then
             echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
             exit 1
           fi
 
-      - name: Corriger les permissions de `bin/console`
+      - name: 🔧 Corriger les permissions de `bin/console`
         run: chmod +x ${{ env.PROJECT_DIR }}/bin/console
 
-      - name: Tester `bin/console`
+      - name: 🎯 Tester `bin/console`
         run: |
           echo "🔧 Test exécution `bin/console`"
           php ${{ env.PROJECT_DIR }}/bin/console --version || echo "❌ Erreur lors de l'exécution de bin/console"
 
-      - name: Wait for MySQL
-        run: sleep 15  # Attente pour éviter les erreurs de connexion
+      - name: 🕒 Attendre MySQL
+        run: sleep 15
 
-      - name: Ensure .env file exists
-        run: |
-          touch ${{ env.PROJECT_DIR }}/.env
-          echo "APP_ENV=test" > ${{ env.PROJECT_DIR }}/.env
-          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> ${{ env.PROJECT_DIR }}/.env
-          echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> ${{ env.PROJECT_DIR }}/.env
-          echo "MAILER_DSN=null://null" >> ${{ env.PROJECT_DIR }}/.env
-          echo "MESSENGER_TRANSPORT_DSN=doctrine://default" >> ${{ env.PROJECT_DIR }}/.env
-
-      - name: Vérification du fichier .env
-        run: |
-          echo "🔍 Vérification du fichier .env"
-          ls -lah ${{ env.PROJECT_DIR }}
-          cat ${{ env.PROJECT_DIR }}/.env
-
-      - name: Create MySQL Database
+      - name: 🏗️ Créer la base de données MySQL
         run: |
           mysql -h 127.0.0.1 -u root -proot -e "CREATE DATABASE IF NOT EXISTS test_db;"
           mysql -h 127.0.0.1 -u root -proot -e "GRANT ALL PRIVILEGES ON test_db.* TO 'user'@'%';"
           mysql -h 127.0.0.1 -u root -proot -e "FLUSH PRIVILEGES;"
 
-      - name: Drop & Create Database Schema
+      - name: 🔄 Recréer le schéma de la base de données
         run: |
-          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:database:drop --force --if-exists
-          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:database:create --if-not-exists
-          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:schema:create
+          cd ${{ env.PROJECT_DIR }}
+          php bin/console doctrine:database:drop --force --if-exists
+          php bin/console doctrine:database:create --if-not-exists
+          php bin/console doctrine:schema:create
 
-      - name: Debug Doctrine Schema
+      - name: 🛠️ Appliquer les migrations Doctrine
         run: |
-          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:schema:validate --skip-sync
+          cd ${{ env.PROJECT_DIR }}
+          php bin/console doctrine:migrations:migrate --no-interaction
 
-      - name: Run database migrations
+      - name: 📨 Configurer Messenger
         run: |
-          cd ${{ env.PROJECT_DIR }} && php bin/console doctrine:migrations:migrate --no-interaction
+          cd ${{ env.PROJECT_DIR }}
+          php bin/console messenger:setup-transports --no-interaction
 
-      - name: Run Messenger schema migration
-        run: |
-          cd ${{ env.PROJECT_DIR }} && php bin/console messenger:setup-transports --no-interaction
-
-      - name: Install Node.js
+      - name: 🔧 Installer Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
 
-      - name: Install NPM dependencies
+      - name: 📦 Installer les dépendances NPM
         run: |
-          cd ${{ env.PROJECT_DIR }} && npm install
+          cd ${{ env.PROJECT_DIR }}
+          npm install
 
-      - name: Build assets
+      - name: 🎨 Construire les assets
         run: |
-          cd ${{ env.PROJECT_DIR }} && npm run build
+          cd ${{ env.PROJECT_DIR }}
+          npm run build
 
-      - name: Debug routes
+      - name: 🗺️ Vérifier les routes
         run: |
-          cd ${{ env.PROJECT_DIR }} && php bin/console debug:router
+          cd ${{ env.PROJECT_DIR }}
+          php bin/console debug:router
 
-      - name: Run tests
+      - name: ✅ Exécuter les tests PHPUnit
         run: |
-          cd ${{ env.PROJECT_DIR }} && vendor/bin/phpunit
+          cd ${{ env.PROJECT_DIR }}
+          vendor/bin/phpunit
