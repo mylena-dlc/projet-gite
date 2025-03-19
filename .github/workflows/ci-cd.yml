@@ -41,6 +41,7 @@ jobs:
       - name: Vérifier et créer .env manquant
         run: |
           echo "📌 Le projet est dans : /var/www"
+          sudo chmod -R 777 /var/www  # Donne des permissions d'écriture pour tous
           if [ ! -f "/var/www/.env" ]; then
             echo "❌ .env introuvable, création en cours..."
             touch "/var/www/.env"
@@ -75,7 +76,7 @@ jobs:
 
       - name: Donner les permissions au bin/console
         run: |
-          chmod +x "/var/www/bin/console"
+          chmod +x /var/www/bin/console
 
       - name: Créer et mettre à jour la base de données
         run: |
