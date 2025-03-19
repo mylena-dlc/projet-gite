@@ -38,6 +38,11 @@ jobs:
         with:
           php-version: '8.2'
 
+      - name: Install PHP dependencies
+        run: |
+          cd app && composer install --no-interaction --prefer-dist
+          cd app && composer dump-autoload
+
       - name: Create .env file
         run: |
           touch app/.env
@@ -70,10 +75,6 @@ jobs:
       - name: Run Messenger schema migration
         run: |
           cd app && php bin/console messenger:setup-transports --no-interaction
-
-      - name: Install PHP dependencies
-        run: |
-          cd app && composer install --no-interaction --prefer-dist
 
       - name: Install Node.js
         uses: actions/setup-node@v3
