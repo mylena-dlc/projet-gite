@@ -24,15 +24,16 @@ services:
       - ./app:/var/www
       - ./app/.env:/var/www/.env
     environment:
-      - UID=${UID:-1000}   # UID par défaut si non défini (pour Windows)
-      - GID=${GID:-1000}   # GID par défaut si non défini (pour Windows)
+      - UID=${UID:-1000}
+      - GID=${GID:-1000}
     depends_on:
       - database
-    user: root  # ✅ Exécution en tant que root pour éviter les problèmes
+    user: www-data
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
         echo "🔧 Vérification des permissions..."
+        mkdir -p /var/www/var/cache /var/www/var/log
         chmod -R 775 /var/www
         exec apache2-foreground
 
