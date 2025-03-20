@@ -56,28 +56,29 @@ jobs:
           done
           echo "✅ Conteneur PHP prêt !"
 
-      - name: Vérifier l'existence des dossiers de cache/log
+      - name: 🧐 Vérification des fichiers avant toute action
         run: |
           docker compose exec -T php bash -c "
-            ls -ld /var/www/var || echo '🚨 /var/www/var n existe pas'
-            ls -ld /var/www/var/cache || echo '🚨 /var/www/var/cache n existe pas'
-            ls -ld /var/www/var/log || echo '🚨 /var/www/var/log n existe pas'
+            echo '🔍 Contenu de /var/www'
+            ls -lah /var/www || echo '❌ /var/www n existe pas'
+            echo '🔍 Contenu de /var/www/var'
+            ls -lah /var/www/var || echo '❌ /var/www/var n existe pas'
           "
 
-      - name: Corriger les permissions avant de créer les dossiers
+      - name: 🔧 Forcer la création des dossiers
         run: |
           docker compose exec -T php bash -c "
-            echo '🔧 Vérification des permissions...'
-            find /var/www/var -type d -exec chmod 775 {} \;
-            find /var/www/var -type f -exec chmod 664 {} \;
-          "
-
-      - name: Créer les dossiers de cache et log si manquants
-        run: |
-          docker compose exec -T php bash -c "
+            echo '📁 Création manuelle des dossiers si absents...'
             mkdir -p /var/www/var/cache /var/www/var/log &&
-            chown -R www-data:www-data /var/www/var &&
-            chmod -R 775 /var/www/var
+            ls -lah /var/www/var
+          "
+
+      - name: 🔧 Appliquer les permissions après création
+        run: |
+          docker compose exec -T php bash -c "
+            echo '✅ Application des permissions...'
+            find /var/www/var -type d -exec chmod 775 {} \; &&
+            find /var/www/var -type f -exec chmod 664 {} \;
           "
 
       - name: Vérifier et créer .env si manquant
@@ -99,18 +100,6 @@ jobs:
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
 
-      - name: Vérifier si le dossier vendor existe après composer install
-        run: |
-          docker compose exec -T php ls -ld /var/www/vendor
-          if [ ! -d "/var/www/vendor" ]; then
-            echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
-            exit 1
-          fi
-
-      - name: Donner les permissions au bin/console
-        run: |
-          docker compose exec -T php chmod +x /var/www/bin/console
-
       - name: Nettoyer et recompiler le cache Symfony
         run: |
           docker compose exec -T php php bin/console cache:clear --no-warmup
@@ -119,23 +108,6 @@ jobs:
         run: |
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
-
-      - name: Installer Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: Installer les dépendances NPM
-        run: |
-          docker compose exec -T php npm install
-
-      - name: Compiler les assets
-        run: |
-          docker compose exec -T php npm run build
-
-      - name: Debugger les routes Symfony
-        run: |
-          docker compose exec -T php php bin/console debug:router
 
       - name: Lancer les tests PHPUnit
         run: |
@@ -193,17 +165,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: main
-
-      - name: Debug SSH connection
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            whoami
-            hostname
-            ls -lah /var/www/projet-gite
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v0.1.6
