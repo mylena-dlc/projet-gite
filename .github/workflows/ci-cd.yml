@@ -189,6 +189,7 @@ jobs:
             whoami
             hostname
             ls -lah /var/www/projet-gite
+            
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v0.1.6
