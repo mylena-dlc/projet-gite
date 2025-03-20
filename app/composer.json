@@ -1,4 +1,6 @@
 {
+    "name": "mylena/projetgite", 
+    "description": "Projet Symfony pour la gestion d'un gîte",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
