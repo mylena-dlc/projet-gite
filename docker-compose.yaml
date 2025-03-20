@@ -21,11 +21,12 @@ services:
       - 8080:80
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./app:/var/www
+      - ./app:/var/www:rw  # Ajout de `rw` pour garantir l'écriture
       - ./app/.env:/var/www/.env
     environment:
-      - UID=${UID:-1000}
-      - GID=${GID:-1000}
+      - UID=33
+      - GID=33
+
     depends_on:
       - database
     user: www-data

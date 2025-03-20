@@ -67,8 +67,9 @@ jobs:
       - name: Corriger les permissions avant de créer les dossiers
         run: |
           docker compose exec -T php bash -c "
-            chown -R www-data:www-data /var/www &&
-            chmod -R 775 /var/www
+            echo '🔧 Vérification des permissions...'
+            find /var/www/var -type d -exec chmod 775 {} \;
+            find /var/www/var -type f -exec chmod 664 {} \;
           "
 
       - name: Créer les dossiers de cache et log si manquants
