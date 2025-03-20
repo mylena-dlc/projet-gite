@@ -65,6 +65,28 @@ jobs:
             ls -lah /var/www/var || echo '❌ /var/www/var n existe pas'
           "
 
+      - name: Debug permissions avant création des dossiers
+        run: |
+          docker compose exec -T php bash -c "
+            echo '🔍 Debug permissions'
+            whoami
+            id
+            ls -ld /var/www
+            ls -ld /var/www/var
+          "
+
+      - name: Vérifier le contenu de /var/www
+        run: |
+          docker compose exec -T php ls -lah /var/www
+
+      - name: Corriger les permissions (CI/CD)
+        run: |
+          docker compose exec -T php bash -c "
+            chown -R www-data:www-data /var/www
+            chmod -R 775 /var/www
+          "
+
+
       - name: 🔧 Forcer la création des dossiers
         run: |
           docker compose exec -T php bash -c "
