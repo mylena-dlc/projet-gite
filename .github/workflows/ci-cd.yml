@@ -59,9 +59,9 @@ jobs:
       - name: Vérifier l'existence des dossiers de cache/log
         run: |
           docker compose exec -T php bash -c "
-            ls -ld /var/www/var || echo '🚨 /var/www/var n\'existe pas'
-            ls -ld /var/www/var/cache || echo '🚨 /var/www/var/cache n\'existe pas'
-            ls -ld /var/www/var/log || echo '🚨 /var/www/var/log n\'existe pas'
+            ls -ld /var/www/var || echo '🚨 /var/www/var n existe pas'
+            ls -ld /var/www/var/cache || echo '🚨 /var/www/var/cache n existe pas'
+            ls -ld /var/www/var/log || echo '🚨 /var/www/var/log n existe pas'
           "
 
       - name: Corriger les permissions avant de créer les dossiers
