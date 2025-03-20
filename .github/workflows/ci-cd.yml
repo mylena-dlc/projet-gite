@@ -56,71 +56,52 @@ jobs:
           done
           echo "✅ Conteneur PHP prêt !"
 
-      - name: 🧐 Vérification des fichiers avant toute action
+      - name: Forcer les permissions sur /var/www
         run: |
           docker compose exec -T php bash -c "
-            echo '🔍 Contenu de /var/www'
-            ls -lah /var/www || echo '❌ /var/www n existe pas'
-            echo '🔍 Contenu de /var/www/var'
-            ls -lah /var/www/var || echo '❌ /var/www/var n existe pas'
+            echo '🔧 Correction des permissions sur /var/www'
+            sudo chown -R www-data:www-data /var/www || echo '⚠️ Échec de chown'
+            sudo chmod -R 775 /var/www || echo '⚠️ Échec de chmod'
           "
 
-      - name: Debug permissions avant création des dossiers
+      - name: Créer les dossiers de cache et log si manquants
         run: |
           docker compose exec -T php bash -c "
-            echo '🔍 Debug permissions'
-            whoami
-            id
-            ls -ld /var/www
-            ls -ld /var/www/var
-          "
-
-      - name: Vérifier le contenu de /var/www
-        run: |
-          docker compose exec -T php ls -lah /var/www
-
-      - name: Corriger les permissions (CI/CD)
-        run: |
-          docker compose exec -T php bash -c "
-            chown -R www-data:www-data /var/www
-            chmod -R 775 /var/www
-          "
-
-
-      - name: 🔧 Forcer la création des dossiers
-        run: |
-          docker compose exec -T php bash -c "
-            echo '📁 Création manuelle des dossiers si absents...'
             mkdir -p /var/www/var/cache /var/www/var/log &&
-            ls -lah /var/www/var
-          "
-
-      - name: 🔧 Appliquer les permissions après création
-        run: |
-          docker compose exec -T php bash -c "
-            echo '✅ Application des permissions...'
-            find /var/www/var -type d -exec chmod 775 {} \; &&
-            find /var/www/var -type f -exec chmod 664 {} \;
+            chown -R www-data:www-data /var/www/var &&
+            chmod -R 775 /var/www/var
           "
 
       - name: Vérifier et créer .env si manquant
         run: |
           docker compose exec -T php bash -c "
-            if [ ! -f \"/var/www/.env\" ]; then
-              echo \"❌ .env introuvable, création en cours...\"
-              echo \"APP_ENV=test\" > /var/www/.env
-              echo \"APP_SECRET=${{ secrets.APP_SECRET }}\" >> /var/www/.env
-              echo \"DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0\" >> /var/www/.env
-              echo \"MAILER_DSN=null://null\" >> /var/www/.env
-              echo \"✅ .env créé avec succès.\"
+            if [ ! -f "/var/www/.env" ]; then
+              echo "❌ .env introuvable, création en cours..."
+              echo "APP_ENV=test" > /var/www/.env
+              echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> /var/www/.env
+              echo "DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0" >> /var/www/.env
+              echo "MAILER_DSN=null://null" >> /var/www/.env
+              echo "✅ .env créé avec succès."
             else
-              echo \"✅ .env existe déjà.\"
+              echo "✅ .env existe déjà."
             fi
           "
 
       - name: Installer les dépendances PHP
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
+
+      - name: Vérifier si le dossier vendor existe après composer install
+        run: |
+          docker compose exec -T php ls -ld /var/www/vendor
+          if [ ! -d "/var/www/vendor" ]; then
+            echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
+            exit 1
+          fi
+
+      - name: Donner les permissions au bin/console
+        run: |
+          docker compose exec -T php chmod +x /var/www/bin/console
 
       - name: Nettoyer et recompiler le cache Symfony
         run: |
@@ -131,75 +112,23 @@ jobs:
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
+      - name: Installer Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Installer les dépendances NPM
+        run: |
+          docker compose exec -T php npm install
+
+      - name: Compiler les assets
+        run: |
+          docker compose exec -T php npm run build
+
+      - name: Debugger les routes Symfony
+        run: |
+          docker compose exec -T php php bin/console debug:router
+
       - name: Lancer les tests PHPUnit
         run: |
           docker compose exec -T php php bin/phpunit
-
-  merge-to-test:
-    needs: test
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout develop branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: develop
-
-      - name: Merge develop into test
-        run: |
-          git checkout test
-          git pull origin test --allow-unrelated-histories || true
-          git merge develop --no-ff -m "Fusion de develop dans test"
-          git push origin test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  merge-to-main:
-    needs: merge-to-test
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout test branch
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-          ref: test
-
-      - name: Merge test into main
-        run: |
-          git checkout main
-          git pull origin main --allow-unrelated-histories || true
-          git merge test --no-ff -m "Fusion de test dans main"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy:
-    needs: merge-to-main
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: Checkout main branch
-        uses: actions/checkout@v3
-        with:
-          ref: main
-
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/projet-gite
-            git pull origin main
-            sudo chown -R www-data:www-data /var/www
-            sudo chmod -R 775 /var/www/var/cache /var/www/var/log
-            sudo rm -rf /var/www/var/cache/prod
-            php bin/console cache:clear --env=prod
-            php bin/console cache:warmup --env=prod
-            sudo systemctl restart apache2
