@@ -33,14 +33,18 @@ jobs:
       - name: 🚀 Démarrer Docker Compose
         run: |
           MYSQL_PORT="" docker compose up -d --build
-          sleep 15
+          sleep 20  # ⏳ Donne plus de temps aux services pour démarrer
           docker compose ps
 
-      - name: 🔧 Configurer permissions dossier vendor
+      - name: 🔧 Correction des permissions dossier vendor
         run: |
-          docker compose exec -T php mkdir -p /var/www/vendor
-          docker compose exec -T php chown -R www-data:www-data /var/www/vendor
-          docker compose exec -T php chmod -R 775 /var/www/vendor
+          docker compose exec -T --user=root php mkdir -p /var/www/vendor
+          docker compose exec -T --user=root php chown -R www-data:www-data /var/www/vendor
+          docker compose exec -T --user=root php chmod -R 775 /var/www/vendor
+
+      - name: 🛠️ Vérification de composer.json
+        run: |
+          docker compose exec -T php composer validate
 
       - name: 📦 Installer les dépendances PHP
         run: |
@@ -50,8 +54,9 @@ jobs:
         run: |
           docker compose exec -T php php bin/console cache:clear --no-warmup
 
-      - name: 🗃️ Doctrine migrations
+      - name: 🗃️ Vérification et exécution des migrations Doctrine
         run: |
+          docker compose exec -T php php bin/console doctrine:migrations:status
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
@@ -72,17 +77,17 @@ jobs:
 
       - name: 🛠️ Merge develop vers test
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git checkout test
-          git pull origin test
+          git pull origin test --rebase
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push origin test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   merge-test-to-main:
-    needs: tests
+    needs: merge-develop-to-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
 
@@ -94,10 +99,10 @@ jobs:
 
       - name: 🛠️ Merge test vers main
         run: |
-          git config user.name github-actions
-          git config user.email github-actions@github.com
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git checkout main
-          git pull origin main
+          git pull origin main --rebase
           git merge --no-ff test -m "CI/CD: Merge test vers main"
           git push origin main
         env:
