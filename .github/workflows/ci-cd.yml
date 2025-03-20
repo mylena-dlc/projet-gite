@@ -82,15 +82,15 @@ jobs:
       - name: Vérifier et créer .env si manquant
         run: |
           docker compose exec -T php bash -c "
-            if [ ! -f '/var/www/.env' ]; then
-              echo '❌ .env introuvable, création en cours...'
-              echo 'APP_ENV=test' > /var/www/.env
-              echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
-              echo 'DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0' >> /var/www/.env
-              echo 'MAILER_DSN=null://null' >> /var/www/.env
-              echo '✅ .env créé avec succès.'
+            if [ ! -f \"/var/www/.env\" ]; then
+              echo \"❌ .env introuvable, création en cours...\"
+              echo \"APP_ENV=test\" > /var/www/.env
+              echo \"APP_SECRET=${{ secrets.APP_SECRET }}\" >> /var/www/.env
+              echo \"DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0\" >> /var/www/.env
+              echo \"MAILER_DSN=null://null\" >> /var/www/.env
+              echo \"✅ .env créé avec succès.\"
             else
-              echo '✅ .env existe déjà.'
+              echo \"✅ .env existe déjà.\"
             fi
           "
 
