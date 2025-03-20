@@ -28,16 +28,11 @@ services:
       - GID=${GID:-1000}   # GID par défaut si non défini (pour Windows)
     depends_on:
       - database
+    user: root  # ✅ Exécution en tant que root pour éviter les problèmes
     entrypoint: ["/bin/sh", "-c"]
     command:
       - |
-        if [ "$(uname -s)" = "Linux" ]; then
-          echo "🐧 Environnement Linux détecté, application des permissions UID:GID"
-          chown -R ${UID}:${GID} /var/www
-        else
-          echo "🪟 Environnement Windows détecté, application des permissions www-data"
-          chown -R www-data:www-data /var/www
-        fi
+        echo "🔧 Vérification des permissions..."
         chmod -R 775 /var/www
         exec apache2-foreground
 

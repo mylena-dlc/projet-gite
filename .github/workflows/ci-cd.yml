@@ -1,13 +1,11 @@
 name: CI/CD Workflow
 
-
 on:
   push:
     branches:
       - develop
       - test
       - main
-
 
 jobs:
   test:
@@ -58,28 +56,20 @@ jobs:
           done
           echo "✅ Conteneur PHP prêt !"
 
-      - name: Vérifier les permissions actuelles
-        run: |
-          docker compose exec -T php ls -ld /var/www
-          docker compose exec -T php ls -ld /var/www/vendor || echo "🚨 /var/www/vendor n'existe pas"
-
-      - name: Corriger les permissions de /var/www
+      - name: Vérifier et fixer les permissions
         run: |
           docker compose exec -T php bash -c "
             chown -R www-data:www-data /var/www &&
             chmod -R 775 /var/www &&
-            mkdir -p /var/www/vendor &&
-            chown -R www-data:www-data /var/www/vendor &&
-            chmod -R 775 /var/www/vendor
+            chown -R www-data:www-data /var/www/var/cache /var/www/var/log &&
+            chmod -R 775 /var/www/var/cache /var/www/var/log
           "
-          docker compose exec -T php ls -ld /var/www/vendor
 
-      - name: Vérifier et créer .env manquant
+      - name: Vérifier et créer .env si manquant
         run: |
           docker compose exec -T php bash -c "
             if [ ! -f '/var/www/.env' ]; then
               echo '❌ .env introuvable, création en cours...'
-              touch /var/www/.env
               echo 'APP_ENV=test' > /var/www/.env
               echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
               echo 'DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0' >> /var/www/.env
@@ -105,6 +95,10 @@ jobs:
       - name: Donner les permissions au bin/console
         run: |
           docker compose exec -T php chmod +x /var/www/bin/console
+
+      - name: Nettoyer et recompiler le cache Symfony
+        run: |
+          docker compose exec -T php php bin/console cache:clear --no-warmup
 
       - name: Créer et mettre à jour la base de données
         run: |
@@ -136,7 +130,6 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: success()
-
 
     steps:
       - name: Checkout develop branch
