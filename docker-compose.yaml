@@ -1,5 +1,4 @@
 services:
-  ###> doctrine/doctrine-bundle ###
   database:
     container_name: database
     image: mysql:8.0
@@ -11,8 +10,8 @@ services:
     ports:
       - 3307:3306
     volumes:
-      - ./mysql:/var/lib/mysql
-  
+      - database_data:/var/lib/mysql
+
   php:
     container_name: php
     build:
@@ -22,15 +21,13 @@ services:
       - 8080:80
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./app:/var/www
-      - ./app/.env:/var/www/.env
+      - ./app:/var/www:cached
     depends_on:
       - database
-    user: "www-data:www-data"  # Ajout de cette ligne pour garantir l'utilisateur
+    user: "${UID}:${GID}"  # Utilisation de l’UID de l'hôte pour éviter les conflits de permissions
     entrypoint: ["/bin/sh", "-c"]
     command:
      - |
-       chown -R www-data:www-data /var/www/vendor
        chmod -R 775 /var/www/vendor
        exec apache2-foreground
 
@@ -54,6 +51,4 @@ services:
       - 8025:8025 #boite mail
       
 volumes:
-  ###> doctrine/doctrine-bundle ###
   database_data:
-  ###< doctrine/doctrine-bundle ###
