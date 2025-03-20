@@ -8,7 +8,7 @@ on:
       - main
 
 jobs:
-  test:
+  tests:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -33,70 +33,78 @@ jobs:
       - name: 🚀 Démarrer Docker Compose
         run: |
           MYSQL_PORT="" docker compose up -d --build
-          sleep 10
+          sleep 15
           docker compose ps
+
+      - name: 🔧 Configurer permissions dossier vendor
+        run: |
+          docker compose exec -T php mkdir -p /var/www/vendor
+          docker compose exec -T php chown -R www-data:www-data /var/www/vendor
+          docker compose exec -T php chmod -R 775 /var/www/vendor
 
       - name: 📦 Installer les dépendances PHP
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
 
-      - name: 🚀 Clear Cache Symfony
+      - name: 🚀 Symfony cache clear
         run: |
           docker compose exec -T php php bin/console cache:clear --no-warmup
 
-      - name: 🗄️ Doctrine Migrations
+      - name: 🗃️ Doctrine migrations
         run: |
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
-      - name: ✅ PHPUnit Tests
+      - name: ✅ Tests PHPUnit
         run: |
           docker compose exec -T php php bin/phpunit
 
-  merge-to-test:
-    needs: test
+  merge-develop-to-test:
+    needs: tests
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
 
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout develop et test
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Merge develop → test
+      - name: 🛠️ Merge develop vers test
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout test
           git pull origin test
-          git merge --no-ff develop -m "CI/CD: Merge develop into test"
+          git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push origin test
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  merge-to-main:
-    needs: test
+  merge-test-to-main:
+    needs: tests
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
 
     steps:
-      - uses: actions/checkout@v3
+      - name: 📥 Checkout test et main
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Merge test → main
+      - name: 🛠️ Merge test vers main
         run: |
           git config user.name github-actions
           git config user.email github-actions@github.com
           git checkout main
           git pull origin main
-          git merge --no-ff test -m "CI/CD: Merge test into main"
+          git merge --no-ff test -m "CI/CD: Merge test vers main"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
-    needs: merge-to-main
+    needs: merge-test-to-main
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
 
@@ -106,7 +114,7 @@ jobs:
         with:
           ref: main
 
-      - name: 🚀 Déploiement VPS
+      - name: 🚀 Déploiement sur VPS
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
