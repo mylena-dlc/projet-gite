@@ -15,11 +15,11 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: test_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
+          MYSQL_DATABASE: gite
+          MYSQL_USER: symfony
+          MYSQL_PASSWORD: symfony
         ports:
-          - 3306:3306
+          - 3307:3306
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -30,18 +30,10 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
-      - name: 🆔 Définir UID et GID
-        run: |
-          echo "UID=$(id -u)" >> $GITHUB_ENV
-          echo "GID=$(id -g)" >> $GITHUB_ENV
-
       - name: 📌 Vérifier la structure du projet
         run: |
           echo "📌 Chemin actuel : $(pwd)"
           ls -lah
-
-      - name: ⏳ Attendre que MySQL soit prêt
-        run: sleep 15
 
       - name: 🚀 Démarrer les services Docker
         run: |
@@ -49,66 +41,14 @@ jobs:
           sleep 10
           docker compose ps
 
-      - name: ⏳ Vérifier si le conteneur PHP est prêt
+      - name: ⏳ Vérifier si MySQL est actif
         run: |
-          until docker compose exec -T php php -v &>/dev/null; do
-            echo "⏳ En attente du conteneur PHP..."
-            sleep 5
-          done
-          echo "✅ Conteneur PHP prêt !"
-
-      - name: 🔍 Vérification des permissions
-        run: |
-          docker compose exec -T php bash -c "
-            echo '🔍 Utilisateur actuel :'
-            whoami
-            echo '🔍 UID/GID actuel :'
-            id
-            echo '🔍 Permissions sur /var/www :'
-            ls -ld /var/www || echo '⚠️ /var/www introuvable'
-            echo '🔍 Permissions sur /var/www/var :'
-            ls -ld /var/www/var || echo '⚠️ /var/www/var introuvable'
-          "
-
-      - name: 🛠️ Correction des permissions et création des dossiers nécessaires
-        run: |
-          docker compose exec -T php bash -c "
-            echo '🔧 Correction des permissions sur /var/www'
-            mkdir -p /var/www/var/cache /var/www/var/log
-            chown -R www-data:www-data /var/www
-            chmod -R 775 /var/www
-          "
-
-      - name: 📄 Vérifier et créer le fichier .env si manquant
-        run: |
-          docker compose exec -T php bash -c "
-            if [ ! -f '/var/www/.env' ]; then
-              echo '❌ .env introuvable, création en cours...'
-              echo 'APP_ENV=test' > /var/www/.env
-              echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
-              echo 'DATABASE_URL=mysql://user:password@127.0.0.1:3306/test_db?serverVersion=8.0' >> /var/www/.env
-              echo 'MAILER_DSN=null://null' >> /var/www/.env
-              echo '✅ .env créé avec succès.'
-            else
-              echo '✅ .env existe déjà.'
-            fi
-          "
+          sleep 10
+          docker compose exec -T database mysqladmin ping -h "database" --silent
 
       - name: 📦 Installer les dépendances PHP
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
-
-      - name: 🛠️ Vérifier l'existence du dossier vendor
-        run: |
-          docker compose exec -T php ls -ld /var/www/vendor
-          if [ ! -d "/var/www/vendor" ]; then
-            echo "❌ ERREUR : Le dossier vendor/ est manquant après composer install !"
-            exit 1
-          fi
-
-      - name: 🔑 Donner les permissions au bin/console
-        run: |
-          docker compose exec -T php chmod +x /var/www/bin/console
 
       - name: 🚀 Nettoyer et recompiler le cache Symfony
         run: |
@@ -119,59 +59,12 @@ jobs:
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
-      - name: 📥 Installer Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
-      - name: 📦 Installer les dépendances NPM
-        run: |
-          docker compose exec -T php npm install
-
-      - name: ⚡ Compiler les assets
-        run: |
-          docker compose exec -T php npm run build
-
-      - name: 🛠️ Debugger les routes Symfony
-        run: |
-          docker compose exec -T php php bin/console debug:router
-
       - name: ✅ Lancer les tests PHPUnit
         run: |
           docker compose exec -T php php bin/phpunit
 
-  merge-to-test:
-    needs: test
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: 🛠️ Fusion de develop dans test
-        run: |
-          git checkout test
-          git pull origin test --allow-unrelated-histories || true
-          git merge develop --no-ff -m "Fusion de develop dans test"
-          git push origin test
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-  merge-to-main:
-    needs: merge-to-test
-    runs-on: ubuntu-latest
-    if: success()
-
-    steps:
-      - name: 🛠️ Fusion de test dans main
-        run: |
-          git checkout main
-          git pull origin main --allow-unrelated-histories || true
-          git merge test --no-ff -m "Fusion de test dans main"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   deploy:
-    needs: merge-to-main
+    needs: test
     runs-on: ubuntu-latest
     if: success()
 
@@ -180,17 +73,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: main
-
-      - name: 🖥️ Debug SSH connection
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            whoami
-            hostname
-            ls -lah /var/www/projet-gite
 
       - name: 🚀 Déploiement sur VPS
         uses: appleboy/ssh-action@v0.1.6
@@ -203,7 +85,6 @@ jobs:
             git pull origin main
             sudo chown -R www-data:www-data /var/www
             sudo chmod -R 775 /var/www/var/cache /var/www/var/log
-            sudo rm -rf /var/www/var/cache/prod
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2

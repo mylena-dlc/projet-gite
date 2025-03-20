@@ -21,24 +21,14 @@ RUN a2enmod rewrite && a2enmod ssl && a2enmod socache_shmcb
 # Définit le répertoire de travail dans le conteneur
 WORKDIR /var/www
 
-# Installe Composer (gestionnaire de dépendances PHP)
+# Installe Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Installe Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | bash
-RUN mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+# Vérifie les permissions et les ajuste au besoin
+RUN chown -R www-data:www-data /var/www \
+    && chmod -R 775 /var/www
 
-# Configure Git (vérifie que cela est nécessaire)
-RUN git config --global user.email "mylena.delacote"
-RUN git config --global user.name "Mylena delacote"
-
-# Vérifie les permissions et les ajuster au besoin
-RUN chown -R www-data:www-data /var/www
-RUN chmod -R 775 /var/www
-
-RUN ls -lah /var/www && stat /var/www
-
-# Change l'utilisateur pour www-data et les permissions des fichiers dans le répertoire /var/www
+# Change l'utilisateur pour www-data
 USER www-data
 
 # Expose le port 80 pour Apache

@@ -1,3 +1,4 @@
+
 services:
   database:
     container_name: database
@@ -23,21 +24,9 @@ services:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./app:/var/www:rw
       - ./app/.env:/var/www/.env
-    environment:
-      - UID=33
-      - GID=33
     depends_on:
       - database
-    user: root  # ⚠️ TEMPORAIREMENT root pour corriger les permissions
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        echo "🔧 Fix permissions..."
-        mkdir -p /var/www/var/cache /var/www/var/log
-        chmod -R 775 /var/www
-        chown -R www-data:www-data /var/www
-        exec apache2-foreground
-
+    command: ["/usr/sbin/apache2ctl", "-D", "FOREGROUND"]
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -55,8 +44,8 @@ services:
     logging:
       driver: 'none'
     ports:
-      - 1025:1025 #SMTP
-      - 8025:8025 #Boîte mail
+      - 1025:1025
+      - 8025:8025
 
 volumes:
   database_data:
