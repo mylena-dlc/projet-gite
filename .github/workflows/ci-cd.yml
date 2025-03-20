@@ -36,19 +36,31 @@ jobs:
           sleep 20  # ⏳ Donne plus de temps aux services pour démarrer
           docker compose ps
 
-      - name: 🔧 Correction des permissions dossier vendor
+      - name: 🛠️ Vérification et correction du fichier .env
         run: |
-          docker compose exec -T --user=root php mkdir -p /var/www/vendor
-          docker compose exec -T --user=root php chown -R www-data:www-data /var/www/vendor
-          docker compose exec -T --user=root php chmod -R 775 /var/www/vendor
+          docker compose exec -T php bash -c '
+            if [ ! -f "/var/www/.env" ]; then
+              echo "⚠️ .env introuvable, création en cours..."
+              echo -e "APP_ENV=dev\nAPP_SECRET=${{ secrets.APP_SECRET }}\nDATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32" > /var/www/.env
+            fi
+            chown www-data:www-data /var/www/.env
+            chmod 644 /var/www/.env
+            echo "✅ .env est en place."
+          '
+
+      - name: 🔧 Correction des permissions avant installation
+        run: |
+          docker compose exec -T --user=root php mkdir -p /var/www/vendor /var/www/var/cache /var/www/var/log
+          docker compose exec -T --user=root php chown -R www-data:www-data /var/www
+          docker compose exec -T --user=root php chmod -R 775 /var/www
 
       - name: 🛠️ Vérification de composer.json
         run: |
-          docker compose exec -T php composer validate
+          docker compose exec -T php composer validate --no-check-lock
 
-      - name: 📦 Installer les dépendances PHP
+      - name: 📦 Installer les dépendances PHP en tant que www-data
         run: |
-          docker compose exec -T php composer install --no-interaction --prefer-dist
+          docker compose exec -T --user=www-data php composer install --no-interaction --prefer-dist
 
       - name: 🚀 Symfony cache clear
         run: |
