@@ -67,3 +67,7 @@ exit
 find /var/www -not -user www-data -or -not -group www-data
  
 exit
+cat /var/log/apache2/error.log | tail -n 50
+docker exec -it php php bin/console cache:clear
+php bin/console cache:clear
+exit
