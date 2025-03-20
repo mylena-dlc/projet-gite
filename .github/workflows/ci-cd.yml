@@ -32,6 +32,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
+      - name: Définir UID et GID (CI/CD)
+        run: |
+          echo "UID=$(id -u)" >> $GITHUB_ENV
+          echo "GID=$(id -g)" >> $GITHUB_ENV
+
       - name: Vérifier l'architecture du projet après checkout
         run: |
           echo "📌 Chemin actuel : $(pwd)"

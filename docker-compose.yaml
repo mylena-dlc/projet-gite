@@ -21,15 +21,25 @@ services:
       - 8080:80
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./app:/var/www:cached
+      - ./app:/var/www
+      - ./app/.env:/var/www/.env
+    environment:
+      - UID=${UID:-1000}   # UID par défaut si non défini (pour Windows)
+      - GID=${GID:-1000}   # GID par défaut si non défini (pour Windows)
     depends_on:
       - database
-    user: "${UID}:${GID}"  # Utilisation de l’UID de l'hôte pour éviter les conflits de permissions
     entrypoint: ["/bin/sh", "-c"]
     command:
-     - |
-       chmod -R 775 /var/www/vendor
-       exec apache2-foreground
+      - |
+        if [ "$(uname -s)" = "Linux" ]; then
+          echo "🐧 Environnement Linux détecté, application des permissions UID:GID"
+          chown -R ${UID}:${GID} /var/www
+        else
+          echo "🪟 Environnement Windows détecté, application des permissions www-data"
+          chown -R www-data:www-data /var/www
+        fi
+        chmod -R 775 /var/www
+        exec apache2-foreground
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -41,14 +51,14 @@ services:
       PMA_PASSWORD: secret
     ports:
       - 8890:80
-  
+
   mailhog:
     image: mailhog/mailhog
     logging:
       driver: 'none'
     ports:
       - 1025:1025 #SMTP
-      - 8025:8025 #boite mail
-      
+      - 8025:8025 #Boîte mail
+
 volumes:
   database_data:
