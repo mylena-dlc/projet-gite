@@ -71,3 +71,14 @@ cat /var/log/apache2/error.log | tail -n 50
 docker exec -it php php bin/console cache:clear
 php bin/console cache:clear
 exit
+php bash -c "cd /var/www && php bin/phpunit"
+docker exec -it php bash -c "cd /var/www && php bin/phpunit"
+php bash -c "cd /var/www && php bin/phpunit"
+docker exec -it php bash -c "cd /var/www && php bin/phpunit"
+php bash -c "cd /var/www && php bin/phpunit"
+exit
+docker exec -it php bash -c "cd /var/www && php bin/console debug:config framework --env=test"
+ -c "cd /var/www && php bin/console debug:config framework --env=test"
+ -c "cd /var/www && php bin/console debug:config framework --env=test"
+docker exec -it php bash -c "cd /var/www && php bin/console debug:config framework --env=test"
+exit

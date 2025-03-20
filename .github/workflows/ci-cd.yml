@@ -30,22 +30,29 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
+      - name: 🚀 Vérification de Docker Compose
+        run: docker compose version
+
       - name: 🚀 Démarrer Docker Compose
         run: |
           MYSQL_PORT="" docker compose up -d --build
           sleep 20  # ⏳ Donne plus de temps aux services pour démarrer
           docker compose ps
 
+      - name: 📜 Debug logs du conteneur PHP
+        run: docker compose logs php --tail=50
+
       - name: 🛠️ Vérification et correction du fichier .env
         run: |
           docker compose exec -T php bash -c '
             if [ ! -f "/var/www/.env" ]; then
               echo "⚠️ .env introuvable, création en cours..."
+              touch /var/www/.env
               echo -e "APP_ENV=dev\nAPP_SECRET=${{ secrets.APP_SECRET }}\nDATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32" > /var/www/.env
+              chown www-data:www-data /var/www/.env
+              chmod 644 /var/www/.env
+              echo "✅ .env est en place."
             fi
-            chown www-data:www-data /var/www/.env
-            chmod 644 /var/www/.env
-            echo "✅ .env est en place."
           '
 
       - name: 🔧 Correction des permissions avant installation
@@ -64,7 +71,7 @@ jobs:
 
       - name: 🚀 Symfony cache clear
         run: |
-          docker compose exec -T php php bin/console cache:clear --no-warmup
+          docker compose exec -T php php bin/console cache:clear --env=prod --no-warmup
 
       - name: 🗃️ Vérification et exécution des migrations Doctrine
         run: |
@@ -145,3 +152,4 @@ jobs:
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2
+ 
