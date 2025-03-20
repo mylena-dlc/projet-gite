@@ -14,12 +14,12 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_PASSWORD: secret
           MYSQL_DATABASE: gite
           MYSQL_USER: symfony
           MYSQL_PASSWORD: symfony
         ports:
-          - 3307:3306
+          - 3306/tcp
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -30,51 +30,83 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v3
 
-      - name: 📌 Vérifier la structure du projet
+      - name: 🚀 Démarrer Docker Compose
         run: |
-          echo "📌 Chemin actuel : $(pwd)"
-          ls -lah
-
-      - name: 🚀 Démarrer les services Docker
-        run: |
-          docker compose up -d
+          MYSQL_PORT="" docker compose up -d --build
           sleep 10
           docker compose ps
-
-      - name: ⏳ Vérifier si MySQL est actif
-        run: |
-          sleep 10
-          docker compose exec -T database mysqladmin ping -h "database" --silent
 
       - name: 📦 Installer les dépendances PHP
         run: |
           docker compose exec -T php composer install --no-interaction --prefer-dist
 
-      - name: 🚀 Nettoyer et recompiler le cache Symfony
+      - name: 🚀 Clear Cache Symfony
         run: |
           docker compose exec -T php php bin/console cache:clear --no-warmup
 
-      - name: 🗄️ Créer et mettre à jour la base de données
+      - name: 🗄️ Doctrine Migrations
         run: |
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
 
-      - name: ✅ Lancer les tests PHPUnit
+      - name: ✅ PHPUnit Tests
         run: |
           docker compose exec -T php php bin/phpunit
 
-  deploy:
+  merge-to-test:
     needs: test
     runs-on: ubuntu-latest
-    if: success()
+    if: github.ref == 'refs/heads/develop'
 
     steps:
-      - name: 📥 Checkout main branch
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Merge develop → test
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout test
+          git pull origin test
+          git merge --no-ff develop -m "CI/CD: Merge develop into test"
+          git push origin test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  merge-to-main:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/test'
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Merge test → main
+        run: |
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git checkout main
+          git pull origin main
+          git merge --no-ff test -m "CI/CD: Merge test into main"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: merge-to-main
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: 📥 Checkout main
         uses: actions/checkout@v3
         with:
           ref: main
 
-      - name: 🚀 Déploiement sur VPS
+      - name: 🚀 Déploiement VPS
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
