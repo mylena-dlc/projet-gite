@@ -35,6 +35,21 @@ jobs:
           echo "UID=$(id -u)" >> $GITHUB_ENV
           echo "GID=$(id -g)" >> $GITHUB_ENV
 
+
+      - name: 🔍 Debug Permissions dans CI/CD
+        run: |
+          docker compose exec -T php bash -c "
+            echo '🔍 Utilisateur actuel:' 
+            whoami
+            echo '🔍 UID/GID actuel:' 
+            id
+            echo '🔍 Permissions sur /var/www'
+            ls -ld /var/www || echo '⚠️ /var/www introuvable'
+            echo '🔍 Permissions sur /var/www/var'
+            ls -ld /var/www/var || echo '⚠️ /var/www/var introuvable'
+          "
+ 
+
       - name: Vérifier la structure du projet après checkout
         run: |
           echo "📌 Chemin actuel : $(pwd)"
