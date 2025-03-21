@@ -20,7 +20,7 @@ final class Version20250116095917 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        // $this->addSql('ALTER TABLE reservation ADD supplement DOUBLE PRECISION NOT NULL, ADD cleaning_charge DOUBLE PRECISION NOT NULL, ADD price_night DOUBLE PRECISION NOT NULL');
+        $this->addSql('ALTER TABLE reservation ADD supplement DOUBLE PRECISION NOT NULL, ADD cleaning_charge DOUBLE PRECISION NOT NULL, ADD price_night DOUBLE PRECISION NOT NULL');
     }
 
     public function down(Schema $schema): void
