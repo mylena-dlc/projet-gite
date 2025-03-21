@@ -87,6 +87,11 @@ jobs:
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing=false || true
 
+      - name: 📦 Installer les dépendances Node.js dans le conteneur
+        run: docker compose exec -T php npm ci
+
+      - name: 🛠️ Compiler les assets dans le conteneur
+        run: docker compose exec -T php npm run build
 
       - name: ✅ Tests PHPUnit
         run: |
