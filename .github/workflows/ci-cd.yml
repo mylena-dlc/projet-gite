@@ -122,7 +122,7 @@ jobs:
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push origin test
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
   merge-test-to-main:
     needs: merge-develop-to-test
