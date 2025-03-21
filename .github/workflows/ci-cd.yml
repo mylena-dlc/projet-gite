@@ -90,7 +90,7 @@ jobs:
 
       - name: ✅ Tests PHPUnit
         run: |
-          docker compose exec -T php php bin/phpunit
+          docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
 
   merge-develop-to-test:
     needs: tests
