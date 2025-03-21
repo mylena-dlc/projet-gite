@@ -117,12 +117,15 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+
+          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}
+
           git checkout test
           git pull origin test --rebase
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push origin test
         env:
-          GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
   merge-test-to-main:
     needs: merge-develop-to-test
@@ -139,12 +142,15 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+
+          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}
+
           git checkout main
           git pull origin main --rebase
           git merge --no-ff test -m "CI/CD: Merge test vers main"
           git push origin main
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
   deploy:
     needs: merge-test-to-main
