@@ -123,8 +123,6 @@ jobs:
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
 
-        env:
-          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
   merge-test-to-main:
     needs: merge-develop-to-test
@@ -147,8 +145,6 @@ jobs:
           git merge --no-ff test -m "CI/CD: Merge test vers main"
           git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
-        env:
-          PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
   deploy:
     needs: merge-test-to-main
