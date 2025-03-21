@@ -52,6 +52,7 @@ jobs:
 
             echo 'APP_ENV=prod' > /var/www/.env
             echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
+            echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /var/www/.env
             echo 'DATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32' >> /var/www/.env
 
             chown www-data:www-data /var/www/.env
