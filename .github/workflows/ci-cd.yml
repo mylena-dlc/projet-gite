@@ -98,7 +98,6 @@ jobs:
       - name: ✅ Tests PHPUnit
         run: docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
 
-
   merge-develop-to-test:
     needs: tests
     runs-on: ubuntu-latest
