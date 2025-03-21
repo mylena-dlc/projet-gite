@@ -106,6 +106,8 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
+    env:
+      GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
     steps:
       - name: 📥 Checkout develop et test
@@ -118,16 +120,20 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
+          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}
+
           git checkout test
           git pull origin test --rebase
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
-          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
+          git push origin test
 
 
   merge-test-to-main:
     needs: merge-develop-to-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
+    env:
+      GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
     steps:
       - name: 📥 Checkout test et main
@@ -140,11 +146,12 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
+          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}
 
           git checkout main
           git pull origin main --rebase
           git merge --no-ff test -m "CI/CD: Merge test vers main"
-          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:main
+          git push origin main
 
 
   deploy:
