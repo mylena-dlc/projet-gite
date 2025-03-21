@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - test
       - main
 
 jobs:
@@ -130,7 +129,7 @@ jobs:
   deploy:
     needs: merge-test-to-main
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref_name == 'main'
     environment:
         name: production
 
