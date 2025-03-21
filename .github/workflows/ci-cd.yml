@@ -46,18 +46,14 @@ jobs:
         run: |
           docker compose exec -T --user=root php bash -c "
             if [ -d /var/www/.env ]; then
-              echo '🧹 Suppression du dossier .env'
               rm -rf /var/www/.env
             fi
-
             echo 'APP_ENV=prod' > /var/www/.env
             echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
             echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /var/www/.env
             echo 'DATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32' >> /var/www/.env
-
             chown www-data:www-data /var/www/.env
             chmod 644 /var/www/.env
-            echo '✅ .env prêt.'
           "
 
       - name: 🔧 Permissions et prérequis
@@ -78,7 +74,7 @@ jobs:
       - name: 🗃️ Migrations Doctrine
         run: |
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
-          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing=false || true
+          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || true
 
       - name: 🧱 Installer & builder les assets
         run: docker compose exec -T php bash -c 'npm ci && npm run build'
@@ -106,8 +102,6 @@ jobs:
     needs: tests
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/develop'
-    env:
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
     steps:
       - name: 📥 Checkout develop et test
@@ -119,21 +113,15 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-
-          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}
-
           git checkout test
           git pull origin test --rebase
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
-          git push origin test
-
+          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
 
   merge-test-to-main:
     needs: merge-develop-to-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
-    env:
-      GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
 
     steps:
       - name: 📥 Checkout test et main
@@ -145,14 +133,10 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-
-          git remote set-url origin https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }}
-
           git checkout main
           git pull origin main --rebase
           git merge --no-ff test -m "CI/CD: Merge test vers main"
-          git push origin main
-
+          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:main
 
   deploy:
     needs: merge-test-to-main
