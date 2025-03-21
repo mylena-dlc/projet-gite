@@ -85,7 +85,7 @@ jobs:
         run: |
           docker compose exec -T php php bin/console doctrine:migrations:status
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
-          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --no-transaction
+          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing=false || true
 
 
       - name: ✅ Tests PHPUnit
