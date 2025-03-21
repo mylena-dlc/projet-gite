@@ -81,11 +81,12 @@ jobs:
         run: |
           docker compose exec -T php php bin/console cache:clear --env=prod --no-warmup
 
-      - name: 🗃️ Vérification et exécution des migrations Doctrine
+      - name: 🗃️ Exécution des migrations Doctrine
         run: |
           docker compose exec -T php php bin/console doctrine:migrations:status
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
-          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction
+          docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing=false
+
 
       - name: ✅ Tests PHPUnit
         run: |
