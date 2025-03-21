@@ -124,7 +124,7 @@ jobs:
     if: github.ref == 'refs/heads/test'
 
     steps:
-      - name: 📌 Étape manuelle requise : merge test → main
+      - name: 📌 Étape manuelle requise merge test → main
         run: echo "Pull request manuelle requise pour merger 'test' vers 'main'"
 
   deploy:
