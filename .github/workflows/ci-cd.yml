@@ -118,16 +118,14 @@ jobs:
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
 
+  merge-test-to-main:
+    needs: merge-develop-to-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/test'
 
-merge-test-to-main:
-  needs: merge-develop-to-test
-  runs-on: ubuntu-latest
-  if: github.ref == 'refs/heads/test'
-
-  steps:
-    - name: 📌 Étape manuelle requise : merge test → main
-      run: echo "Pull request manuelle requise pour merger 'test' vers 'main'"
-
+    steps:
+      - name: 📌 Étape manuelle requise : merge test → main
+        run: echo "Pull request manuelle requise pour merger 'test' vers 'main'"
 
   deploy:
     needs: merge-test-to-main
