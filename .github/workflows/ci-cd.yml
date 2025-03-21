@@ -82,6 +82,9 @@ jobs:
       - name: 🧱 Installer & builder les assets
         run: docker compose exec -T php bash -c 'npm ci && npm run build'
 
+      - name: 📦 Installer les assets importmap
+        run: docker compose exec -T php php bin/console importmap:install
+
       - name: ✅ Tests PHPUnit
         run: docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
 
