@@ -118,11 +118,14 @@ jobs:
           git merge --no-ff develop -m "CI/CD: Merge develop vers test"
           git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
 
+
   merge-test-to-main:
     needs: merge-develop-to-test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/test'
-
+    environment:
+        name: production
+        
     steps:
       - name: 📥 Checkout test et main
         uses: actions/checkout@v3
