@@ -140,6 +140,7 @@ jobs:
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
+
           git checkout main
           git pull origin main --rebase
           git merge --no-ff test -m "CI/CD: Merge test vers main"
