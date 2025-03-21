@@ -45,14 +45,18 @@ jobs:
       - name: 🛠️ Vérification et correction du fichier .env
         run: |
           docker compose exec -T php bash -c '
-            if [ ! -f "/var/www/.env" ]; then
-              echo "⚠️ .env introuvable, création en cours..."
-              touch /var/www/.env
-              echo -e "APP_ENV=dev\nAPP_SECRET=${{ secrets.APP_SECRET }}\nDATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32" > /var/www/.env
-              chown www-data:www-data /var/www/.env
-              chmod 644 /var/www/.env
-              echo "✅ .env est en place."
+            if [ -d "/var/www/.env" ]; then
+              echo "🧹 /var/www/.env est un dossier, suppression..."
+              rm -rf /var/www/.env
             fi
+
+            echo "📝 Création du fichier .env..."
+            echo -e "APP_ENV=prod\nAPP_SECRET=${{ secrets.APP_SECRET }}\nDATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32" > /var/www/.env
+
+            chown www-data:www-data /var/www/.env
+            chmod 644 /var/www/.env
+
+            echo "✅ .env est prêt à l'emploi."
           '
 
       - name: 🔧 Correction des permissions avant installation

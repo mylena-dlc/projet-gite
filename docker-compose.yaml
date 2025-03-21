@@ -24,7 +24,6 @@ services:
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./app:/var/www:rw,cached
-      - ./app/.env:/var/www/.env
       - ./php/entrypoint.sh:/entrypoint.sh
     depends_on:
       - database
