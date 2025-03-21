@@ -33,16 +33,19 @@ class HoneyPotSubscriber implements EventSubscriberInterface
 
     public function checkHoneyJar(FormEvent $event): void
     {
-        $request = $this->requestStack->getCurrentRequest();
+        // Désactivation en environnement de test
+        if ($_ENV['APP_ENV'] === 'test') {
+            return;
+        }
 
+        $request = $this->requestStack->getCurrentRequest();
         if (!$request) {
             return;
         }
 
         $data = $event->getData();
-        if (!array_key_exists('numberPhone', $data) || !array_key_exists('numberFax', $data)) {
-            header('Location: /');
-            exit;
+        if (!isset($data['numberPhone']) || !isset($data['numberFax'])) {
+            throw new HttpException(400, "Données invalides");
         }
 
         [
@@ -51,11 +54,16 @@ class HoneyPotSubscriber implements EventSubscriberInterface
         ] = $data;
 
         if ($numberPhone !== "" || $numberFax !== "") {
-            $this->honeyPotLogger->info("Une potentielle tentative de robot spammeur ayant l\'adresse IP suivante '
-             {$request->getClientIp()}' a eu lieu.
-             Le champ number phone contenait '{$numberPhone}' et le champ numberFax contenait '{$numberFax}'.");
-             header('Location: /');
-             exit;
+            $this->honeyPotLogger->info(
+                "Tentative de spam détectée depuis {$request->getClientIp()}.
+                Le champ numberPhone contenait '{$numberPhone}' 
+                et le champ numberFax contenait '{$numberFax}'."
+            );
+
+            // Redirection avec une réponse Symfony propre
+            $response = new RedirectResponse('/');
+            $response->send();
+            exit; // Arrêt immédiat du script après la redirection
         }
     }
 }

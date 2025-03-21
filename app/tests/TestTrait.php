@@ -19,11 +19,10 @@ trait TestTrait
     {
         $kernel = self::bootKernel();
 
-        $entityManager = $kernel->getContainer()->get('doctrine')->getManager;
+        $entityManager = $kernel->getContainer()->get('doctrine')->getManager();
+        $connection = $entityManager->getConnection();
+        $connection->executeQuery("TRUNCATE TABLE `{$table}`");
 
-        $connection = $entityManager->getConnection()
-                                    ->executeQuery("TRUNCATE TABLE `{$table}`");
-
-        $entityManager->getConnection()->close();
+        $connection->close();
     }
 } 

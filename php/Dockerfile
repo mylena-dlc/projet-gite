@@ -1,25 +1,33 @@
 FROM php:8.2-apache
 
-RUN apt-get update \
-    && apt-get install -y build-essential curl zlib1g-dev g++ git libicu-dev zip libzip-dev libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev \
-    && docker-php-ext-install intl opcache pdo pdo_mysql \
+# Mise à jour et installation des dépendances
+RUN apt-get update && apt-get install -y \
+    build-essential curl zlib1g-dev g++ git libicu-dev zip libzip-dev \
+    libpng-dev libjpeg-dev libwebp-dev libfreetype6-dev \
+    # 👇 Installation de Node.js 18
+    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && apt-get install -y nodejs \
+    && docker-php-ext-install intl opcache pdo pdo_mysql zip gd exif \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
-    && docker-php-ext-configure zip \
-    && docker-php-ext-install zip
+    && a2enmod rewrite ssl socache_shmcb \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN docker-php-ext-configure gd --with-freetype --with-webp --with-jpeg \
-    && docker-php-ext-install  gd \
-    && docker-php-ext-install exif
-
-RUN a2enmod rewrite && a2enmod ssl && a2enmod socache_shmcb
-
+# Définir le dossier de travail
 WORKDIR /var/www
 
+# Copie et permission du script d’entrée
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+# Installer Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-RUN curl -sS https://get.symfony.com/cli/installer | bash
-RUN mv /root/.symfony5/bin/symfony /usr/local/bin/symfony
+# Permissions sur le projet
+RUN chown -R www-data:www-data /var/www && chmod -R 775 /var/www
 
-RUN git config --global user.email "mylena.delacote"
-RUN git config --global user.name "Mylena delacote"
+USER www-data
+
+EXPOSE 80
+
+ENTRYPOINT ["/entrypoint.sh"]

@@ -1,6 +1,5 @@
 
 services:
-###> doctrine/doctrine-bundle ###
   database:
     container_name: database
     image: mysql:8.0
@@ -10,21 +9,29 @@ services:
       MYSQL_USER: symfony
       MYSQL_PASSWORD: symfony
     ports:
-      - 3307:3306
+      - "${MYSQL_PORT:-3307}:3306"
     volumes:
-      - ./mysql:/var/lib/mysql
-  
+      - database_data:/var/lib/mysql
+    restart: unless-stopped
+
   php:
     container_name: php
     build:
       context: ./php
+      dockerfile: Dockerfile
     ports:
       - 8080:80
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
-      - ./app:/var/www
+      - ./app:/var/www:rw,cached
+      - ./php/entrypoint.sh:/entrypoint.sh
     depends_on:
       - database
+    environment:
+      APP_ENV: dev
+      DATABASE_URL: "mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32"
+    entrypoint: ["/bin/bash", "/entrypoint.sh"]
+    restart: unless-stopped
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -36,16 +43,16 @@ services:
       PMA_PASSWORD: secret
     ports:
       - 8890:80
-  
+    restart: unless-stopped
+
   mailhog:
     image: mailhog/mailhog
     logging:
       driver: 'none'
     ports:
-      - 1025:1025 #SMTP
-      - 8025:8025 #boite mail
-      
+      - 1025:1025
+      - 8025:8025
+    restart: unless-stopped
+
 volumes:
-###> doctrine/doctrine-bundle ###
   database_data:
-###< doctrine/doctrine-bundle ###
