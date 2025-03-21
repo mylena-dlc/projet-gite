@@ -42,25 +42,25 @@ jobs:
       - name: 📜 Debug logs du conteneur PHP
         run: docker compose logs php --tail=50
 
-      - name: 🛠️ (Re)Création propre du fichier .env
+
+      - name: 🛠️ Création manuelle du fichier .env (ligne par ligne)
         run: |
-          docker compose exec -T php bash -c " 
-            if [ -d \"/var/www/.env\" ]; then
+          docker compose exec -T --user=root php bash -c "
+            if [ -d /var/www/.env ]; then
               echo '🧹 /var/www/.env est un dossier, suppression...'
               rm -rf /var/www/.env
             fi
 
             echo '📝 Création du fichier .env...'
-            cat <<EOF > /var/www/.env
-            APP_ENV=prod
-            APP_SECRET=${{ secrets.APP_SECRET }}
-            DATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32
-            EOF
+
+            echo 'APP_ENV=prod' > /var/www/.env
+            echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
+            echo 'DATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32' >> /var/www/.env
 
             chown www-data:www-data /var/www/.env
             chmod 644 /var/www/.env
 
-            echo '✅ .env est prêt à l\\'emploi.'
+            echo '✅ .env est prêt à l'\''emploi.'
           "
 
       - name: 🔧 Correction des permissions avant installation
