@@ -36,22 +36,19 @@ jobs:
       - name: 🚀 Démarrer Docker Compose
         run: |
           MYSQL_PORT="" docker compose up -d --build
-          sleep 20  # ⏳ Donne plus de temps aux services pour démarrer
+          sleep 20
           docker compose ps
 
-      - name: 📜 Debug logs du conteneur PHP
+      - name: 📜 Logs du conteneur PHP
         run: docker compose logs php --tail=50
 
-
-      - name: 🛠️ Création manuelle du fichier .env (ligne par ligne)
+      - name: 🛠️ Création du fichier .env
         run: |
           docker compose exec -T --user=root php bash -c "
             if [ -d /var/www/.env ]; then
-              echo '🧹 /var/www/.env est un dossier, suppression...'
+              echo '🧹 Suppression du dossier .env'
               rm -rf /var/www/.env
             fi
-
-            echo '📝 Création du fichier .env...'
 
             echo 'APP_ENV=prod' > /var/www/.env
             echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
@@ -59,43 +56,34 @@ jobs:
 
             chown www-data:www-data /var/www/.env
             chmod 644 /var/www/.env
-
-            echo '✅ .env est prêt à l'\''emploi.'
+            echo '✅ .env prêt.'
           "
 
-      - name: 🔧 Correction des permissions avant installation
+      - name: 🔧 Permissions et prérequis
         run: |
           docker compose exec -T --user=root php mkdir -p /var/www/vendor /var/www/var/cache /var/www/var/log
           docker compose exec -T --user=root php chown -R www-data:www-data /var/www
           docker compose exec -T --user=root php chmod -R 775 /var/www
 
-      - name: 🛠️ Vérification de composer.json
-        run: |
-          docker compose exec -T php composer validate --no-check-lock
+      - name: 🛠️ Validation de composer.json
+        run: docker compose exec -T php composer validate --no-check-lock
 
-      - name: 📦 Installer les dépendances PHP en tant que www-data
-        run: |
-          docker compose exec -T --user=www-data php composer install --no-interaction --prefer-dist
+      - name: 📦 Installer les dépendances PHP
+        run: docker compose exec -T --user=www-data php composer install --no-interaction --prefer-dist
 
       - name: 🚀 Symfony cache clear
-        run: |
-          docker compose exec -T php php bin/console cache:clear --env=prod --no-warmup
+        run: docker compose exec -T php php bin/console cache:clear --env=prod --no-warmup
 
-      - name: 🗃️ Exécution des migrations Doctrine
+      - name: 🗃️ Migrations Doctrine
         run: |
-          docker compose exec -T php php bin/console doctrine:migrations:status
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration --all-or-nothing=false || true
 
-      - name: 📦 Installer les dépendances Node.js dans le conteneur
-        run: docker compose exec -T php npm ci
-
-      - name: 🛠️ Compiler les assets dans le conteneur
-        run: docker compose exec -T php npm run build
+      - name: 🧱 Installer & builder les assets
+        run: docker compose exec -T php bash -c 'npm ci && npm run build'
 
       - name: ✅ Tests PHPUnit
-        run: |
-          docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
+        run: docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
 
   merge-develop-to-test:
     needs: tests
@@ -108,7 +96,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🛠️ Merge develop vers test
+      - name: 🔀 Merge develop vers test
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -130,7 +118,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🛠️ Merge test vers main
+      - name: 🔀 Merge test vers main
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
@@ -166,4 +154,3 @@ jobs:
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2
- 
