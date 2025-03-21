@@ -33,10 +33,11 @@ class RegistrationControllerTest extends WebTestCase
             ]
         );
 
-        // Vérifier si la réponse est un 403 "Forbidden"
-        $this->assertResponseStatusCodeSame(403, 'Go away dirty bot !');
-
-        // Vérifier si on est bien redirigé vers "/"
+        // Vérifie la redirection vers /
         $this->assertResponseRedirects('/');
+        $client->followRedirect();
+        // Vérifie qu'on n'est plus sur la page d'inscription
+        
+        $this->assertSelectorNotExists('form[name="registration_form"]'); 
     }
 }
