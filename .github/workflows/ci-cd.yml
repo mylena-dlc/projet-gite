@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - develop
-      - main
 
 jobs:
   tests:
@@ -125,31 +124,3 @@ jobs:
     steps:
       - name: 📌 Étape manuelle requise merge test → main
         run: echo "Pull request manuelle requise pour merger 'test' vers 'main'"
-
-  deploy:
-    needs: merge-test-to-main
-    runs-on: ubuntu-latest
-    if: github.ref_name == 'main'
-    environment:
-        name: production
-
-    steps:
-      - name: 📥 Checkout main
-        uses: actions/checkout@v3
-        with:
-          ref: main
-
-      - name: 🚀 Déploiement sur VPS
-        uses: appleboy/ssh-action@v0.1.6
-        with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USER }}
-          key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: |
-            cd /var/www/projet-gite
-            git pull origin main
-            sudo chown -R www-data:www-data /var/www
-            sudo chmod -R 775 /var/www/var/cache /var/www/var/log
-            php bin/console cache:clear --env=prod
-            php bin/console cache:warmup --env=prod
-            sudo systemctl restart apache2
