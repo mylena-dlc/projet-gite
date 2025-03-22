@@ -12,22 +12,21 @@ jobs:
       name: production
 
     steps:
-      - name: 📥 Checkout main
+      - name: Checkout main
         uses: actions/checkout@v3
         with:
           ref: main
 
-      - name: 🚀 Déploiement sur VPS
+      - name: Déploiement sur VPS
         uses: appleboy/ssh-action@v0.1.6
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd /var/www/projet-gite
+            cd /var/www/projet-gite/app
             git pull origin main
-            sudo chown -R www-data:www-data /var/www
-            sudo chmod -R 775 /var/www/var/cache /var/www/var/log
+            composer install --no-interaction --prefer-dist
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2
