@@ -1,4 +1,4 @@
-name: 🚀 Déploiement production
+name: Déploiement production
 
 on:
   push:
