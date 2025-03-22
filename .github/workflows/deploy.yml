@@ -27,6 +27,8 @@ jobs:
             cd /var/www/projet-gite/app
             git pull origin main
             composer install --no-interaction --prefer-dist
+            sudo chown -R www-data:www-data var
+            sudo chmod -R 775 var
             php bin/console cache:clear --env=prod
             php bin/console cache:warmup --env=prod
             sudo systemctl restart apache2
