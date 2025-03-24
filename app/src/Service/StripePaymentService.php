@@ -64,7 +64,9 @@ class StripePaymentService
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
-            'success_url' => $_ENV['APP_URL'] . '/reservation/confirmation?session_id={CHECKOUT_SESSION_ID}',
+            // 'success_url' => $_ENV['APP_URL'] . '/reservation/confirmation?session_id={CHECKOUT_SESSION_ID}',
+            'success_url' => $_ENV['APP_URL'] . '/reservation/confirmation-pending?session_id={CHECKOUT_SESSION_ID}',
+
             'cancel_url' => $_ENV['APP_URL'] . '/reservation/error',        
             'metadata' => [
                 'user_id' => $reservationDetails['userId'],
