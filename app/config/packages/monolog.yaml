@@ -2,6 +2,7 @@ monolog:
     channels:
         - deprecation # Deprecations are logged in the dedicated "deprecation" channel when it exists
         - honey_pot
+        - payment
         
 when@dev:
     monolog:
@@ -31,6 +32,14 @@ when@dev:
                 channels:
                     # - app
                     - honey_pot
+            payment:
+                level: info
+                type: stream
+                path: "%kernel.logs_dir%/payment/payment.%kernel.environment%.log"
+                max_files: 10
+                channels: 
+                    - payment
+
 
 when@test:
     monolog:

@@ -338,9 +338,9 @@ class ReservationController extends AbstractController
 
         if ($reservationForm->isSubmitted() && $reservationForm->isValid()) {
             //Générer une référence unique 
-            $randomCode = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
-            $reference = 'RES-' . $arrivalDate->format('Y') . '-' . str_pad($reservation->getId(), 3, '0', STR_PAD_LEFT) . '-' . $randomCode;
-            $reservation->setReference($reference);
+            // $randomCode = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
+            // $reference = 'RES-' . $arrivalDate->format('Y') . '-' . str_pad($reservation->getId(), 3, '0', STR_PAD_LEFT) . '-' . $randomCode;
+            // $reservation->setReference($reference);
 
             // Vérification et formatage du numéro de téléphone
             $phone = $reservation->getPhone();
@@ -379,8 +379,7 @@ class ReservationController extends AbstractController
             $reservationDetails['departure_date'] = $reservation->getdepartureDate();
             $reservationDetails['number_adult'] = $reservation->getnumberAdult();
             $reservationDetails['number_kid'] = $reservation->getnumberKid();
-
-    
+            
             // Si un token a été renseigné, récupérer ses données
             if ($session->has('reservation_token')) {
                 $promoCode = $session->get('reservation_token')['promoCode'];
@@ -428,14 +427,7 @@ class ReservationController extends AbstractController
             $reservation->setArrivalDate($arrivalDate);
             $reservation->setDepartureDate($departureDate);
 
-            // $em->persist($reservation);
-            // $em->flush();
             $description = 'Validez votre réservation pour notre gîte à Orbey. Vérifiez les détails, les tarifs, et complétez vos coordonnées en toute sécurité. Séjournez dans notre charmant hébergement en Alsace.';
-
-        // return $this->render('reservation/confirm.html.twig', [
-        //     'description' => $description,
-        //     // 'breadcrumb' => $breadcrumb
-        // ]);
 
             return $this->redirectToRoute('confirm_reservation', [
                 'slug' => $reservation->getSlug(),
@@ -543,8 +535,7 @@ class ReservationController extends AbstractController
     //     return $this->redirect($paymentUrl);
     // }
     
-
-    #[Route('/reservation/confirm', name: 'reservation_confirm', methods: ['GET'])]
+    #[Route('/reservation/confirmation', name: 'reservation_temp_confirm', methods: ['GET'])]
     public function confirm(Request $request, EntityManagerInterface $em): Response
     {
         $sessionId = $request->query->get('session_id');
@@ -552,32 +543,37 @@ class ReservationController extends AbstractController
         if (!$sessionId) {
             return new Response('Erreur : Aucun identifiant de session Stripe fourni.', 400);
         }
-
-        // Récupérer la session Stripe
-        $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
-        \Stripe\Stripe::setApiKey($stripeSecretKey);
-
+    
+        \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+    
         try {
             $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
+    
+            if ($stripeSession->payment_status !== 'paid') {
+                return new Response('Paiement non confirmé.', 400);
+            }
+    
             $paymentIntentId = $stripeSession->payment_intent;
         } catch (\Exception $e) {
             return new Response('Erreur Stripe : ' . $e->getMessage(), 400);
         }
-
-        // Récupérer la réservation associée
+    
         $reservation = $em->getRepository(Reservation::class)->findOneBy([
-            'stripePaymentId' => $paymentIntentId
+            'stripe_paymentId' => $paymentIntentId
         ]);
-
+    
         if (!$reservation) {
-            return new Response('Erreur : Aucune réservation trouvée.', 404);
+            return new Response('Erreur : Réservation introuvable.', 404);
         }
+    
+        $description = 'Votre réservation dans notre gîte de charme à Orbey en Alsace est confirmée. Préparez-vous à vivre une expérience exceptionnelle dans notre maison de vacances!';
 
         return $this->render('reservation/confirm.html.twig', [
-            'reservation' => $reservation
+            'reservation' => $reservation,
+            'description' => $description
         ]);
     }
-
+    
     
 
 

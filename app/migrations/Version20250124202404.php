@@ -16,12 +16,12 @@ final class Version20250124202404 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // 🔧 Ajout des sécurités pour éviter les erreurs "table already exists"
+        // Ajout des sécurités pour éviter les erreurs "table already exists"
         $this->addSql('DROP TABLE IF EXISTS reservation_extra');
         $this->addSql('DROP TABLE IF EXISTS extra');
         $this->addSql('DROP TABLE IF EXISTS supplement');
 
-        // ✅ Création des nouvelles tables
+        // Création des nouvelles tables
         $this->addSql('CREATE TABLE extra (id INT AUTO_INCREMENT NOT NULL, name VARCHAR(255) NOT NULL, price DOUBLE PRECISION NOT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('CREATE TABLE reservation_extra (id INT AUTO_INCREMENT NOT NULL, extra_id INT DEFAULT NULL, reservation_id INT DEFAULT NULL, date DATETIME NOT NULL, quantity INT NOT NULL, INDEX IDX_E40DDC22B959FC6 (extra_id), INDEX IDX_E40DDC2B83297E7 (reservation_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
         $this->addSql('ALTER TABLE reservation_extra ADD CONSTRAINT FK_E40DDC22B959FC6 FOREIGN KEY (extra_id) REFERENCES extra (id)');
