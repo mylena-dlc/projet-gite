@@ -3,6 +3,8 @@
 namespace App\Controller;
 
 use Stripe\Webhook;
+use App\Entity\Gite;
+use App\Entity\User;
 use App\Entity\Reservation;
 use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,65 +25,54 @@ class StripeWebhookController
         $this->logger = $logger;
     }
 
-   /**
- * Fonction de gestion des évènements Stripe
- */
-#[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
-public function handleStripeWebhook(Request $request, LoggerInterface $logger): Response
-{
-    $this->logger->info("Webhook Stripe reçu");
+    /**
+     * Fonction de gestion des évènements Stripe
+     */
+    #[Route('/stripe/webhook', name: 'stripe_webhook', methods: ['POST'])]
+    public function handleStripeWebhook(Request $request): Response
+    {
+        $this->logger->info("Webhook Stripe reçu");
 
-    // Récupération des données Stripe
-    $payload = @file_get_contents('php://input');
-    $sigHeader = $request->headers->get('stripe-signature');
-    $endpointSecret = $_ENV['STRIPE_WEBHOOK_SECRET'];
-    $event = null;
+        // Récupération des données Stripe
+        $payload = @file_get_contents('php://input');
+        $sigHeader = $request->headers->get('stripe-signature');
+        $endpointSecret = $_ENV['STRIPE_WEBHOOK_SECRET'];
+        $event = null;
 
-    try {
-        // Vérification de la signature Stripe
-        $event = Webhook::constructEvent(
-            $payload,
-            $sigHeader,
-            $endpointSecret
-        );
-    } catch (UnexpectedValueException $e) {
-        $logger->error("Erreur : Payload invalide");
-        return new Response('Erreur : Payload invalide.', 400);
-    } catch (SignatureVerificationException $e) {
-        $logger->error("Erreur : Signature Stripe invalide");
-        return new Response('Erreur : Signature invalide.', 400);
+        try {
+            // Vérification de la signature Stripe
+            $event = Webhook::constructEvent(
+                $payload,
+                $sigHeader,
+                $endpointSecret
+            );
+        } catch (UnexpectedValueException $e) {
+            $this->logger->error("Erreur : Payload invalide");
+            return new Response('Erreur : Payload invalide.', 400);
+        } catch (SignatureVerificationException $e) {
+            $this->logger->error("Erreur : Signature Stripe invalide");
+            return new Response('Erreur : Signature invalide.', 400);
+        }
+
+        // Gestion des événements Stripe 
+        switch ($event->type) {
+            case 'checkout.session.completed':
+                $this->logger->info("Paiement confirmé pour session ID : " . $event->data->object->id);
+                $this->handleSuccessfulPayment($event->data->object);
+                break;
+
+            case 'payment_intent.payment_failed':
+                $this->logger->warning("Échec de paiement pour : " . $event->data->object->id);
+                $this->handlePaymentFailed($event->data->object);
+                break;
+
+            default:
+                $this->logger->warning("Événement Stripe non traité : " . $event->type);
+                return new Response('Événement non traité.', 400);
+        }
+
+        return new Response('Webhook traité avec succès', 200);
     }
-
-    // Gestion des événements Stripe avec un switch
-    switch ($event->type) {
-        case 'checkout.session.completed':
-            $logger->info("Paiement confirmé pour session ID : " . $event->data->object->id);
-            $this->handleSuccessfulPayment($event->data->object);
-            break;
-
-        case 'payment_intent.succeeded':
-            $logger->info("PaymentIntent réussi : " . $event->data->object->id);
-            $this->handlePaymentSucceeded($event->data->object);
-            break;
-
-        case 'charge.succeeded':
-            $logger->info("Charge réussie pour ID : " . $event->data->object->id);
-            $this->handleChargeSucceeded($event->data->object);
-            break;
-
-        case 'payment_intent.payment_failed':
-            $logger->warning("Échec de paiement pour : " . $event->data->object->id);
-            $this->handlePaymentFailed($event->data->object);
-            break;
-
-        default:
-            $logger->warning("Événement Stripe non traité : " . $event->type);
-            return new Response('Événement non traité.', 400);
-    }
-
-    return new Response('Webhook traité avec succès', 200);
-}
-
 
 
     /**
@@ -89,115 +80,79 @@ public function handleStripeWebhook(Request $request, LoggerInterface $logger): 
     */
     private function handleSuccessfulPayment($session)
     {
+
+        $this->logger->info('Stripe session reçue : ' . $session->id);
+        $this->logger->info('PaymentIntent : ' . $session->payment_intent);
+
         $metadata = $session->metadata;
-        $tempReservationId = $metadata->temp_reservation_id;
-    
-        // Vérifier si la réservation existe déjà
-        $existingReservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
-            'reference' => $tempReservationId
-        ]);
-    
-        if ($existingReservation) {
-            $this->logger->info("Réservation déjà existante en BDD, on ne la recrée pas.");
-            return;
-        }
-    
-        // Récupération des détails en session
-        $reservationDetails = $_SESSION['reservation_ok_' . $tempReservationId] ?? null;
-        if (!$reservationDetails) {
-            $this->logger->error("Détails de réservation introuvables en session !");
-            return;
-        }
-    
-        // Création de la réservation
         $reservation = new Reservation();
-        $reservation->setArrivalDate(\DateTime::createFromFormat('d/m/Y', $reservationDetails['startDate']));
-        $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $reservationDetails['endDate']));
-        $reservation->setNumberAdult($reservationDetails['numberAdult']);
-        $reservation->setNumberKid($reservationDetails['numberKid']);
-        $reservation->setTotalNight($reservationDetails['totalNight']);
-        $reservation->setPriceNight($reservationDetails['nightPrice']);
-        $reservation->setCleaningCharge($reservationDetails['cleaningCharge']);
-        $reservation->setSupplement($reservationDetails['supplement']);
-        $reservation->setTva($reservationDetails['tva']);
-        $reservation->setTourismTax($reservationDetails['tax']);
-        $reservation->setTotalPrice($reservationDetails['totalPrice']);
-        $reservation->setLastName($reservationDetails['lastName']);
-        $reservation->setFirstName($reservationDetails['firstName']);
-        $reservation->setAddress($reservationDetails['address']);
-        $reservation->setCp($reservationDetails['cp']);
-        $reservation->setCity($reservationDetails['city']);
-        $reservation->setCountry($reservationDetails['country']);
-        $reservation->setPhone($reservationDetails['phone']);
-        $reservation->setEmail($reservationDetails['email']);
-        $reservation->setIsMajor($reservationDetails['isMajor']);
-        $reservation->setMessage($reservationDetails['message']);
-        $reservation->setReference($tempReservationId);
-        $reservation->setStripePaymentId($session->payment_intent); // On stocke l'ID Stripe
+        $reservation->setArrivalDate(\DateTime::createFromFormat('d/m/Y', $metadata->start_date));
+        $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $metadata->end_date));
+        $reservation->setNumberAdult($metadata->number_adult);
+        $reservation->setNumberKid($metadata->number_kid);
+        $reservation->setTotalNight($metadata->total_night);
+        $reservation->setPriceNight($metadata->night_price);
+        $reservation->setCleaningCharge($metadata->cleaning_charge);
+        $reservation->setSupplement($metadata->supplement);
+        $reservation->setTva($metadata->tva);
+        $reservation->setTourismTax($metadata->tax);
+        $reservation->setTotalPrice($metadata->total_price);
+        $reservation->setLastName($metadata->last_name);
+        $reservation->setFirstName($metadata->first_name);
+        $reservation->setAddress($metadata->address);
+        $reservation->setCp($metadata->cp);
+        $reservation->setCity($metadata->city);
+        $reservation->setCountry($metadata->country);
+        $reservation->setPhone($metadata->phone);
+        $reservation->setEmail($metadata->email);
+        $reservation->setIsMajor($metadata->is_major === 1); 
+        $reservation->setMessage($metadata->message);
+        $reservation->setStripePaymentId($session->payment_intent);
     
-        // Récupération du Gîte et de l'Utilisateur
-        $gite = $this->entityManager->getRepository(\App\Entity\Gite::class)->find($metadata->gite_id);
-        $user = $this->entityManager->getRepository(\App\Entity\User::class)->find($metadata->user_id);
-        $reservation->setGite($gite);
+        // Référence unique
+        $uuid = strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
+        $reference = 'RES-' . date('Y') . '-' . $uuid;
+        $reservation->setReference($reference);
+
+        // Relations
+        $user = $this->entityManager->getRepository(User::class)->find($metadata->user_id);
+        $gite = $this->entityManager->getRepository(Gite::class)->find($metadata->gite_id);
         $reservation->setUser($user);
-    
-        // Enregistrement en base de données
+        $reservation->setGite($gite);
+
         try {
             $this->entityManager->persist($reservation);
             $this->entityManager->flush();
-            $this->logger->info("Réservation confirmée et sauvegardée !");
+            $this->logger->info("Réservation confirmée et enregistrée (Webhook Stripe)");
         } catch (\Exception $e) {
-            $this->logger->error("Erreur lors de la sauvegarde de la réservation : " . $e->getMessage());
+            $this->logger->error("Erreur lors de la sauvegarde : " . $e->getMessage());
         }
     }
     
 
-    private function handlePaymentSucceeded($paymentIntent)
-{
-    $this->logger->info("Paiement réussi pour PaymentIntent ID : " . $paymentIntent->id);
+    /**
+     * Gestion du paiement échoué (payment_intent.payment_failed)
+     */
+    private function handlePaymentFailed($paymentIntent)
+    {
+        $this->logger->warning("Échec du paiement pour PaymentIntent ID : " . $paymentIntent->id);
 
-    
-    // Récupération de la réservation via Stripe PaymentIntent
-    $reservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
-        'stripePaymentId' => $paymentIntent->id
-    ]);
+        // Récupération de la réservation
+        $reservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
+            'stripePaymentId' => $paymentIntent->id
+        ]);
 
-    if (!$reservation) {
-        $this->logger->error("Aucune réservation trouvée pour PaymentIntent ID : " . $paymentIntent->id);
-        return;
+        if (!$reservation) {
+            $this->logger->error("Aucune réservation trouvée pour PaymentIntent ID : " . $paymentIntent->id);
+            return;
+        }
+
+        // Marquer la réservation comme non confirmée
+        $reservation->setIsConfirm(false);
+        $this->entityManager->persist($reservation);
+        $this->entityManager->flush();
+
+        $this->logger->info("Réservation non confirmée pour : " . $reservation->getReference());
     }
-
-    // Confirmer la réservation
-    // $reservation->setIsConfirm(true);
-    $this->entityManager->persist($reservation);
-    $this->entityManager->flush();
-
-    $this->logger->info("Réservation confirmée pour : " . $reservation->getReference());
-}
-
-/**
- * 🔹 Gestion du paiement échoué (payment_intent.payment_failed)
- */
-private function handlePaymentFailed($paymentIntent)
-{
-    $this->logger->warning("Échec du paiement pour PaymentIntent ID : " . $paymentIntent->id);
-
-    // Récupération de la réservation
-    $reservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
-        'stripePaymentId' => $paymentIntent->id
-    ]);
-
-    if (!$reservation) {
-        $this->logger->error("Aucune réservation trouvée pour PaymentIntent ID : " . $paymentIntent->id);
-        return;
-    }
-
-    // Marquer la réservation comme non confirmée
-    $reservation->setIsConfirm(false);
-    $this->entityManager->persist($reservation);
-    $this->entityManager->flush();
-
-    $this->logger->info("Réservation non confirmée pour : " . $reservation->getReference());
-}
 
 }

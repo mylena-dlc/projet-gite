@@ -37,3 +37,13 @@ services:
         resource: '../src/Controller/'
         tags: ['controller.service_arguments']
 
+    App\Service\StripePaymentService:
+        arguments:
+            $logger: '@monolog.logger.payment'
+
+    App\Controller\StripeWebhookController:
+        tags: ['controller.service_arguments']
+        arguments:
+            $logger: '@monolog.logger.payment'
+            $entityManager: '@doctrine.orm.entity_manager'
+

@@ -64,14 +64,34 @@ class StripePaymentService
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
+            'success_url' => $_ENV['APP_URL'] . '/reservation/confirmation?session_id={CHECKOUT_SESSION_ID}',
+            'cancel_url' => $_ENV['APP_URL'] . '/reservation/error',        
             'metadata' => [
-                'temp_reservation_id' => $uniqueId,
-                'php_session_id' => session_id() // 🔹 Stocke l'ID de session
+                'user_id' => $reservationDetails['userId'],
+                'gite_id' => $reservationDetails['giteId'],
+                'start_date' => $reservationDetails['startDate'],
+                'end_date' => $reservationDetails['endDate'],
+                'number_adult' => $reservationDetails['numberAdult'],
+                'number_kid' => $reservationDetails['numberKid'],
+                'total_night' => $reservationDetails['totalNight'],
+                'night_price' => $reservationDetails['nightPrice'],
+                'cleaning_charge' => $reservationDetails['cleaningCharge'],
+                'supplement' => $reservationDetails['supplement'],
+                'tva' => $reservationDetails['tva'],
+                'tax' => $reservationDetails['tax'],
+                'total_price' => $reservationDetails['totalPrice'],
+                'first_name' => $reservationDetails['firstName'],
+                'last_name' => $reservationDetails['lastName'],
+                'email' => $reservationDetails['email'],
+                'phone' => $reservationDetails['phone'],
+                'address' => $reservationDetails['address'],
+                'city' => $reservationDetails['city'],
+                'cp' => $reservationDetails['cp'],
+                'country' => $reservationDetails['country'],
+                'is_major' => $reservationDetails['isMajor'],
+                'message' => $reservationDetails['message'] ?? '',
 
-            ],
-        
-            'success_url' => $_ENV['APP_URL'] . '/reservation/confirm?session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url' => $_ENV['APP_URL'] . '/reservation/error',
+            ]
         ]);
 
         return $session->url;
