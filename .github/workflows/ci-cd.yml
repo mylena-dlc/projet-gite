@@ -5,6 +5,7 @@ on:
     branches:
       - develop
 
+
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -80,10 +81,10 @@ jobs:
       - name: 📦 Installer les assets importmap
         run: docker compose exec -T php php bin/console importmap:install
 
-      - name: 🗃️ Migrations pour l'environnement de test
+      - name: 🛠️ Migration TEST - Assurer que toutes les colonnes sont à jour
         run: |
-          docker compose exec -T php php bin/console doctrine:database:create --env=test --if-not-exists
-          docker compose exec -T php php bin/console doctrine:migrations:migrate --env=test --no-interaction
+          docker compose exec -T php php bin/console doctrine:schema:drop --env=test --force --full-database
+          docker compose exec -T php php bin/console doctrine:schema:create --env=test
 
       - name: 🩹 Créer un faux logo dans le conteneur
         run: |

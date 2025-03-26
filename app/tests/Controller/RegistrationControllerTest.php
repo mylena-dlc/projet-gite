@@ -37,7 +37,6 @@ class RegistrationControllerTest extends WebTestCase
         $this->assertResponseRedirects('/');
         $client->followRedirect();
         // Vérifie qu'on n'est plus sur la page d'inscription
-        
         $this->assertSelectorNotExists('form[name="registration_form"]'); 
     }
 }

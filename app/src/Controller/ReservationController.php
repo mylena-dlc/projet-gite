@@ -338,9 +338,9 @@ class ReservationController extends AbstractController
 
         if ($reservationForm->isSubmitted() && $reservationForm->isValid()) {
             //Générer une référence unique 
-            $randomCode = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
-            $reference = 'RES-' . $arrivalDate->format('Y') . '-' . str_pad($reservation->getId(), 3, '0', STR_PAD_LEFT) . '-' . $randomCode;
-            $reservation->setReference($reference);
+            // $randomCode = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
+            // $reference = 'RES-' . $arrivalDate->format('Y') . '-' . str_pad($reservation->getId(), 3, '0', STR_PAD_LEFT) . '-' . $randomCode;
+            // $reservation->setReference($reference);
 
             // Vérification et formatage du numéro de téléphone
             $phone = $reservation->getPhone();
@@ -379,8 +379,7 @@ class ReservationController extends AbstractController
             $reservationDetails['departure_date'] = $reservation->getdepartureDate();
             $reservationDetails['number_adult'] = $reservation->getnumberAdult();
             $reservationDetails['number_kid'] = $reservation->getnumberKid();
-
-    
+            
             // Si un token a été renseigné, récupérer ses données
             if ($session->has('reservation_token')) {
                 $promoCode = $session->get('reservation_token')['promoCode'];
@@ -428,14 +427,7 @@ class ReservationController extends AbstractController
             $reservation->setArrivalDate($arrivalDate);
             $reservation->setDepartureDate($departureDate);
 
-            // $em->persist($reservation);
-            // $em->flush();
             $description = 'Validez votre réservation pour notre gîte à Orbey. Vérifiez les détails, les tarifs, et complétez vos coordonnées en toute sécurité. Séjournez dans notre charmant hébergement en Alsace.';
-
-        // return $this->render('reservation/confirm.html.twig', [
-        //     'description' => $description,
-        //     // 'breadcrumb' => $breadcrumb
-        // ]);
 
             return $this->redirectToRoute('confirm_reservation', [
                 'slug' => $reservation->getSlug(),
@@ -470,116 +462,56 @@ class ReservationController extends AbstractController
     }
     
 
-
-    // /**
-    // * Fonction de paiement Stripe
-    // */
-    // #[Route('/reservation/{id}/paiement_stripe', name: 'paiement_stripe')]
-    // public function paiementStripe( int $id, Request $request, EntityManagerInterface $em): Response 
-    // {
-    //     $reservation = $this->reservationRepository->findOneBy(['id' => $id]);
-
-    //     // Récupérez les détails de la réservation
-    //     $totalPrice = round($reservation->getTotalPrice() * 100); // Conversion du prix en centimes et arrondi
-    
-    //     // Configurez Stripe 
-    //     $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
-    //     Stripe::setApiKey($stripeSecretKey);
-        
-    //     // Créez une session de paiement avec Stripe Checkout
-    //     $session = Session::create([
-    //         'payment_method_types' => ['card', 'paypal'],
-    //         'line_items' => [[
-    //             'price_data' => [
-    //                 'currency' => 'eur',
-    //                 'product_data' => [
-    //                     'name' => 'Réservation de gîte',
-    //                 ],
-    //                 'unit_amount' => $totalPrice,
-    //             ],
-    //             'quantity' => 1,
-    //         ]],
-    //         'mode' => 'payment',
-    //         'payment_intent_data' => [ // Inclure payment_intent dans la réponse
-    //             'metadata' => [
-    //                 'reservation_id' => $reservation->getId(),
-    //             ],
-    //         ],
-    //         'success_url' => $this->generateUrl('confirm_reservation', [
-    //             'id' => $reservation->getId(),
-    //             ], UrlGeneratorInterface::ABSOLUTE_URL) . '?session_id={CHECKOUT_SESSION_ID}',
-    //         'cancel_url' => $this->generateUrl('payment_error', 
-    //             ['id' => $reservation->getId()],
-    //              UrlGeneratorInterface::ABSOLUTE_URL),
-    //     ]);
-
-    //     // Redirigez l'utilisateur vers la page de paiement de Stripe
-    //     return $this->redirect($session->url);
-    // }
-
-    // #[Route('/reservation/paiement', name: 'paiement_stripe')]
-    // public function paiementStripe(SessionInterface $session, GiteRepository $giteRepository, StripePaymentService $stripePaymentService): Response
-    // {
-    //     $reservationDetails = $session->get('reservation_details');
-    //     if (!$reservationDetails) {
-    //         $this->addFlash('error', 'Aucune réservation en cours.');
-    //         return $this->redirectToRoute('app_reservation');
-    //     }
-    
-    //     // Récupérer le gîte
-    //     $gite = $giteRepository->find(1);
-    //     if (!$gite) {
-    //         $this->addFlash('error', 'Gîte non trouvé.');
-    //         return $this->redirectToRoute('app_reservation');
-    //     }
-    
-    //     // Ajouter le nom du gîte aux métadonnées Stripe
-    //     $reservationDetails['gite_name'] = $gite->getName();
-    //     $reservationDetails['gite_id'] = $gite->getId();
-    
-    //     // Créer la session de paiement avec Stripe
-    //     $paymentUrl = $stripePaymentService->createPaymentSession($reservationDetails);
-    
-    //     return $this->redirect($paymentUrl);
-    // }
-    
-
-    #[Route('/reservation/confirm', name: 'reservation_confirm', methods: ['GET'])]
+    #[Route('/reservation/confirmation', name: 'reservation_temp_confirm', methods: ['GET'])]
     public function confirm(Request $request, EntityManagerInterface $em): Response
     {
         $sessionId = $request->query->get('session_id');
-
+    
         if (!$sessionId) {
             return new Response('Erreur : Aucun identifiant de session Stripe fourni.', 400);
         }
-
-        // Récupérer la session Stripe
-        $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
-        \Stripe\Stripe::setApiKey($stripeSecretKey);
-
+    
+        \Stripe\Stripe::setApiKey($_ENV['STRIPE_SECRET_KEY']);
+    
         try {
             $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
+    
+            if ($stripeSession->payment_status !== 'paid') {
+                return new Response('Paiement non confirmé.', 400);
+            }
+    
             $paymentIntentId = $stripeSession->payment_intent;
         } catch (\Exception $e) {
             return new Response('Erreur Stripe : ' . $e->getMessage(), 400);
         }
-
-        // Récupérer la réservation associée
-        $reservation = $em->getRepository(Reservation::class)->findOneBy([
-            'stripePaymentId' => $paymentIntentId
-        ]);
-
-        if (!$reservation) {
-            return new Response('Erreur : Aucune réservation trouvée.', 404);
+    
+        // 🔁 Attente douce que le webhook ait créé la réservation
+        $reservation = null;
+        $timeout = 10; // max 10 secondes
+        $elapsed = 0;
+    
+        while (!$reservation && $elapsed < $timeout) {
+            usleep(300000); // 300 ms
+            $reservation = $em->getRepository(Reservation::class)->findOneBy([
+                'stripePaymentId' => $paymentIntentId
+            ]);
+            $elapsed += 0.3;
         }
-
+    
+        if (!$reservation) {
+            return new Response('Erreur : Réservation introuvable.', 404);
+        }
+    
+        $description = 'Votre réservation dans notre gîte de charme à Orbey en Alsace est confirmée. Préparez-vous à vivre une expérience exceptionnelle dans notre maison de vacances!';
+    
         return $this->render('reservation/confirm.html.twig', [
-            'reservation' => $reservation
+            'reservation' => $reservation,
+            'description' => $description
         ]);
     }
-
     
-
+    
+    
 
 //     /**
 //     * Fonction pour afficher la vue de confirmation d'une réservation
