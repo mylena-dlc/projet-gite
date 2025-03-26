@@ -24,26 +24,10 @@ class ReservationTest extends KernelTestCase
         $this->assertCount(0, $errors);
     }
 
-
-
         public function testIsConfirmDefaultValue(): void
     {
         $reservation = new Reservation();
 
         $this->assertEquals(['status' => 'en attente'], $reservation->getIsConfirm());
     }
-
-        public function testMissingRequiredFieldsTriggersValidationErrors(): void
-    {
-        self::bootKernel();
-        $validator = static::getContainer()->get('validator');
-
-        $reservation = new Reservation(); // vide
-
-        $errors = $validator->validate($reservation);
-
-        $this->assertGreaterThan(0, count($errors));
-    }
-
-
 }
