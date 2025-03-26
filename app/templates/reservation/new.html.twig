@@ -14,7 +14,7 @@
 
 		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
 
-		<h1 class="mb-4 mt-2">confirmer votre demande de réservation</h1>
+		<h1 class="mb-4 mt-2">confirmer votre demande<br class="hidden lg:block"> de réservation</h1>
 
 		{% if not app.user  %}
 			<p class="font-bold">Veuillez vous connecter pour confirmer votre réservation 
@@ -23,7 +23,7 @@
 		{% endif %}  
 
 		<section class="py-4">
-			<h3>Ajoutez l'accès au bain nordique<br> à votre réservation</h3>
+			<p class="font-bold">Ajoutez l'accès au bain nordique<br> à votre réservation</p>
 			{{ form_start(extraForm, { 'attr': { 'id': 'extraForm' } }) }}
 			{{ form_row(extraForm.date, { 'label': 'Choisissez une soirée' }) }}
 				<button type="submit" id="addExtraButton" class="btn-secondary my-4 w-full">Ajouter à la réservation</button>
@@ -32,7 +32,7 @@
 		</section>
 
 		<section class="py-4">
-			<h3>Extras ajoutés</h3>
+			<h3><i class="fa-solid fa-plus mr-2"></i> Extras ajoutés</h3>
 				<div id="extrasList">
 					{% if reservationExtras is not empty %}
 						{% for extra in reservationExtras %}
@@ -52,7 +52,7 @@
 		<div class="line"></div>
 		<section class="flex my-4 justify-between">
 			<div>
-				<h3>connexion</h3>
+				<h3><i class="fa-solid fa-circle-user mr-2"></i> connexion</h3>
 				<p>Vous êtes connecter avec ce compte:</p>
 				<p class="font-bold">{{ app.user.email }}</p>
 				<p>Connectez-vous avec un autre compte
@@ -61,7 +61,7 @@
 			</div>
 		</section>
 		<section class="py-4">
-			<h3>Vos coordonnées</h3>
+			<h3><i class="fa-solid fa-address-book mr-2"></i> Vos coordonnées</h3>
 			<p class="my-2 italic text-sm">* Ces champs sont obligatoires</p>
 			{{ form_start(form) }}
 
@@ -96,7 +96,7 @@
 		</section>
 
 		<section class="py-4">
-			<h3>Envoyer un message à l'hôte</h3>
+			<h3> <i class="fa-solid fa-comment mr-2"></i> Envoyer un message à l'hôte</h3>
 			{{ form_row(form.message, {
 				'attr': {
 					'class': 'bg-white1 w-full p-2',
@@ -109,13 +109,13 @@
 		</section>
 
 		<section class="py-4">
-			<h3>important</h3>
+			<h3><i class="fa-solid fa-exclamation mr-2"></i> important</h3>
 			<p>Votre réservation ne sera pas confirmée tant que le propriétaire n'aura pas accepté votre demande, dans les 24 heures maximun.
 				Le montant de votre réservation ne sera débité qu'à cette date.</p>
 		</section>
 
 		<section class="py-4">
-			<h3>Détails du prix</h3>
+			<h3><i class="fa-solid fa-money-bill-1-wave mr-2"></i> Détails du prix</h3>
 			<div class="px-14">
 				<div class="flex justify-between">
 					{% set totalNightPrice = nightPrice * totalNight %}
@@ -203,8 +203,7 @@
 			<div class="line mx-0"></div>
 
 			<div class="my-6">
-				<h3>Méthodes de paiement
-				</h3>
+				<h3><i class="fa-solid fa-money-check mr-2"></i> Méthodes de paiement</h3>
 				<div class="payment-methods px-6">
 					<div class="flex">
 						<img src="{{ asset( 'assets/img/stripe-logo.png' ) }}" alt="Stripe" class="w-1/2 mr-4"/>
