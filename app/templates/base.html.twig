@@ -84,12 +84,6 @@
     </head>
     <body>
         <flash-messages id="flash-messages" data-max-messages="5" class="z-[999]"></flash-messages>
-        {# {% for messages in app.flashes %}
-            {% for message in messages %}
-                <p> {{ message|raw }}</p>
-            {% endfor %}
-        {% endfor %}           #}
-
         <main>
         {% block body %}{% endblock %}
         </main>
