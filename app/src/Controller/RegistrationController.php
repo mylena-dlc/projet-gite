@@ -68,19 +68,19 @@ class RegistrationController extends AbstractController
 
                 $token = $jwt->generate($header, $payload, $this->getParameter('app.jwtsecret'));
 
-                // Encodage du logo
-                $logo = $this->imageToBase64($this->getParameter('kernel.project_dir') . '/public/assets/img/logo-gite-rain-du-pair.png');
+                // // Encodage du logo
+                // $logo = $this->imageToBase64($this->getParameter('kernel.project_dir') . '/public/assets/img/logo-gite-rain-du-pair.png');
 
-                // Envoyer l'e-mail de confirmation
-                $mail->send(
-                    'no-reply@giteraindupair',
-                    $user->getEmail(),
-                    'Activation de votre compte sur le site Gîte du Rain du Pair',
-                    'register',
-                    compact('user', 'token', 'logo')
-                );
+                // // Envoyer l'e-mail de confirmation
+                // $mail->send(
+                //     'no-reply@giteraindupair',
+                //     $user->getEmail(),
+                //     'Activation de votre compte sur le site Gîte du Rain du Pair',
+                //     'register',
+                //     compact('user', 'token', 'logo')
+                // );
 
-                $this->addFlash('success', 'Utilisateur inscrit, veuillez cliquer sur le lien reçu pour confirmer votre adresse e-mail');
+                // $this->addFlash('success', 'Utilisateur inscrit, veuillez cliquer sur le lien reçu pour confirmer votre adresse e-mail');
 
                 return $userAuthenticator->authenticateUser(
                     $user,
