@@ -29,6 +29,7 @@ services:
       - database
     environment:
       APP_ENV: dev
+      APP_URL: "http://51.75.125.13:8080"
       DATABASE_URL: "mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32"
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     restart: unless-stopped
