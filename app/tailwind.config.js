@@ -16,6 +16,7 @@ module.exports = {
         terracota1: "#6E5340",
         terracota2: "#85634d",
         terracota3: "#ecdcd3",
+        terracota4: "#b58869",
         white1: "#fcf7f1"
       },
       fontFamily: {
