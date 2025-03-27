@@ -462,7 +462,7 @@ class ReservationController extends AbstractController
     }
     
 
-    #[Route('/reservation/confirmation', name: 'reservation_temp_confirm', methods: ['GET'])]
+    #[Route('/reservation/confirmation', name: 'reservation_confirm', methods: ['GET'])]
     public function confirm(Request $request, EntityManagerInterface $em): Response
     {
         $sessionId = $request->query->get('session_id');
@@ -493,7 +493,7 @@ class ReservationController extends AbstractController
         while (!$reservation && $elapsed < $timeout) {
             usleep(300000); // 300 ms
             $reservation = $em->getRepository(Reservation::class)->findOneBy([
-                'stripePaymentId' => $paymentIntentId
+                'stripe_paymentId' => $paymentIntentId
             ]);
             $elapsed += 0.3;
         }
