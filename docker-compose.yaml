@@ -57,5 +57,17 @@ services:
       - 8025:8025
     restart: unless-stopped
 
+  nginx:
+    image: nginx:latest
+    container_name: gite_nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - php
+      - phpmyadmin
+    restart: unless-stopped
+
 volumes:
   database_data:

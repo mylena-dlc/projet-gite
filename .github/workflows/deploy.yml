@@ -26,9 +26,12 @@ jobs:
           script: |
             cd /var/www/projet-gite/app
             git pull origin main
-            composer install --no-interaction --prefer-dist
-            sudo chown -R www-data:www-data var
-            sudo chmod -R 775 var
-            php bin/console cache:clear --env=prod
-            php bin/console cache:warmup --env=prod
-            sudo systemctl restart apache2
+
+            docker compose exec -T php php bin/console cache:clear --env=prod
+            docker compose exec -T php php bin/console cache:warmup --env=prod
+
+            docker compose exec -T --user=root php chown -R www-data:www-data /var/www/var
+            docker compose exec -T --user=root php chmod -R 775 /var/www/var
+
+            docker compose down
+            docker compose --env-file .env up -d --build
