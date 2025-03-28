@@ -48,7 +48,7 @@ jobs:
           sleep 20
           docker compose ps
 
-      - name: 📜 Logs du conteneur PHP
+      - name: Logs du conteneur PHP
         run: docker compose logs php --tail=50
 
       - name: Création du fichier .env dans le conteneur
@@ -103,3 +103,32 @@ jobs:
 
       - name: Tests PHPUnit
         run: docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
+
+  merge-develop-to-test:
+    needs: tests
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/develop'
+
+    steps:
+      - name: Checkout develop et test
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Merge develop vers test
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git checkout test
+          git pull origin test --rebase
+          git merge --no-ff develop -m "CI/CD: Merge develop vers test"
+          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
+
+  merge-test-to-main:
+    needs: merge-develop-to-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/test'
+
+    steps:
+      - name: Étape manuelle requise merge test → main
+        run: echo "Pull request manuelle requise pour merger 'test' vers 'main'"
