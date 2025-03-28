@@ -30,12 +30,11 @@ services:
       APP_ENV: ${APP_ENV}
       APP_URL: ${APP_URL}
       DATABASE_URL: ${DATABASE_URL}
-      VIRTUAL_HOST: ${VIRTUAL_HOST}
-      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}  # Laisse vide en local
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}  # Laisse vide en local
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}  # Laisse vide en local
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     restart: unless-stopped
-
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -45,6 +44,9 @@ services:
       PMA_HOST: database
       PMA_USER: ${PMA_USER}
       PMA_PASSWORD: ${PMA_PASSWORD}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}  # Laisse vide en local
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}  # Laisse vide en local
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}  # Laisse vide en local
     ports:
       - 8890:80
     volumes:
@@ -81,7 +83,7 @@ services:
     container_name: nginx-proxy-acme
     restart: always
     environment:
-      - DEFAULT_EMAIL=mylena.delacote@laposte.net
+      - DEFAULT_EMAIL=${ACME_EMAIL}
     volumes_from:
       - nginx-proxy
     volumes:
