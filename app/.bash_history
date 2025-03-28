@@ -87,3 +87,4 @@ cd var
 ls
 cd ..
 exit
+exit
