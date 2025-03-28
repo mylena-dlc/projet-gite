@@ -82,3 +82,8 @@ docker exec -it php bash -c "cd /var/www && php bin/console debug:config framewo
  -c "cd /var/www && php bin/console debug:config framework --env=test"
 docker exec -it php bash -c "cd /var/www && php bin/console debug:config framework --env=test"
 exit
+ls
+cd var
+ls
+cd ..
+exit
