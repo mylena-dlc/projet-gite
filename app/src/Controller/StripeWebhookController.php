@@ -137,22 +137,8 @@ class StripeWebhookController
     {
         $this->logger->warning("Échec du paiement pour PaymentIntent ID : " . $paymentIntent->id);
 
-        // Récupération de la réservation
-        $reservation = $this->entityManager->getRepository(Reservation::class)->findOneBy([
-            'stripePaymentId' => $paymentIntent->id
-        ]);
-
-        if (!$reservation) {
-            $this->logger->error("Aucune réservation trouvée pour PaymentIntent ID : " . $paymentIntent->id);
-            return;
-        }
-
-        // Marquer la réservation comme non confirmée
-        $reservation->setIsConfirm(false);
-        $this->entityManager->persist($reservation);
-        $this->entityManager->flush();
-
-        $this->logger->info("Réservation non confirmée pour : " . $reservation->getReference());
+        // Aucune action en base, juste log l'info
+        $this->logger->info("Aucune réservation à supprimer. L'utilisateur a probablement annulé avant le paiement.");
     }
 
 }
