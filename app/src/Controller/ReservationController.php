@@ -485,7 +485,7 @@ class ReservationController extends AbstractController
             return new Response('Erreur Stripe : ' . $e->getMessage(), 400);
         }
     
-        // 🔁 Attente douce que le webhook ait créé la réservation
+        // Attente douce que le webhook ait créé la réservation
         $reservation = null;
         $timeout = 10; // max 10 secondes
         $elapsed = 0;
@@ -510,135 +510,18 @@ class ReservationController extends AbstractController
         ]);
     }
     
-    
-    
-
-//     /**
-//     * Fonction pour afficher la vue de confirmation d'une réservation
-//     */
-//     #[Route('/reservation/{slug}/confirmation', name: 'confirm_reservation')]
-//     public function confirm($slug, Request $request, SendEmailService $mail, 
-//     DompdfService $dompdfService, FactoryInterface $factory, EntityManagerInterface $em): Response {
-
-//         // Créez un menu "breadcrumb"
-//         $breadcrumb = $factory->createItem('root');
-//         $breadcrumb->addChild('Accueil', ['route' => 'app_home']);
-//         $breadcrumb->addChild('Demande de réservation', ['route' => 'app_reservation']);
-//         $breadcrumb->addChild('Confirmation de réservation', ['route' => 'new_reservation']);
-//         $breadcrumb->addChild('Demande envoyée');  
-
-//         // Nettoyage des données en session
-//         $session = $request->getSession();
-//         $session->remove('reservation_details'); // Supprime les détails de la réservation
-//         $session->remove('reservation_details_token'); // Supprime les informations liées au token
-
-//         // Récupérer la réservation
-//         $reservation = $this->reservationRepository->findOneBy(['slug' => $slug]);
-//         $slug =$reservation->getSlug();
-
-//         // Vérifier la méthode de paiement
-//         // $paymentMethod = $reservation->getPaymentMethod();
-
-//         // Récupérer l'id de la session Stripe
-//         // $sessionId = $request->query->get('session_id');
-
-//     //     if ($sessionId) {
-//     //         // Configurez Stripe
-//     //         $stripeSecretKey = $_ENV['STRIPE_SECRET_KEY'];
-//     //         Stripe::setApiKey($stripeSecretKey);
-        
-//     //         try {
-//     //             // Récupérez la session Stripe
-//     //             $stripeSession = \Stripe\Checkout\Session::retrieve($sessionId);
-    
-//     //             // Récupérez le payment_intent depuis la session Stripe
-//     //             $paymentIntentId = $stripeSession->payment_intent;
-    
-//     //             // Mettez à jour la réservation avec l'ID Stripe Payment Intent
-//     //             $reservation->setStripePaymentId($paymentIntentId);
-//     //             $em->persist($reservation);
-//     //             $em->flush();
-    
-//     //             $this->addFlash('success', 'Paiement confirmé et enregistré avec succès.');
-//     //         } catch (\Exception $e) {
-//     //             $this->addFlash('error', 'Erreur lors de la récupération des informations de paiement : ' . $e->getMessage());
-//     //         }
-//     //     } else {
-//     //         $this->addFlash('error', 'Session Stripe ID non fourni.');
-//     //         return $this->redirectToRoute('app_home');
-//     //     }
-        
-//     //     // Données à afficher dans le mail
-//     //     $gite = $this->giteRepository->findOneBy(['id' => 1]);
-//     //     $startDate = $reservation->getArrivalDate();
-//     //     $endDate = $reservation->getDepartureDate();
-//     //     $totalNight = $reservation->getTotalNight();
-//     //     $cleaningCharge = $reservation->getCleaningCharge();
-//     //     $riceNight = $reservation->getPriceNight();
-//     //     $priceHt = $reservation->getTotalPrice() - $cleaningCharge;
-
-//     //     // Récupérer le contenu du template de la facture
-//     //     $invoiceContent = $this->renderView('reservation/invoice.html.twig', [
-//     //     'reservation' => $reservation,
-//     //     'totalNight' => $totalNight,
-//     //     'gite' => $gite,
-//     //     'priceHt' => $priceHt,
-//     //     'cleaningCharge' => $cleaningCharge,
-//     //     'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
-//     //     . '/public/assets/img/logo-gite-rain-du-pair.png'),
-//     // ]);
-
-//     //     // Générez le PDF à partir du HTML
-//     //     $pdfContent = $dompdfService->generatePdf($invoiceContent);
-
-//     //     // Convertir le contenu du PDF en une chaîne Base64
-//     //     $pdfBase64 = base64_encode($pdfContent);
-
-//     //     // Envoyer le mail de confirmation
-//     //     $mail->send(
-//     //         'contact@giteraindupair.fr',
-//     //         $reservation->getEmail(), 
-//     //         '[GITE RAIN DU PAIR] Demande de réservation envoyée',
-//     //         'request_reservation',
-//     //         [
-//     //             'reservation' => $reservation,
-//     //             'pdfBase64' => $pdfBase64, 
-//     //             'logo' => $this->imageToBase64($this->getParameter('kernel.project_dir') 
-//     //             . '/public/assets/img/logo-gite-rain-du-pair.png'),
-//     //         ],
-//     //     );
-
-//     //     // Envoyer un e-mail à l'administrateur
-//     //     $mail->sendAdminNotification(
-//     //         'contact@giteraindupair.fr',
-//     //         'admin@giteraindupair.com',
-//     //         'Nouvelle demande de réservation',
-//     //         'admin_request_reservation',
-//     //         [
-//     //             'reservation' => $reservation,
-//     //         ],
-//     //     );
-
-//         $description = 'Votre réservation dans notre gîte de charme à Orbey en Alsace est confirmée. Préparez-vous à vivre une expérience exceptionnelle dans notre maison de vacances!';
-    
-//         return $this->render('reservation/confirm.html.twig', [
-//             'description' => $description,
-//             'breadcrumb' => $breadcrumb
-//         ]);
-// }
-
 
 
     /**
     * Fonction pour afficher une page d'erreur si le paiement échoue
     */
-    #[Route('/reservation/echec-paiement', name: 'payment_error')]
+    #[Route('/reservation/error', name: 'payment_error')]
     public function stripeError(SessionInterface $session)
     {
-        // Suppression de la session
+        // Supprime les données de réservation côté client
         $session->remove('reservation_details');
 
-        $this->addFlash('error', 'Erreur lors du paiement, veuilliez recommencer votre réservation.');
+        $this->addFlash('error', 'Le paiement a été annulé ou a échoué. Veuillez réessayer votre réservation.');
         return $this->redirectToRoute('app_home');
     }
 
