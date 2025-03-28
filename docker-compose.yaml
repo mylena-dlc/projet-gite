@@ -19,7 +19,7 @@ services:
       context: ./php
       dockerfile: Dockerfile
     ports:
-      - 8080:80
+      - 8080:80 # ← reste pour LOCAL uniquement
     volumes:
       - ./apache/default.conf:/etc/apache2/sites-enabled/000-default.conf
       - ./app:/var/www:rw,cached
@@ -30,8 +30,12 @@ services:
       APP_ENV: ${APP_ENV}
       APP_URL: ${APP_URL}
       DATABASE_URL: ${DATABASE_URL}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     restart: unless-stopped
+
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -57,17 +61,34 @@ services:
       - 8025:8025
     restart: unless-stopped
 
-  nginx:
-    image: nginx:latest
-    container_name: gite_nginx
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    container_name: nginx-proxy
+    restart: always
     ports:
       - "80:80"
+      - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-    depends_on:
-      - php
-      - phpmyadmin
-    restart: unless-stopped
+      - /etc/nginx/certs
+      - /etc/nginx/vhost.d
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - default
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    restart: always
+    environment:
+      - DEFAULT_EMAIL=mylena.delacote@laposte.net
+    volumes_from:
+      - nginx-proxy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /etc/acme.sh
+    networks:
+      - default
 
 volumes:
   database_data:
