@@ -88,3 +88,9 @@ ls
 cd ..
 exit
 exit
+echo $APP_ENV
+php bin/console cache:clear
+php bin/console cache:clear
+php bin/console cache:clear
+php bin/console cache:warmup
+exit
