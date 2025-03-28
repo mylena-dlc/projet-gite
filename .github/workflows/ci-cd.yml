@@ -5,7 +5,6 @@ on:
     branches:
       - develop
 
-
 jobs:
   tests:
     runs-on: ubuntu-latest
@@ -13,10 +12,10 @@ jobs:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_ROOT_PASSWORD: secret
-          MYSQL_DATABASE: gite
-          MYSQL_USER: symfony
-          MYSQL_PASSWORD: symfony
+          MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+          MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+          MYSQL_USER: ${{ secrets.MYSQL_USER }}
+          MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
         ports:
           - 3306/tcp
         options: >-
@@ -26,67 +25,75 @@ jobs:
           --health-retries=5
 
     steps:
-      - name: 📥 Checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: 🚀 Vérification de Docker Compose
-        run: docker compose version
-
-      - name: 🚀 Démarrer Docker Compose
+      - name: Générer fichier .env pour le CI
         run: |
-          MYSQL_PORT="" docker compose up -d --build
+          echo "APP_ENV=prod" > .env.ci
+          echo "APP_URL=${{ secrets.APP_URL }}" >> .env.ci
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" >> .env.ci
+          echo "APP_SECRET=${{ secrets.APP_SECRET }}" >> .env.ci
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.ci
+          echo "MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}" >> .env.ci
+          echo "MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}" >> .env.ci
+          echo "MYSQL_USER=${{ secrets.MYSQL_USER }}" >> .env.ci
+          echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env.ci
+          echo "PMA_USER=${{ secrets.PMA_USER }}" >> .env.ci
+          echo "PMA_PASSWORD=${{ secrets.PMA_PASSWORD }}" >> .env.ci
+
+      - name: Démarrer Docker Compose
+        run: |
+          docker compose --env-file .env.ci up -d --build
           sleep 20
           docker compose ps
 
       - name: 📜 Logs du conteneur PHP
         run: docker compose logs php --tail=50
 
-      - name: 🛠️ Création du fichier .env
+      - name: Création du fichier .env dans le conteneur
         run: |
           docker compose exec -T --user=root php bash -c "
-            if [ -d /var/www/.env ]; then
-              rm -rf /var/www/.env
-            fi
-            echo 'APP_ENV=prod' > /var/www/.env
-            echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env
-            echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /var/www/.env
-            echo 'DATABASE_URL=mysql://symfony:symfony@database:3306/gite?serverVersion=8.0.32' >> /var/www/.env
-            chown www-data:www-data /var/www/.env
+            echo 'APP_ENV=prod' > /var/www/.env &&
+            echo 'APP_SECRET=${{ secrets.APP_SECRET }}' >> /var/www/.env &&
+            echo 'JWT_SECRET=${{ secrets.JWT_SECRET }}' >> /var/www/.env &&
+            echo 'DATABASE_URL=${{ secrets.DATABASE_URL }}' >> /var/www/.env &&
+            chown www-data:www-data /var/www/.env &&
             chmod 644 /var/www/.env
           "
 
-      - name: 🔧 Permissions et prérequis
+      - name: Permissions et prérequis
         run: |
           docker compose exec -T --user=root php mkdir -p /var/www/vendor /var/www/var/cache /var/www/var/log
           docker compose exec -T --user=root php chown -R www-data:www-data /var/www
           docker compose exec -T --user=root php chmod -R 775 /var/www
 
-      - name: 🛠️ Validation de composer.json
+      - name: Validation de composer.json
         run: docker compose exec -T php composer validate --no-check-lock
 
-      - name: 📦 Installer les dépendances PHP
+      - name: Installer les dépendances PHP
         run: docker compose exec -T --user=www-data php composer install --no-interaction --prefer-dist
 
-      - name: 🚀 Symfony cache clear
+      - name: Symfony cache clear
         run: docker compose exec -T php php bin/console cache:clear --env=prod --no-warmup
 
-      - name: 🗃️ Migrations Doctrine
+      - name: Migrations Doctrine
         run: |
           docker compose exec -T php php bin/console doctrine:database:create --if-not-exists
           docker compose exec -T php php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration || true
 
-      - name: 🧱 Installer & builder les assets
+      - name: Installer & builder les assets
         run: docker compose exec -T php bash -c 'npm ci && npm run build'
 
-      - name: 📦 Installer les assets importmap
+      - name: Installer les assets importmap
         run: docker compose exec -T php php bin/console importmap:install
 
-      - name: 🛠️ Migration TEST - Assurer que toutes les colonnes sont à jour
+      - name: Migration TEST - Assurer que toutes les colonnes sont à jour
         run: |
           docker compose exec -T php php bin/console doctrine:schema:drop --env=test --force --full-database
           docker compose exec -T php php bin/console doctrine:schema:create --env=test
 
-      - name: 🩹 Créer un faux logo dans le conteneur
+      - name: Créer un faux logo dans le conteneur
         run: |
           docker compose exec -T --user=root php bash -c "
             mkdir -p /var/www/public/assets/img &&
@@ -94,34 +101,5 @@ jobs:
             chown www-data:www-data /var/www/public/assets/img/logo-gite-rain-du-pair.png
           "
 
-      - name: ✅ Tests PHPUnit
+      - name: Tests PHPUnit
         run: docker compose exec -T php bash -c 'APP_ENV=test php bin/phpunit'
-
-  merge-develop-to-test:
-    needs: tests
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/develop'
-
-    steps:
-      - name: 📥 Checkout develop et test
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: 🔀 Merge develop vers test
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git checkout test
-          git pull origin test --rebase
-          git merge --no-ff develop -m "CI/CD: Merge develop vers test"
-          git push https://x-access-token:${{ secrets.PERSONAL_TOKEN }}@github.com/${{ github.repository }} HEAD:test
-
-  merge-test-to-main:
-    needs: merge-develop-to-test
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/test'
-
-    steps:
-      - name: 📌 Étape manuelle requise merge test → main
-        run: echo "Pull request manuelle requise pour merger 'test' vers 'main'"
