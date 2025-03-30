@@ -22,7 +22,7 @@ class SitemapController extends AbstractController
     }
 
 
-    #[Route('/sitemap.xml', name: 'app_sitemap', defaults: ['_format' => 'xml'])]
+    #[Route('/sitemap.xml', name: 'app_sitemap', defaults: ['_format' => 'xml', '_public_access' => true])]
     public function index(Request $request): Response
     {
         // On récupère le nom d'hôte depuis l'URL
