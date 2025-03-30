@@ -72,7 +72,7 @@ class ReservationController extends AbstractController
         $this->reservationService = $reservationService;
     }
 
-        #[Route('/reservation', name: 'app_reservation')]
+        #[Route('/reservation', name: 'app_reservation', defaults: ['_public_access' => true])]
         public function index(Request $request, FactoryInterface $factory): Response
         {
             // Créez un menu "breadcrumb"
@@ -289,7 +289,7 @@ class ReservationController extends AbstractController
          LocationService $locationService): Response 
     {
         if (!$security->isGranted('IS_AUTHENTICATED_FULLY')) {
-            $session->set('_security.main.target_path', $request->getUri()); // ✅ Sauvegarde la page actuelle
+            $session->set('_security.main.target_path', $request->getUri()); // Sauvegarde la page actuelle
             $this->addFlash('error', 'Vous devez vous connecter ou créer un compte pour continuer votre réservation.');
             return $this->redirectToRoute('app_login');
         }
@@ -337,11 +337,6 @@ class ReservationController extends AbstractController
         $reservationForm->handleRequest($request);
 
         if ($reservationForm->isSubmitted() && $reservationForm->isValid()) {
-            //Générer une référence unique 
-            // $randomCode = strtoupper(substr(bin2hex(random_bytes(2)), 0, 3));
-            // $reference = 'RES-' . $arrivalDate->format('Y') . '-' . str_pad($reservation->getId(), 3, '0', STR_PAD_LEFT) . '-' . $randomCode;
-            // $reservation->setReference($reference);
-
             // Vérification et formatage du numéro de téléphone
             $phone = $reservation->getPhone();
             $country = $reservation->getCountry();
@@ -352,7 +347,7 @@ class ReservationController extends AbstractController
                 return $this->redirectToRoute('new_reservation');
             }
             $reservation->setPhone($formattedPhone);
-            // dump($this->getUser());
+           
             // exit;
             /** @var User $user */
             $user = $this->getUser();

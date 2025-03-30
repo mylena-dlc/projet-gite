@@ -19,8 +19,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class HomeController extends AbstractController
 {
-   
-    #[Route('/', name: 'app_home')]
+    #[Route('/', name: 'app_home', defaults: ['_public_access' => true])]
     public function index(ReservationRepository $reservationRepository,
      PictureRepository $pictureRepository, CategoryRepository $categoryRepository, ReviewRepository $reviewRepository): Response
     {
@@ -50,7 +49,7 @@ class HomeController extends AbstractController
     }
 
 
-    #[Route('/recherche-reservation', name: 'app_search_reservation')]
+    #[Route('/recherche-reservation', name: 'app_search_reservation', defaults: ['_public_access' => true])]
     public function reservation(ReservationRepository $reservationRepository, FactoryInterface $factory, SluggerInterface $slugger): Response
     {
         $breadcrumb = $factory->createItem('root');
@@ -88,7 +87,7 @@ class HomeController extends AbstractController
     /**
     * Fonction de redirection vers la galerie
     */
-    #[Route('/galerie', name: 'app_galery')]
+    #[Route('/galerie', name: 'app_galery', defaults: ['_public_access' => true])]
     public function showGalerie(CategoryRepository $categoryRepository, FactoryInterface $factory): Response
     {
         $breadcrumb = $factory->createItem('root');
@@ -112,7 +111,7 @@ class HomeController extends AbstractController
     /**
     * Fonction de redirection vers les mentions légales
     */
-    #[Route('/mentions-legales', name: 'app_mentions_legales')]
+    #[Route('/mentions-legales', name: 'app_mentions_legales', defaults: ['_public_access' => true])]
     public function mentionsLegales(): Response
     {
         return $this->render('home/mentions-legales.html.twig');
@@ -122,7 +121,7 @@ class HomeController extends AbstractController
     /**
     * Fonction de redirection vers la politique de confidentialité
     */
-    #[Route('/politique-de-confidentialite', name: 'app_politique_confidentialite')]
+    #[Route('/politique-de-confidentialite', name: 'app_politique_confidentialite', defaults: ['_public_access' => true])]
     public function politiqueConfidentialite(): Response
     {
         return $this->render('home/politique-confidentialite.html.twig');
@@ -143,7 +142,7 @@ class HomeController extends AbstractController
     /**
     * Fonction pour afficher la page contact
     */
-    #[Route('/contact', name: 'app_contact')]
+    #[Route('/contact', name: 'app_contact', defaults: ['_public_access' => true])]
     public function pageContact(FactoryInterface $factory, MailerInterface $mailer, Request $request, FormFactoryInterface $formFactory): Response
     {
         $breadcrumb = $factory->createItem('root');
@@ -219,7 +218,7 @@ class HomeController extends AbstractController
     /**
     * Fonction pour afficher la page FAQ
     */
-    #[Route('/foire-aux-questions', name: 'app_faq')]
+    #[Route('/foire-aux-questions', name: 'app_faq', defaults: ['_public_access' => true])]
     public function pageFAQ(FactoryInterface $factory): Response
     {
         $breadcrumb = $factory->createItem('root');
