@@ -41,6 +41,9 @@ jobs:
           echo "MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}" >> .env.ci
           echo "PMA_USER=${{ secrets.PMA_USER }}" >> .env.ci
           echo "PMA_PASSWORD=${{ secrets.PMA_PASSWORD }}" >> .env.ci
+          echo "PMA_VIRTUAL_HOST=" >> .env.ci
+          echo "PMA_LETSENCRYPT_HOST=" >> .env.ci
+          echo "PMA_LETSENCRYPT_EMAIL=" >> .env.ci
 
       - name: Démarrer Docker Compose
         run: |

@@ -48,7 +48,7 @@ services:
       LETSENCRYPT_HOST: ${PMA_LETSENCRYPT_HOST}
       LETSENCRYPT_EMAIL: ${PMA_LETSENCRYPT_EMAIL}
     ports:
-      - 8890:80
+      - "8890:80"
     volumes:
       - ./phpmyadmin/htaccess:/var/www/html/.htaccess
       - ./phpmyadmin/htpasswd:/etc/phpmyadmin/.htpasswd

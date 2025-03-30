@@ -20,7 +20,6 @@
                     <i class="fa-brands fa-facebook text-5xl opacity-50 hover:opacity-100 transition duration-300 text-terracota2"></i>
                     <p class="pt-2">Gîte du Rain du Pair</p>
                 </a>
-                
             </div>
             <!-- Instagram -->
             <div class="flex flex-col items-center justify-between text-center space-y-3">
@@ -28,7 +27,6 @@
                 <a href="https://www.instagram.com/giteraindupair" target="_blank">
                     <i class="fa-brands fa-instagram text-5xl opacity-50 hover:opacity-100 transition duration-300 text-terracota2"></i>
                     <p class="pt-2">@giteraindupair</p>
-
                 </a>
             </div>
             <!-- Téléphone -->
@@ -54,35 +52,12 @@
                 Un renseignement?<br> Une demande particulière?<br> N'hésitez pas, envoyez-nous un message !
             </h2>  
             <p class="text-center pb-4">Nous y répondrons dans les plus brefs délais.</p>  
-            
-            {# <form id="reservationForm" class="flex flex-col gap-6" action="{{ path('app_contact_email') }}" method="post">
-                
-                <label for="email" class="text-lg font-medium">Votre adresse mail</label>
-                <input type="email" id="contact-email" name="email" required placeholder="Sélectionnez votre adresse mail"
-                    class="border p-3 rounded w-full focus:outline-none focus:ring bg-white">
-
-                <label for="subject" class="text-lg font-medium">Sujet</label>
-                <input type="text" id="contact-subject" name="subject" required placeholder="Objet de votre demande"
-                    class="border p-3 rounded w-full focus:outline-none focus:ring bg-white">
-
-                <label for="message" class="text-lg font-medium">Votre message</label>
-                <textarea id="contact-message" name="message" required placeholder="Quel est votre demande ?"class="border p-3 rounded w-full h-32 focus:outline-none focus:ring"></textarea>
-                
-                <input type="text" name="honeypot" id="honeypot" value="" style="display:none;" autocomplete="off">
-
-                <button type="submit" class="btn-primary">Envoyer</button>
-            </form> #}
-
-            {{ form_start(contactForm) }}
-
-    {{ form_row(contactForm.email) }}
-    {{ form_row(contactForm.subject) }}
-    {{ form_row(contactForm.message) }}
-
-
-    <button type="submit" class="btn-primary">Envoyer</button>
-
-    {{ form_end(contactForm) }}
+                {{ form_start(contactForm) }}
+                    {{ form_row(contactForm.email) }}
+                    {{ form_row(contactForm.subject) }}
+                    {{ form_row(contactForm.message) }}
+                    <button type="submit" class="btn-primary">Envoyer</button>
+                {{ form_end(contactForm) }}
         </div>
 </div>
 
