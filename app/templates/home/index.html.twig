@@ -105,7 +105,7 @@
                             <figure class="w-[40%] lg:w-1/4">
                                 <img src="{{ asset( 'assets/img/bain-nordique.jpeg' ) }}" 
                                     alt="Expérience relaxante dans un bain nordique en Alsace" 
-                                    class="aspect-square object-cover overflow-hidden m-auto" />
+                                    class="aspect-square object-cover overflow-hidden m-auto w-96 h-96" />
                             </figure>
                             <p class="w-[100%] p-6">
                                 Offrez-vous un moment de détente unique dans notre <strong class="">bain nordique</strong> chauffé au feu de bois, face à une vue imprenable sur la vallée. <br>
@@ -183,10 +183,10 @@
         <div class="flex flex-col items-center my-4 lg:px-10">
             <h3 class="lg:text-xl">Suivez-nous !</h3>
             <div class="lg:pb-2">
-                <a href="https://www.instagram.com/giteraindupair/" class="mr-2 lg:text-3xl" target="_blank">
+                <a href="https://www.instagram.com/giteraindupair/" class="mr-2 lg:text-3xl" target="_blank" aria-label="Visiter notre compte Instagram">
                     <i class="fa-brands fa-instagram"></i>
                 </a>
-                <a href="https://www.facebook.com/profile.php?id=61555292307736" class="lg:text-3xl" target="_blank">
+                <a href="https://www.facebook.com/profile.php?id=61555292307736" class="lg:text-3xl" target="_blank" aria-label="Visiter notre page Facebook">
                     <i class="fa-brands fa-facebook"></i>
                 </a>
             </div>
@@ -239,11 +239,10 @@
 
     {% block custom_javascripts %}
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/js/splide.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js"></script>  
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/js/splide.min.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js" defer></script>  
 
         <script>
             function adjustHeroHeight() {
