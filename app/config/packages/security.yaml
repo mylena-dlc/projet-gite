@@ -22,9 +22,13 @@ security:
                 - App\Security\UsersAuthenticator
                 - App\Security\GoogleAuthenticator
             form_login:
+                login_path: app_login
+                check_path: app_login
                 use_referer: true   
-                default_target_path: app_home 
-                csrf_token_generator: security.csrf.token_manager 
+                default_target_path: app_home
+                enable_csrf: true              
+                csrf_token_id: authenticate  
+
             logout:
                 path: app_logout
                 # where to redirect after logout
