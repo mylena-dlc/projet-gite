@@ -476,7 +476,7 @@ class SecurityController extends AbstractController
 
          // Envoyer le mail d'annulation
          $mail->send(
-            'contact@giteraindupair.fr',
+            'contact@gite-rain-du-pair.fr',
             $reservation->getEmail(), 
             '[GITE RAIN DU PAIR] Annulation de réservation',
             'cancel_reservation',
@@ -492,7 +492,7 @@ class SecurityController extends AbstractController
 
         // Envoyer un e-mail à l'administrateur
         $mail->sendAdminNotification(
-            'contact@giteraindupair.fr',
+            'contact@gite-rain-du-pair.fr',
             'admin@giteraindupair.com',
             'Annulation de réservation',
             'admin_cancel_reservation',
