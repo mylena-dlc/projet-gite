@@ -656,7 +656,7 @@ class DashboardController extends AbstractController
 
         // Envoyer le mail de confirmation
         $mail->send(
-            'contact@giteraindupair.fr',
+            'contact@gite-rain-du-pair.fr',
             $reservation->getEmail(), 
             '[GITE RAIN DU PAIR] Confimation de réservation',
             'confirm_reservation',
@@ -670,7 +670,7 @@ class DashboardController extends AbstractController
 
         // Envoyer un e-mail à l'administrateur
         $mail->sendAdminNotification(
-            'contact@giteraindupair.fr',
+            'contact@gite-rain-du-pair.fr',
             'admin@giteraindupair.com',
             'Nouvelle réservation confirmée',
             'admin_confirm_reservation',
@@ -741,7 +741,7 @@ class DashboardController extends AbstractController
 
             // Envoyer un e-mail de notification
             $mail->send(
-                'contact@giteraindupair.fr',
+                'contact@gite-rain-du-pair.fr',
                 $reservation->getEmail(),
                 '[GITE RAIN DU PAIR] Réservation refusée',
                 'reject_reservation',
@@ -789,7 +789,7 @@ class DashboardController extends AbstractController
 
                 // Envoyer la notification à l'administrateur
                 $mail->sendAdminNotification(
-                    'contact@giteraindupair.fr',
+                    'contact@gite-rain-du-pair.fr',
                     'admin@giteraindupair.com',
                     'Nouvel avis à confirmer',
                     'admin_review',

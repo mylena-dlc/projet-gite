@@ -159,7 +159,7 @@ class HomeController extends AbstractController
         
             $email = (new Email())
             ->from($data['email'])
-            ->to('contact@giteraindupair.fr')
+            ->to('contact@gite-rain-du-pair.fr')
             ->subject($data['subject'])
             ->html($data['message']);
 
@@ -178,41 +178,6 @@ class HomeController extends AbstractController
             'contactForm' => $form->createView()
         ]);
     }
-
-
-    // /**
-    // * Fonction pour envoyer les mails contact
-    // */
-    // #[Route('/contact/email', name: 'app_contact_email')]
-    // public function sendEmailContact(MailerInterface $mailer, Request $request): Response
-    // {
-    //     // Récupérez les données du formulaire
-    //     if ($request->isMethod('POST')) {
-    //         // Vérification du honeypot 
-    //         if (!empty($request->request->get('honeypot'))) {
-    //             return $this->redirectToRoute('app_home'); 
-    //         }
-
-    //         $emailFrom = $request->get('email');
-    //         $subject = $request->get('subject');
-    //         $messageContent = $request->get('message');
-
-    //         // Envoi de mail
-    //         $email = (new Email())
-    //             ->from($emailFrom)
-    //             ->to('contact@giteraindupair.fr')
-    //             ->subject($subject)
-    //             ->html($messageContent);
-
-    //         try {
-    //             $mailer->send($email);
-    //             $this->addFlash('success', 'Votre message a été envoyé avec succès. Merci pour votre demande, nous vous répondrons dans les plus brefs délais.');
-    //             return $this->redirectToRoute('app_home');
-    //         } catch (Exception $e) {
-    //             $this->addFlash('error', 'Echec de l\'envoi du message. Veuillez réessayer.');
-    //         }
-    //     } 
-    // }
     
 
     /**
