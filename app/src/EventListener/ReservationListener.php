@@ -34,7 +34,7 @@ final class ReservationListener
 
         // Mail au client
         $this->mailer->send(
-            'contact@giteraindupair.fr',
+            'contact@gite-rain-du-pair.fr',
             $reservation->getEmail(),
             '[GITE RAIN DU PAIR] Confirmation de demande de réservation',
             'request_reservation',
@@ -46,7 +46,7 @@ final class ReservationListener
 
         // Mail à l’admin
         $this->mailer->sendAdminNotification(
-            'contact@giteraindupair.fr',
+            'contact@gite-rain-du-pair.fr',
             'admin@giteraindupair.com',
             'Nouvelle réservation reçue',
             'admin_request_reservation',
