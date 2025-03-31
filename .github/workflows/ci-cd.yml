@@ -45,6 +45,9 @@ jobs:
           echo "PMA_LETSENCRYPT_HOST=" >> .env.ci
           echo "PMA_LETSENCRYPT_EMAIL=" >> .env.ci
 
+      - name: Créer le réseau nginx-proxy si nécessaire
+        run: docker network create nginx-proxy || true
+
       - name: Démarrer Docker Compose
         run: |
           docker compose --env-file .env.ci up -d --build
