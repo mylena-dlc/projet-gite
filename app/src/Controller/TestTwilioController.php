@@ -23,7 +23,7 @@ class TestTwilioController
             return new Response("SMS envoyé avec succès !");
         } catch (\Exception $e) {
             $logger->error(" Erreur d'envoi de SMS : " . $e->getMessage());
-            return new Response(" Erreur : " . $e->getMessage());
+            return new Response("Une erreur est survenue lors de l'envoi du SMS.");
         }
     }
 }
