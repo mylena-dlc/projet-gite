@@ -17,7 +17,7 @@ class ActivityController extends AbstractController
     {
         $this->apiHttpClient = $apiHttpClient;
     }
-    #[Route('/activity', name: 'app_activity')]
+    #[Route('/activity', name: 'app_activity', defaults: ['_public_access' => true])]
     public function index(FactoryInterface $factory): Response
     {
         $breadcrumb = $factory->createItem('root');
