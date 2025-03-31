@@ -36,7 +36,7 @@
                     <strong class="color"> séjour nature et détente</strong> en Alsace. Profitez d'un hébergement cosy, à deux pas des pistes de ski du Lac Blanc et des sentiers de randonnée dans les Vosges.    
                 </p>
                 <figure class="my-6 w-full lg:w-1/2 flex justify-center">
-                    <img src="{{ asset('assets/img/sejour-gite-alsace.webp') }}" alt="Séjour lumineux du gîte en Alsace avec canapé et grande baie vitrée" class="border w-3/5 m-auto aspect-square object-cover" style="border-radius: 20% 50% 20% 50%;">
+                    <img src="{{ asset('assets/img/sejour-gite-alsace.webp') }}" loading="lazy" alt="Séjour lumineux du gîte en Alsace avec canapé et grande baie vitrée" class="border w-3/5 m-auto aspect-square object-cover" style="border-radius: 20% 50% 20% 50%;">
                 </figure>
             </div>
         </div>
@@ -47,7 +47,7 @@
 
             <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xl uppercase font-thin leading-tight">
                 <div class="relative flex items-center justify-center h-40 ">
-                    <img src="{{ asset('assets/img/icon-bain-nordique.png') }}" alt="Bain nordique" class="absolute w-40 opacity-20">
+                    <img src="{{ asset('assets/img/icon-bain-nordique.png') }}" loading="lazy" alt="Bain nordique" class="absolute w-40 opacity-20">
                         <p class="absolute">
                             Bain nordique
                         </p>
@@ -133,11 +133,11 @@
                 </div>
 
                 <div id="myCarousel" class="carousel-gite lg:w-1/2">
-                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-salle-de-bain.webp' ) }}" alt="Chambre spacieuse du gîte en Alsace avec lit 160x200 et salle de bain privative" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-cuisine.webp' ) }}" alt="Location gîte à Orbey avec cuisine équipée et espace convivial pour préparer vos repas en Alsace" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-sejour.webp' ) }}" alt="Espace détente du gîte à Orbey avec coin salon et décoration chaleureuse" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-montagne.webp' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-hebergement.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-salle-de-bain.webp' ) }}" alt="Chambre spacieuse du gîte en Alsace avec lit 160x200 et salle de bain privative" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-cuisine.webp' ) }}" alt="Location gîte à Orbey avec cuisine équipée et espace convivial pour préparer vos repas en Alsace" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-sejour.webp' ) }}" alt="Espace détente du gîte à Orbey avec coin salon et décoration chaleureuse" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-montagne.webp' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-hebergement.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                 </div>
             </div>     
         </div>
@@ -164,7 +164,7 @@
                     <div class="text-center group">
                         <a href="{{ path('app_galery') }}#{{ categoryName | lower | replace({' ': '-'}) }}">
                             <div class="relative aspect-square bg-gray-200 rounded-lg overflow-hidden">
-                                <img src="{{ asset('assets/img/' ~ cover.url) }}" alt="{{ cover.alt }}" class="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-110">
+                                <img src="{{ asset('assets/img/' ~ cover.url) }}" alt="{{ cover.alt }}" loading="lazy" class="w-full h-full object-cover rounded-lg transition-transform duration-300 group-hover:scale-110">
                                 <div class="absolute inset-0 bg-black bg-opacity-30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                                     <i class="fa-solid fa-magnifying-glass text-white"></i>
                                 </div>
