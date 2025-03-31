@@ -30,11 +30,14 @@ services:
       APP_ENV: ${APP_ENV}
       APP_URL: ${APP_URL}
       DATABASE_URL: ${DATABASE_URL}
-      VIRTUAL_HOST: ${VIRTUAL_HOST}  
-      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}  
-      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL} 
+      VIRTUAL_HOST: gite-rain-du-pair.fr,www.gite-rain-du-pair.fr
+      LETSENCRYPT_HOST: gite-rain-du-pair.fr,www.gite-rain-du-pair.fr
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
     entrypoint: ["/bin/bash", "/entrypoint.sh"]
     restart: unless-stopped
+    networks:
+      - default
+      - nginx-proxy
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -53,6 +56,9 @@ services:
       - ./phpmyadmin/htaccess:/var/www/html/.htaccess
       - ./phpmyadmin/htpasswd:/etc/phpmyadmin/.htpasswd
     restart: unless-stopped
+    networks:
+      - default
+      - nginx-proxy
 
   mailhog:
     image: mailhog/mailhog
@@ -76,7 +82,7 @@ services:
       - nginx_html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
-      - default
+      - nginx-proxy
 
   acme-companion:
     image: nginxproxy/acme-companion
@@ -84,7 +90,7 @@ services:
     restart: always
     environment:
       - DEFAULT_EMAIL=${ACME_EMAIL}
-      - ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory  # <= temporaire pour STAGING
+      - ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory # temporaire
     volumes_from:
       - nginx-proxy
     volumes:
@@ -94,7 +100,7 @@ services:
       - acme_data:/etc/acme.sh
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - default
+      - nginx-proxy
 
 volumes:
   database_data:
@@ -105,3 +111,5 @@ volumes:
 
 networks:
   default:
+  nginx-proxy:
+    external: true
