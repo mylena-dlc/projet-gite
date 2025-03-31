@@ -239,10 +239,8 @@
 
     {% block custom_javascripts %}
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
         <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/js/splide.min.js" defer></script>
         <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js" defer></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js" defer></script>  
 
         <script>
             function adjustHeroHeight() {
@@ -294,17 +292,17 @@
                     splideElement.splide.refresh();
                 });
 
-            document.querySelectorAll('.rating').forEach(function (element) {
-                const rating = parseFloat(element.getAttribute('data-rating')) || 0;
-                $(element).rateYo({
-                    rating: rating,
-                    readOnly: true,
-                    starWidth: "20px",
-                    normalFill: "#ddd",
-                    ratedFill: "#f6c600"
-                });
-            });
-        
+                if (document.querySelector('.rating')) {
+                    const jqueryScript = document.createElement('script');
+                    jqueryScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+                    jqueryScript.onload = () => {
+                        const rateyoScript = document.createElement('script');
+                        rateyoScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js';
+                        rateyoScript.defer = true;
+                        document.head.appendChild(rateyoScript);
+                    };
+                    document.head.appendChild(jqueryScript);
+                }
         </script>
 
     {% endblock %}
