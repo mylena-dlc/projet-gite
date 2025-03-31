@@ -71,9 +71,9 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - /etc/nginx/certs
-      - /etc/nginx/vhost.d
-      - /usr/share/nginx/html
+      - nginx_certs:/etc/nginx/certs
+      - nginx_vhost:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
     networks:
       - default
@@ -84,13 +84,24 @@ services:
     restart: always
     environment:
       - DEFAULT_EMAIL=${ACME_EMAIL}
+      - ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory  # <= temporaire pour STAGING
     volumes_from:
       - nginx-proxy
     volumes:
+      - nginx_certs:/etc/nginx/certs
+      - nginx_vhost:/etc/nginx/vhost.d
+      - nginx_html:/usr/share/nginx/html
+      - acme_data:/etc/acme.sh
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /etc/acme.sh
     networks:
       - default
 
 volumes:
   database_data:
+  nginx_certs:
+  nginx_vhost:
+  nginx_html:
+  acme_data:
+
+networks:
+  default:
