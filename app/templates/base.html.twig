@@ -35,10 +35,10 @@
                 <script type="text/javascript">
                     window.addEventListener('DOMContentLoaded', function () {
                         tarteaucitron.init({
-                            "privacyUrl": "/politique-confidentialite", /* URL vers votre page de politique de confidentialité */
+                            "privacyUrl": "/politique-de-confidentialite", /* URL vers votre page de politique de confidentialité */
                             "hashtag": "#tarteaucitron", /* Lien ancre vers les paramètres cookies */
                             "cookieName": "tarteaucitron", /* Nom du cookie */
-                            "orientation": "top", /* Position (bottom, top) */
+                            "orientation": "bottom", /* Position */
                             "showAlertSmall": false, /* Petit bandeau */
                             "cookieslist": true, /* Affiche la liste des cookies */
                             "closePopup": true, /* Affiche un bouton "Fermer" dans la bannière */
@@ -85,7 +85,7 @@
         {% block body %}{% endblock %}
         </main>
     
-        <button id="backToTop" aria-label="Revenir en haut de la page" class="fixed bottom-8 right-6 bg-gray1 text-white p-3 rounded-lg shadow-lg transition-opacity opacity-0 hover:bg-gray2">
+        <button id="backToTop" aria-label="Revenir en haut de la page" class="fixed bottom-16 right-6 bg-gray1 text-white p-3 rounded-lg shadow-lg transition-opacity opacity-0 hover:bg-gray2">
             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>
             </svg>
