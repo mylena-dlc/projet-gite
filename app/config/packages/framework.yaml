@@ -7,7 +7,10 @@ framework:
             - 'fr'
 
     # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    session: 
+        cookie_secure: auto 
+        cookie_samesite: lax 
+
 
     notifier:
         texter_transports:
