@@ -5,6 +5,7 @@ framework:
     translator:
         fallbacks:
             - 'fr'
+    csrf_protection: ~
 
     # Note that the session will be started ONLY if you read or write from it.
     session: 
