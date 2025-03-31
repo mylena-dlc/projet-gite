@@ -477,7 +477,7 @@ class ReservationController extends AbstractController
     
             $paymentIntentId = $stripeSession->payment_intent;
         } catch (\Exception $e) {
-            return new Response('Erreur Stripe : ' . $e->getMessage(), 400);
+            return new Response('Une erreur est survenue lors du paiement.', 400);
         }
     
         // Attente douce que le webhook ait créé la réservation
