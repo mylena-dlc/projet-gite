@@ -29,6 +29,7 @@ services:
     environment:
       APP_ENV: ${APP_ENV}
       APP_URL: ${APP_URL}
+      APP_SECRET: ${APP_SECRET}
       DATABASE_URL: ${DATABASE_URL}
       VIRTUAL_HOST: gite-rain-du-pair.fr,www.gite-rain-du-pair.fr
       LETSENCRYPT_HOST: gite-rain-du-pair.fr,www.gite-rain-du-pair.fr
