@@ -7,6 +7,10 @@ require dirname(__DIR__).'/vendor/autoload.php';
 $dotenv = new Dotenv();
 $envFile = dirname(__DIR__).'/.env';
 
+if ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? null === 'https') {
+    $_SERVER['HTTPS'] = 'on';
+}
+
 // Vérifie si le fichier .env existe avant de le charger
 if (file_exists($envFile)) {
     $dotenv->load($envFile);
