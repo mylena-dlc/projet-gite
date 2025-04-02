@@ -1,10 +1,11 @@
 <header>
-	<nav id="header" class="bg-gray-100 fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase shadow-sm" style="background-image: url('/assets/img/fond-banner.webp');">
+	{# <nav id="header" class="bg-gray-100 fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase shadow-sm" style="background-image: url('/assets/img/fond-banner.webp');"> #}
+	<nav id="header" class="bg-transparent fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase shadow-sm">
 		<div class="p-2 flex items-center justify-between flex-wrap " id="header-nav">
 			 <div id="logo-container" class="w-32 ml-4 sm:w-36 md:w-40 lg:w-44 xl:w-48 transition-all duration-300">
 				<figure id="logo">
 					<a href="{{ path('app_home') }}">
-						<img src="{{ asset('assets/img/logo-gite-rain-du-pair.webp') }}" alt="Logo gîte du Rain du pair" class="w-24 h-24"/>
+						<img src="{{ asset('assets/img/logo-gite-rain-du-pair.webp') }}" alt="Logo gîte du Rain du pair" class="w-24 h-auto"/>
 					</a>
 				</figure>
 		 	</div>
@@ -17,7 +18,7 @@
 				</button>
 			</div>
 
-			<div class="w-full hidden lg:block lg:w-max" id="main-nav">
+			<div class="w-full min-h-[60px] hidden lg:block lg:w-max" id="main-nav">
 				<ul class="bg-gray-50 font-medium p-6 lg:p-0 border border-gray-200 flex flex-col lg:flex-row lg:bg-transparent lg:border-0 lg:mt-0">
 					<li class="nav-item">
 						<a href="https://www.instagram.com/giteraindupair/" target="_blank" aria-label="Instagram du Gîte" class="text-xl hover:text-[var(--color1)]">
