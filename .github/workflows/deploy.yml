@@ -27,6 +27,9 @@ jobs:
           
             cd /var/www/projet-gite/app
 
+            # S'assurer que l'utilisateur SSH a bien les droits
+            sudo chown -R ubuntu:ubuntu .
+
             # Nettoyage pour éviter les conflits si des fichiers sont modifiés localement
             git reset --hard
             git clean -fd
