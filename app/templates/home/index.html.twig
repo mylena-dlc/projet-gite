@@ -9,7 +9,7 @@
 {% include "_partials/_header.html.twig" %}
 
 <div class="">
-    <section id="hero-section" class="relative w-full flex justify-center items-center">
+    {# <section id="hero-section" class="relative w-full flex justify-center items-center">
         <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/assets/img/IMG_9092.webp');"></div>
         <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent"></div>
         <div class="relative z-10 max-w-lg px-4">
@@ -20,9 +20,32 @@
                 Réserver un séjour
             </a>
         </div>
+    </section> #}
+
+    <section id="hero-section" class="relative w-full flex justify-center items-center">
+        <img 
+            src="{{ asset('assets/img/IMG_9092.webp') }}" 
+            alt="Vue d'ensemble du gîte" 
+            class="absolute inset-0 w-full h-full object-cover z-0" 
+            loading="eager" 
+            fetchpriority="high" 
+            decoding="async" 
+        />
+        
+        <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10"></div>
+
+        <div class="relative z-20 max-w-lg px-4">
+            <h1 class="text-xl mb-4 text-gray1 tracking-normal normal-case font-semibold mx-6 text-start">
+                Évadez-vous en Alsace dans un gîte de charme avec bain nordique, idéal pour 4 personnes.
+            </h1>
+            <a href="{{ path('app_search_reservation') }}" class="btn-primary w-full">
+                Réserver un séjour
+            </a>
+        </div>
     </section>
 
-    <section class="mt-6">
+
+    <section class="mt-6 min-h-[400px]">
         <h2 class="mb-4 pl-4 lg:pl-40">Entre nature et tranquilité</h2>
         <div class="relative pb-12">
             <div class="absolute bottom-0 right-0 w-full z-0 bg-cover bg-center opacity-30 fond-home" style=" background-image: url('/assets/img/fond.webp');"></div>
@@ -41,7 +64,7 @@
             </div>
         </div>
 
-        <div class="py-6 relative">
+        <div class="py-6 lg:py-0 lg:p-8 relative">
             <div class="absolute left-0 top-0 w-full h-full z-[-1]" style="background-image: url('{{ asset('/assets/img/fond-banner.jpg') }}'); background-size: cover; background-position: center;"></div>
             <h2 class="b-4 text-center pt-8">Les petits +</h2>
 
@@ -52,7 +75,7 @@
                             Bain nordique
                         </p>
                     </div>
-                    <div class="relative flex items-center justify-center h-40 ">
+                    <div class="relative flex items-center justify-center h-40 min-h-[80px]">
                         <i class="fa-solid fa-bed text-terracota4 absolute opacity-20 text-8xl"></i>
                         <p class="absolute">
                             Linge de maison
@@ -105,7 +128,7 @@
                             <figure class="w-[40%] lg:w-1/4">
                                 <img src="{{ asset( 'assets/img/bain-nordique-gite-alsace.webp' ) }}" 
                                     alt="Expérience relaxante dans un bain nordique en Alsace" 
-                                    class="aspect-square object-cover overflow-hidden m-auto w-96 h-96" />
+                                    class="aspect-square object-cover overflow-hidden m-auto w-46 h-46 rounded-xl" loading="lazy" />
                             </figure>
                             <p class="w-[100%] p-6">
                                 Offrez-vous un moment de détente unique dans notre <strong class="">bain nordique</strong> chauffé au feu de bois, face à une vue imprenable sur la vallée. <br>
@@ -120,7 +143,7 @@
                     <h3 class="pl-4 pb-2 font-light text-center">Bain nordique</h3>
                     <div class="flex items-center mb-4">
                         <figure class="w-[40%] lg:w-1/4 ml-4">
-                            <img src="{{ asset( 'assets/img/bain-nordique.jpeg' ) }}" 
+                            <img src="{{ asset( 'assets/img/bain-nordique-gite-alsace.webp' ) }}" 
                                 alt="Expérience relaxante dans un bain nordique en Alsace" 
                                 class="aspect-square object-cover overflow-hidden m-auto" />
                         </figure>
@@ -139,7 +162,7 @@
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-sejour.webp' ) }}" alt="Espace détente du gîte à Orbey avec coin salon et décoration chaleureuse" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-hebergement.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne-naturet.webp' ) }}" alt="Hébergement cosy en Alsace avec literie de qualité et ambiance naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne-nature.webp' ) }}" alt="Hébergement cosy en Alsace avec literie de qualité et ambiance naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                 </div>
             </div>     
         </div>
@@ -293,17 +316,36 @@
             //         splideElement.splide.refresh();
             //     });
 
-                if (document.querySelector('.rating')) {
-                    const jqueryScript = document.createElement('script');
-                    jqueryScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
-                    jqueryScript.onload = () => {
-                        const rateyoScript = document.createElement('script');
-                        rateyoScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js';
-                        rateyoScript.defer = true;
-                        document.head.appendChild(rateyoScript);
-                    };
-                    document.head.appendChild(jqueryScript);
-                }
+                // if (document.querySelector('.rating')) {
+                //     const jqueryScript = document.createElement('script');
+                //     jqueryScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+                //     jqueryScript.onload = () => {
+                //         const rateyoScript = document.createElement('script');
+                //         rateyoScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js';
+                //         rateyoScript.defer = true;
+                //         document.head.appendChild(rateyoScript);
+                //     };
+                //     document.head.appendChild(jqueryScript);
+                // }
+
+                document.addEventListener('DOMContentLoaded', () => {
+                    const ratings = document.querySelectorAll('.rating');
+                    if (ratings.length > 0) {
+                        const jqueryScript = document.createElement('script');
+                        jqueryScript.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+                        jqueryScript.onload = () => {
+                            const rateyoScript = document.createElement('script');
+                            rateyoScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.js';
+                            rateyoScript.onload = () => {
+                                const initScript = document.createElement('script');
+                                initScript.src = '{{ asset("assets/js/rating.js") }}';
+                                document.body.appendChild(initScript);
+                            };
+                            document.head.appendChild(rateyoScript);
+                        };
+                        document.head.appendChild(jqueryScript);
+                    }
+                });
         </script>
 
     {% endblock %}
