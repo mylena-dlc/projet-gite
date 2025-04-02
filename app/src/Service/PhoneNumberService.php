@@ -15,7 +15,6 @@ class PhoneNumberService
         $this->phoneUtil = PhoneNumberUtil::getInstance();
     }
 
-
     public function formatPhoneNumber(string $phone, string $country): ?string
     {
         try {

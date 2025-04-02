@@ -17,30 +17,30 @@ class LocationController extends AbstractController
         $this->locationService = $locationService;
     }
     
-    #[Route('/api/get-location', name: 'get_location', methods: ['GET'])]
-    public function getLocation(Request $request): JsonResponse
-    {
-        try {
-            // Récupération du pays et du code postal renseignés
-            $postalCode = $request->query->get('postalCode');
-            $country = $request->query->get('country', 'France'); // Défaut à "France" si non défini
+    // #[Route('/api/get-location', name: 'get_location', methods: ['GET'])]
+    // public function getLocation(Request $request): JsonResponse
+    // {
+    //     try {
+    //         // Récupération du pays et du code postal renseignés
+    //         $postalCode = $request->query->get('postalCode');
+    //         $country = $request->query->get('country', 'France'); // Défaut à "France" si non défini
 
-            // Utilisation du service pour récupérer les données
-            $result = $this->locationService->getLocationData($postalCode, $country);
+    //         // Utilisation du service pour récupérer les données
+    //         $result = $this->locationService->getLocationData($postalCode, $country);
 
-             // Vérifie si une erreur est retournée par le service
-             if (isset($result['error'])) {
-                return new JsonResponse($result, 400);
-            }
+    //          // Vérifie si une erreur est retournée par le service
+    //          if (isset($result['error'])) {
+    //             return new JsonResponse($result, 400);
+    //         }
 
-            return new JsonResponse($result);
+    //         return new JsonResponse($result);
 
-        } catch (\Exception $e) {
-            return new JsonResponse([
-                'error' => 'Erreur serveur : ' . $e->getMessage()
-            ], 500);
-        }
-    }
+    //     } catch (\Exception $e) {
+    //         return new JsonResponse([
+    //             'error' => 'Erreur serveur : ' . $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     #[Route('/api/get-cities', name: 'get_cities', methods: ['GET'])]
 public function getCities(Request $request, LocationService $locationService): JsonResponse

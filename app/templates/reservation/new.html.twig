@@ -375,12 +375,12 @@
          let country = countrySelect.value.trim(); 
 
          if (postalCode.length >= 4) {
-             let url = "/api/get-cities?postalCode=" + encodeURIComponent(postalCode) + "&country=" + encodeURIComponent(country);
+			let url = "{{ path('get_cities') }}?postalCode=" + encodeURIComponent(postalCode) + "&country=" + encodeURIComponent(country);
 
              fetch(url)
                  .then(response => response.json())
                  .then(data => {
-                     citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>'; // Réinitialisation
+                     citySelect.innerHTML = '<option value="">Sélectionnez une ville</option>';
 
                      if (data.error) {
                          alert(data.error);

@@ -47,3 +47,6 @@ services:
             $logger: '@monolog.logger.payment'
             $entityManager: '@doctrine.orm.entity_manager'
 
+    App\EventSubscriber\HoneyPotSubscriber:
+        arguments:
+            $honeyPotLogger: '@monolog.logger.honey_pot'
