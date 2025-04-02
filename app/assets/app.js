@@ -1,8 +1,7 @@
-import './bootstrap.js';
 import './styles/app.css';
 import './js/dashboard.js';
 
-
+// Fonction menu burger
 function toogleMenu() {
     const toggleElements = document.querySelectorAll("[data-collapse-toggle]");
 
@@ -16,6 +15,7 @@ function toogleMenu() {
 }
 toogleMenu();
 
+// Fonction du bouton scroll
 document.addEventListener("DOMContentLoaded", function () {
     let backToTopButton = document.getElementById("backToTop");
 
