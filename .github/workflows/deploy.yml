@@ -26,16 +26,24 @@ jobs:
           script: |
           
             cd /var/www/projet-gite/app
+
+            # Nettoyage pour éviter les conflits si des fichiers sont modifiés localement
+            git reset --hard
+            git clean -fd
             git pull origin main
 
+            # Installation des dépendances
             npm install
             npm run build
 
+            # Build et redémarrage du conteneur PHP
             docker compose build php 
             docker compose up -d php 
 
+            # Clear + Warmup du cache Symfony en prod
             docker compose exec -T php php bin/console cache:clear --env=prod
             docker compose exec -T php php bin/console cache:warmup --env=prod
 
+            # Permissions (important pour que Symfony fonctionne bien)
             docker compose exec -T --user=root php chown -R www-data:www-data /var/www/var
             docker compose exec -T --user=root php chmod -R 775 /var/www/var
