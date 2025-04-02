@@ -82,7 +82,7 @@ services:
       - nginx_vhost:/etc/nginx/vhost.d
       - nginx_html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./certs:/etc/nginx/certs:ro 
+      - acme_data:/etc/acme.sh  
     networks:
       - nginx-proxy
 
