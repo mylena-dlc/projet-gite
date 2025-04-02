@@ -18,7 +18,6 @@ window.closeDeleteModal = function () {
 };
 
 
-
 // Fonction pour afficher toutes les transactions (page revenus)
 window.showAllTransactions = function () {
     const allTransactions = document.getElementById('allTransactions');

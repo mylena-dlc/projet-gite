@@ -44,7 +44,7 @@ class HoneyPotType extends AbstractType
                 'tabindex' => '-1',
                 'class' => 'sweet-candy',
             ],
-            //'data' => 'fake data', // Attention, supprimer cette ligne après les tests
+            // 'data' => 'fake data', // Attention, supprimer cette ligne après les tests
             'mapped' => false,
             'required' => false,
             'label' => false,

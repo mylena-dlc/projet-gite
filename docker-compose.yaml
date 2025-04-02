@@ -92,7 +92,7 @@ services:
     restart: always
     environment:
       - DEFAULT_EMAIL=${ACME_EMAIL}
-      - ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory # temporaire
+      #- ACME_CA_URI=https://acme-staging-v02.api.letsencrypt.org/directory # temporaire
     volumes_from:
       - nginx-proxy
     volumes:
