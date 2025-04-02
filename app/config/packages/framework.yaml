@@ -9,8 +9,9 @@ framework:
 
     # Note that the session will be started ONLY if you read or write from it.
     session: 
-        cookie_secure: auto 
+        cookie_secure: true
         cookie_samesite: lax 
+        cookie_httponly: true
         handler_id: null
         save_path: '%kernel.project_dir%/var/sessions'
 

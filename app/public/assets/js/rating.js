@@ -11,4 +11,3 @@ $(document).ready(function () {
     });
 });
 
-console.log("fichier rating ok");
