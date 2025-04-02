@@ -8,7 +8,7 @@
     }
 
     body {
-      @apply font-catamaran text-gray1 min-h-screen;
+      @apply font-sans text-gray1 min-h-screen;
     }
 
     h1, h2 {
@@ -39,16 +39,16 @@
 
   @layer components {
     .btn-primary {
-      @apply w-1/2 m-auto block text-lg font-normal bg-terracota1 text-white1 font-catamaran rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+      @apply w-1/2 m-auto block text-lg font-normal bg-terracota1 text-white1 font-heading rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
       @apply md:w-1/3 lg:w-1/4;
     }
 
     .btn-secondary {
-      @apply w-3/12 m-auto block text-sm font-normal bg-terracota1 text-white1 font-catamaran rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+      @apply w-3/12 m-auto block text-sm font-normal bg-terracota1 text-white1 font-heading rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
     }
 
     .btn-span {
-      @apply bg-terracota1 text-white1 font-catamaran rounded-xl;
+      @apply bg-terracota1 text-white1 font-heading rounded-xl;
     }
 
     .line {

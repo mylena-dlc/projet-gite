@@ -28,6 +28,9 @@ jobs:
             cd /var/www/projet-gite/app
             git pull origin main
 
+            npm install
+            npm run build
+
             docker compose build php 
             docker compose up -d php 
 
