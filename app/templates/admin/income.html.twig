@@ -10,39 +10,28 @@
 	<section class="p-6 mb-32 mt-24 lg:p-12">
 		<div>
 			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
-				<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+			<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
 		</div>
-
 		<h1 class="my-4">Revenu</h1>
-
 		<h3>Gains ce mois-ci :</h3>
-		{% set totalHorsTaxe = 0 %}
-		{% for reservation in reservationsForCurrentMonth %}
-			{% set totalHorsTaxe = totalHorsTaxe + (reservation.totalPrice - reservation.tva - reservation.tourismTax) %}
-		{% endfor %}
-
-		<p class="text-2xl font-bold text-terracota2">{{ totalHorsTaxe }}
-			€</p>
-
-		<div class="my-6">
-			<canvas id="incomeChart"></canvas>
-
-		</div>
-
+            {% set totalHorsTaxe = 0 %}
+                {% for reservation in reservationsForCurrentMonth %}
+                    {% set totalHorsTaxe = totalHorsTaxe + (reservation.totalPrice - reservation.tva - reservation.tourismTax) %}
+                {% endfor %}
+		<p class="text-2xl font-bold text-terracota2">{{ totalHorsTaxe }} €</p>
+        <div class="my-6">
+            <canvas id="incomeChart" data-graph='{{ graphData|json_encode|e("html_attr") }}'></canvas>
+        </div>
 
 		<h3 class="py-6">Transactions</h3>
 		<div class="mr-32">
 			{% for transaction in transactions|slice(0, 4) %}
-
 				<div class="flex justify-between">
 					<p class="font-bold">{{ transaction.date|format_date(locale: 'fr') }}</p>
-					<p>{{ transaction.totalPrice }}
-						€
-					</p>
+					<p>{{ transaction.totalPrice }} €</p>
 				</div>
 				<p class="font-thin italic">Versement effectué</p>
 				<div class="line"></div>
-
 			{% endfor %}
 
 			<!-- Conteneur caché pour afficher toutes les transactions -->
@@ -50,42 +39,33 @@
 				{% for transaction in transactions|slice(4) %}
 					<div class="flex justify-between">
 						<p class="font-bold">{{ transaction.date|format_date(locale: 'fr') }}</p>
-						<p>{{ transaction.totalPrice }}
-							€
-						</p>
+						<p>{{ transaction.totalPrice }} €</p>
 					</div>
 					<p class="font-thin italic">Versement effectué</p>
 					<div class="line"></div>
 				{% endfor %}
 			</div>
-
-
 			<p onclick="showAllTransactions()" class="text-terracota1 underline my-6">Voir toutes les transactions</p>
-
-
 		</div>
 
-
-		
 		<h3 class="py-6">Rapport de revenus</h3>
         <div class="mx-6 flex gap-2">
-        {% for item in monthlyIncomes %}
-            {% if item.income > 0 %}
-                <a href="{{ item.link }}" class="bg-white1 hover:bg-terracota3 duration-300 rounded-xl p-6 aspect-square w-3/6 flex flex-col justify-center">
-                    <p class="pb-8">{{ item.year }}</p>
-                    <p class="font-bold text-lg">{{ item.month }}</p>
-                    <p class="text-terracota2 text-xl font-bold">{{ item.income }} €</p>
-                </a>
-            {% endif %}
-        {% endfor %}
-    </div>
+            {% for item in monthlyIncomes %}
+                {% if item.income > 0 %}
+                    <a href="{{ item.link }}" class="bg-white1 hover:bg-terracota3 duration-300 rounded-xl p-6 aspect-square w-3/6 flex flex-col justify-center">
+                        <p class="pb-8">{{ item.year }}</p>
+                        <p class="font-bold text-lg">{{ item.month }}</p>
+                        <p class="text-terracota2 text-xl font-bold">{{ item.income }} €</p>
+                    </a>
+                {% endif %}
+            {% endfor %}
+        </div>
     
+    </section>
+    {% include "_partials/_footer_admin.html.twig" %}
 
 
-</div>
-</section>
-{% include "_partials/_footer_admin.html.twig" %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{# <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     // Récupération des données pour le graphique
     const graphData = {{ graphData|json_encode|raw }}; // Données formatées pour le graphique
@@ -125,6 +105,6 @@
             }
         }
     });
-</script>
+</script> #}
 
 {% endblock %}

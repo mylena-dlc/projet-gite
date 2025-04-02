@@ -7,18 +7,13 @@
         <meta name="description" content="{% block meta_description %}{%endblock%}">
         <link rel="icon" href="{{ asset( 'assets/img/favicon.jpg' ) }}" type="image/png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@100..900&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@100..900&family=Corinthia:wght@400;700&display=swap" rel="stylesheet">
-        <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/css/splide.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.css" />
+        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/css/splide.min.css"> #}
+        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css"> #}
+        {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.css" defer/> #}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/noty.min.css">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/themes/mint.min.css">
+        {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/noty.min.css"> #}
+        {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/themes/mint.min.css"> #}
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
         {% block stylesheets %}
@@ -26,36 +21,45 @@
         {% endblock %}   
 
         {% block javascripts %}
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/noty.min.js" defer></script>
 
-                <script src="https://cdnjs.cloudflare.com/ajax/libs/tarteaucitronjs/1.15.0/tarteaucitron.js" integrity="sha512-62eOEgHMZUJrhPye67OGYDBdRtoGKAQ3R9e770/990JWPvW9PxVT019z7juVdSc6itOy+zZ3yYOUmeggwmbo7Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-                <script src="https://unpkg.com/flashy-js@0.4.0/dist/flashy.min.js"></script>
+            {{ encore_entry_script_tags('app') }}
+            {# // <script src="{{ asset('assets/js/tarteaucitron.min.js') }}"></script> #}
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/tarteaucitronjs/1.15.0/tarteaucitron.js" integrity="sha512-62eOEgHMZUJrhPye67OGYDBdRtoGKAQ3R9e770/990JWPvW9PxVT019z7juVdSc6itOy+zZ3yYOUmeggwmbo7Q==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+
+            <script>
+                window.addEventListener('DOMContentLoaded', function () {
+                    tarteaucitron.init({
+                        privacyUrl: "/politique-de-confidentialite",
+                        hashtag: "#tarteaucitron",
+                        cookieName: "tarteaucitron",
+                        orientation: "bottom",
+                        showAlertSmall: false,
+                        cookieslist: true,
+                        closePopup: true,
+                        useExternalCss: false,
+                        useExternalJs: false,
+                        lang: "fr",
+                        handleBrowserDNTRequest: false,
+                    });
+
+                    tarteaucitron.services.instagram = {
+                        key: "instagram",
+                        type: "social",
+                        name: "Instagram",
+                        uri: "https://help.instagram.com/519522125107875",
+                        needConsent: true,
+                        cookies: [],
+                    };
+
+                    (tarteaucitron.job = tarteaucitron.job || []).push('instagram');
+                }); 
+            </script>
 
 
-                <script type="text/javascript">
-                    window.addEventListener('DOMContentLoaded', function () {
-                        tarteaucitron.init({
-                            "privacyUrl": "/politique-de-confidentialite", /* URL vers votre page de politique de confidentialité */
-                            "hashtag": "#tarteaucitron", /* Lien ancre vers les paramètres cookies */
-                            "cookieName": "tarteaucitron", /* Nom du cookie */
-                            "orientation": "bottom", /* Position */
-                            "showAlertSmall": false, /* Petit bandeau */
-                            "cookieslist": true, /* Affiche la liste des cookies */
-                            "closePopup": true, /* Affiche un bouton "Fermer" dans la bannière */
-                            "useExternalCss": false, /* Si vous souhaitez personnaliser le style via CSS externe */
-                            "handleBrowserDNTRequest": false, /* Respecte les paramètres Do Not Track */
-                        });
-                        tarteaucitron.services.instagram = {
-                            "key": "instagram",
-                            "type": "social",
-                            "name": "Instagram",
-                            "uri": "https://help.instagram.com/519522125107875",
-                            "needConsent": true,
-                            "cookies": [],
-                        };
-                        (tarteaucitron.job = tarteaucitron.job || []).push('instagram');
-                    })
-                </script>
+                {# // <script src="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/noty.min.js" defer></script> #}
+
+                {# // <script src="https://unpkg.com/flashy-js@0.4.0/dist/flashy.min.js"></script> #}
+{#
                 <script>
                     document.addEventListener('DOMContentLoaded', function () {
                         const flashMessagesElement = document.querySelector('#flash-messages');
@@ -73,14 +77,21 @@
                         {% endfor %}
                     });
                 </script>
-            {% block importmap %}
+            {# {% block importmap %}
                 {{ importmap('app') }}
-            {% endblock %}
+            {% endblock %} #}
             {% block custom_javascripts %}{% endblock %} {# JS spécifique à chaque template #}
         {% endblock %}
     </head>
     <body>
-        <flash-messages id="flash-messages" data-max-messages="5" class="z-[999]"></flash-messages>
+        {# <flash-messages id="flash-messages" data-max-messages="5" class="z-[999]"></flash-messages> #}
+        <flash-messages
+            id="flash-messages"
+            data-max-messages="5"
+            class="z-[999]"
+            data-messages='{{ app.session.flashbag.all() | json_encode | e('html_attr') }}'>
+        </flash-messages>
+
         <main>
         {% block body %}{% endblock %}
         </main>

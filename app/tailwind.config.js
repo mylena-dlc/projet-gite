@@ -20,9 +20,8 @@ module.exports = {
         white1: "#fcf7f1"
       },
       fontFamily: {
-        catamaran: ['Catamaran', 'sans-serif'],
-        corinthia: ['Corinthia', 'cursive'],
-        raleway: ['Raleway', 'serif'],
+        sans: ['system-ui', 'sans-serif'],
+        heading: ['"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
       }
     },
   },
