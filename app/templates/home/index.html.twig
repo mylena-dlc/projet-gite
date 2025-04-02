@@ -25,7 +25,7 @@
     <section class="mt-6">
         <h2 class="mb-4 pl-4 lg:pl-40">Entre nature et tranquilité</h2>
         <div class="relative pb-12">
-            <div class="absolute bottom-0 right-0 w-full z-0 bg-cover bg-center opacity-30 fond-home" style=" background-image: url('/assets/img/fond.jpg');"></div>
+            <div class="absolute bottom-0 right-0 w-full z-0 bg-cover bg-center opacity-30 fond-home" style=" background-image: url('/assets/img/fond.webp');"></div>
             <div class="relative p-4 lg:px-40 z-10 w-full flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-8">
                 <p class="w-full lg:w-1/2">
                     Bienvenue au<strong class="color"> Gîte du Rain du Pair</strong>, un havre de paix situé dans un ancien corps de ferme récemment rénové, perché sur les hauteurs d'Orbey,
@@ -132,26 +132,26 @@
                     </div>
                 </div>
 
-                {# <div id="myCarousel" class="carousel-gite lg:w-1/2"> #}
-                <div id="myCarousel" class="carousel-gite lg:w-[90%] lg:mx-auto lg:space-x-4">
+                <div id="myCarousel" class="carousel-gite lg:w-1/2">
+                {# <div id="myCarousel" class="carousel-gite lg:w-[90%] lg:mx-auto lg:space-x-4"> #}
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-salle-de-bain.webp' ) }}" alt="Chambre spacieuse du gîte en Alsace avec lit 160x200 et salle de bain privative" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-cuisine.webp' ) }}" alt="Location gîte à Orbey avec cuisine équipée et espace convivial pour préparer vos repas en Alsace" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-sejour.webp' ) }}" alt="Espace détente du gîte à Orbey avec coin salon et décoration chaleureuse" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-hebergement.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne-naturet.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne-naturet.webp' ) }}" alt="Hébergement cosy en Alsace avec literie de qualité et ambiance naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                 </div>
             </div>     
         </div>
     </section>
 
     <section class="relative h-[500px] bg-cover bg-center bg-fixed text-white flex items-center justify-center transition-transform duration-500 ease-in-out" style="background-image: url('{{ asset('assets/img/banniere-gite-alsace-orbey.webp') }}');">
-        <div class="absolute inset-0 bg-black bg-opacity-50"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-80"></div>
         <div class="relative text-center bg-opacity-50 p-6">
-            <p class="font-medium text-2xl lg:text-3xl lg:leading-[1.5]">
-                Réservez votre<strong class="font-medium"> hébergement tout équipé à Orbey</strong>
+            <p class="font-bold text-2xl lg:text-3xl lg:leading-[1.5]">
+                Réservez votre<strong class="font-bold"> hébergement tout équipé à Orbey</strong>
                 dès aujourd'hui <br>et profitez d'un séjour inoubliable<br> entre randonnées au Lac Blanc,<br> ski et détente dans notre
-                <strong class="font-medium"> gîte de charme en montagne</strong>.
+                <strong class="font-bold"> gîte de charme en montagne</strong>.
             </p>
         </div>
     </section>
@@ -220,7 +220,7 @@
 
                                 </div>
                                 <div class="py-4">
-                                    <h5 class="font-medium mb-2 lg:text-lg">{{ review.title }}</h5>
+                                    <p class="font-medium mb-2 lg:text-lg">{{ review.title }}</p>
                                     <p class="">
                                         {{ review.comment }}
                                     </p>
@@ -239,59 +239,59 @@
     {% include "_partials/_footer.html.twig" %}
 
     {% block custom_javascripts %}
-
+{# 
         <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/js/splide.min.js" defer></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js" defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js" defer></script> #}
 
         <script>
-            function adjustHeroHeight() {
-                const header = document.querySelector('header');
-                const heroSection = document.getElementById('hero-section');
-                if (header && heroSection) {
-                    const headerHeight = header.offsetHeight; 
-                    heroSection.style.height = `calc(100vh - ${headerHeight}px)`; 
-                }
-            }
+            // function adjustHeroHeight() {
+            //     const header = document.querySelector('header');
+            //     const heroSection = document.getElementById('hero-section');
+            //     if (header && heroSection) {
+            //         const headerHeight = header.offsetHeight; 
+            //         heroSection.style.height = `calc(100vh - ${headerHeight}px)`; 
+            //     }
+            // }
 
-            window.addEventListener('load', adjustHeroHeight); // Exécute au chargement
-            window.addEventListener('resize', adjustHeroHeight); // Ajuste si la fenêtre est redimensionnée
+            // window.addEventListener('load', adjustHeroHeight); // Exécute au chargement
+            // window.addEventListener('resize', adjustHeroHeight); // Ajuste si la fenêtre est redimensionnée
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const container = document.getElementById("myCarousel");
-                const options = {
-                    infinite: true,
-                    Dots: false,
-                };
-                new Carousel(container, options);
-            })
+            // document.addEventListener('DOMContentLoaded', function () {
+            //     const container = document.getElementById("myCarousel");
+            //     const options = {
+            //         infinite: true,
+            //         Dots: false,
+            //     };
+            //     new Carousel(container, options);
+            // })
 
-            document.addEventListener('DOMContentLoaded', function () {
-                const splideElement = document.querySelector('#splide');
-                if (splideElement) {
-                    // Vérifier et supprimer la pagination existante pour éviter les doublons
-                    const existingPagination = splideElement.querySelector('.splide__pagination');
-                    if (existingPagination) {
-                        existingPagination.remove();
-                    }
-                }
-                    new Splide(splideElement, {
-                        type: 'slide',
-                        perPage: 3,
-                        arrows: true,
-                        pagination: true,
-                        speed: 600,
-                        gap: '1rem',
-                        rewind: false,
-                        breakpoints: {
-                            1024: { perPage: 2 },
-                            768: { perPage: 1 }, 
-                        },
-                        classes: {
-                            arrows: 'splide__arrows your-custom-arrows-class',
-                        },
-                    }).mount();
-                    splideElement.splide.refresh();
-                });
+            // document.addEventListener('DOMContentLoaded', function () {
+            //     const splideElement = document.querySelector('#splide');
+            //     if (splideElement) {
+            //         // Vérifier et supprimer la pagination existante pour éviter les doublons
+            //         const existingPagination = splideElement.querySelector('.splide__pagination');
+            //         if (existingPagination) {
+            //             existingPagination.remove();
+            //         }
+            //     }
+            //         new Splide(splideElement, {
+            //             type: 'slide',
+            //             perPage: 3,
+            //             arrows: true,
+            //             pagination: true,
+            //             speed: 600,
+            //             gap: '1rem',
+            //             rewind: false,
+            //             breakpoints: {
+            //                 1024: { perPage: 2 },
+            //                 768: { perPage: 1 }, 
+            //             },
+            //             classes: {
+            //                 arrows: 'splide__arrows your-custom-arrows-class',
+            //             },
+            //         }).mount();
+            //         splideElement.splide.refresh();
+            //     });
 
                 if (document.querySelector('.rating')) {
                     const jqueryScript = document.createElement('script');

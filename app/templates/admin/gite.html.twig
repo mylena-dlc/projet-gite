@@ -146,185 +146,191 @@
 		</div>
 	</section>
 
+    <div id="gite-dashboard"
+        data-update-url="{{ path('admin_gite_update') }}"
+        data-delete-picture-url="{{ path('admin_gite_delete_picture', { id: 'PICTURE_ID_PLACEHOLDER' }) }}">
+    </div>
+
+
 	{% include "_partials/_footer_admin.html.twig" %}
 
 	<script>
 
-		function openEditModal(field, giteId, currentValue) { // Pré-remplir les champs cachés dans la modale
-            document.getElementById('field-name').value = field; // Champ à modifier
-            document.getElementById('gite-id').value = giteId; // Id du gîte
-            document.getElementById('new-value').value = currentValue; // Valeur actuelle du champ
-            document.getElementById('editModal').style.display = 'block';
-        }
+		// function openEditModal(field, giteId, currentValue) { // Pré-remplir les champs cachés dans la modale
+        //     document.getElementById('field-name').value = field; // Champ à modifier
+        //     document.getElementById('gite-id').value = giteId; // Id du gîte
+        //     document.getElementById('new-value').value = currentValue; // Valeur actuelle du champ
+        //     document.getElementById('editModal').style.display = 'block';
+        // }
 
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
+        // function closeEditModal() {
+        //     document.getElementById('editModal').style.display = 'none';
+        // }
 
-        // Fonction pour gérer la soumission de la mise à jour AJAX
-        document.getElementById('editForm').addEventListener('submit', function (e) {
-            e.preventDefault();
+        // // Fonction pour gérer la soumission de la mise à jour AJAX
+        // document.getElementById('editForm').addEventListener('submit', function (e) {
+        //     e.preventDefault();
 
-            const field = document.getElementById('field-name').value;
-            const giteId = document.getElementById('gite-id').value;
-            const newValue = document.getElementById('new-value').value;
+        //     const field = document.getElementById('field-name').value;
+        //     const giteId = document.getElementById('gite-id').value;
+        //     const newValue = document.getElementById('new-value').value;
 
-            fetch(`/gite/update`, {
-                method: 'POST',
-                headers: {
-                'Content-Type': 'application/json'
-            },
-                body: JSON.stringify(
-                    {id: giteId, field: field, value: newValue}
-                )
-            }).then((response) => {
-                if (!response.ok) {
-                    throw new Error (`HTTP error! status: ${
-                    response.status
-                }`);
-            }
-                return response.json(); // Attendre une réponse JSON
+        //     fetch(`/gite/update`, {
+        //         method: 'POST',
+        //         headers: {
+        //         'Content-Type': 'application/json'
+        //     },
+        //         body: JSON.stringify(
+        //             {id: giteId, field: field, value: newValue}
+        //         )
+        //     }).then((response) => {
+        //         if (!response.ok) {
+        //             throw new Error (`HTTP error! status: ${
+        //             response.status
+        //         }`);
+        //     }
+        //         return response.json(); // Attendre une réponse JSON
 
-            }).then((data) => {
-                if (data.success) {
-                const priceFields = ['price', 'cleaningCharge']; // Liste des champs de type prix
-                const displayValue = priceFields.includes(field) ? `${newValue} €` : `${newValue} personnes`;
+        //     }).then((data) => {
+        //         if (data.success) {
+        //         const priceFields = ['price', 'cleaningCharge']; // Liste des champs de type prix
+        //         const displayValue = priceFields.includes(field) ? `${newValue} €` : `${newValue} personnes`;
 
-                // Mettre à jour le texte de l'élément
-                document.getElementById (`${field}-value`).innerText = displayValue;
+        //         // Mettre à jour le texte de l'élément
+        //         document.getElementById (`${field}-value`).innerText = displayValue;
 
-                closeEditModal();
-                } else {
-                    alert('Erreur lors de la mise à jour.');
-                }
-                    }).catch((error) => {
-                        console.error('Erreur:', error);
-                    });
-                    });
-
-
-        document.getElementById('addCategory').addEventListener('submit', function (e) {
-        e.preventDefault(); // Empêche le rechargement de la page
-
-        const formData = new FormData(this);
-
-        fetch(this.action, {
-            method: 'POST',
-            body: formData,
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest', 
-            }
-        }).then((response) => {
-            if (!response.ok) {
-                throw new Error (`HTTP error! status: ${
-                    response.status
-                }`);
-            }
-            return response.json();
-
-        }).then((data) => {
-        if (data.success) {
-            const categoryList = document.querySelector('.category-list');
-            const newCategory = document.createElement('p');
-            newCategory.innerHTML = `
-                ${data.category.name} 
-                <a href="/delete-category/${data.category.id}" class="ml-2">
-                    <i class="fa-solid fa-trash-can"></i>
-                </a>
-            `;
-            categoryList.appendChild(newCategory);
-
-            // Réinitialiser le formulaire
-            this.reset();
-                } else {
-                    alert('Erreur lors de l\'ajout de la catégorie.');
-                }
-                }).catch((error) => {
-                    console.error('Erreur:', error);
-                });
-            });
+        //         closeEditModal();
+        //         } else {
+        //             alert('Erreur lors de la mise à jour.');
+        //         }
+        //             }).catch((error) => {
+        //                 console.error('Erreur:', error);
+        //             });
+        //             });
 
 
-            document.getElementById('formPicture').addEventListener('submit', function (e) {
-                e.preventDefault();
+        // document.getElementById('addCategory').addEventListener('submit', function (e) {
+        // e.preventDefault(); // Empêche le rechargement de la page
 
-                const formData = new FormData(this);
+        // const formData = new FormData(this);
 
-                fetch(this.action, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest'
-                    }
-                })
-                .then((response) => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then((data) => {
-                    if (data.success) {
-                        const categoryName = data.picture.category;
+        // fetch(this.action, {
+        //     method: 'POST',
+        //     body: formData,
+        //     headers: {
+        //         'X-Requested-With': 'XMLHttpRequest', 
+        //     }
+        // }).then((response) => {
+        //     if (!response.ok) {
+        //         throw new Error (`HTTP error! status: ${
+        //             response.status
+        //         }`);
+        //     }
+        //     return response.json();
 
-                        // Sélectionner la galerie correspondant à la catégorie
-                        const gallery = document.querySelector(`.image-gallery[data-category="${categoryName}"]`);
+        // }).then((data) => {
+        // if (data.success) {
+        //     const categoryList = document.querySelector('.category-list');
+        //     const newCategory = document.createElement('p');
+        //     newCategory.innerHTML = `
+        //         ${data.category.name} 
+        //         <a href="/delete-category/${data.category.id}" class="ml-2">
+        //             <i class="fa-solid fa-trash-can"></i>
+        //         </a>
+        //     `;
+        //     categoryList.appendChild(newCategory);
 
-                        if (gallery) {
-                            const newImage = document.createElement('div');
-                            newImage.className = 'image-item';
-                            newImage.innerHTML = `
-                                <img src="/assets/img/${data.picture.url}" alt="${data.picture.alt}" class="w-48 h-48 object-cover rounded-lg">
-                            `;
-                            gallery.appendChild(newImage);
-                        } else {
-                            alert('Galerie introuvable pour la catégorie ' + categoryName);
-                        }
+        //     // Réinitialiser le formulaire
+        //     this.reset();
+        //         } else {
+        //             alert('Erreur lors de l\'ajout de la catégorie.');
+        //         }
+        //         }).catch((error) => {
+        //             console.error('Erreur:', error);
+        //         });
+        //     });
 
-                        // Réinitialiser le formulaire
-                        this.reset();
-                    } else {
-                        alert(data.message || 'Erreur lors de l\'ajout de l\'image.');
-                    }
-                })
-                    .catch((error) => {
-                    console.error('Erreur:', error);
-                });
-            });
 
-            document.addEventListener('DOMContentLoaded', () => {
-                document.querySelectorAll('.delete-picture-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        event.preventDefault();
-                        const pictureId = button.getAttribute('data-id');
+        //     document.getElementById('formPicture').addEventListener('submit', function (e) {
+        //         e.preventDefault();
 
-                        if (!confirm('Voulez-vous vraiment supprimer cette image ?')) {
-                            return;
-                        }
+        //         const formData = new FormData(this);
 
-                        fetch(`/dashboard/gite/picture/${pictureId}`, {
-                            method: 'DELETE',
-                            headers: {
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                // Supprimer l'image de la galerie
-                                button.closest('.image-item').remove();
-                                // alert(data.message);
-                            } else {
-                                alert('Erreur lors de la suppression : ' + data.message);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Erreur :', error);
-                        });
-                    });
-                });
-            });
+        //         fetch(this.action, {
+        //             method: 'POST',
+        //             body: formData,
+        //             headers: {
+        //                 'X-Requested-With': 'XMLHttpRequest'
+        //             }
+        //         })
+        //         .then((response) => {
+        //             if (!response.ok) {
+        //                 throw new Error(`HTTP error! status: ${response.status}`);
+        //             }
+        //             return response.json();
+        //         })
+        //         .then((data) => {
+        //             if (data.success) {
+        //                 const categoryName = data.picture.category;
+
+        //                 // Sélectionner la galerie correspondant à la catégorie
+        //                 const gallery = document.querySelector(`.image-gallery[data-category="${categoryName}"]`);
+
+        //                 if (gallery) {
+        //                     const newImage = document.createElement('div');
+        //                     newImage.className = 'image-item';
+        //                     newImage.innerHTML = `
+        //                         <img src="/assets/img/${data.picture.url}" alt="${data.picture.alt}" class="w-48 h-48 object-cover rounded-lg">
+        //                     `;
+        //                     gallery.appendChild(newImage);
+        //                 } else {
+        //                     alert('Galerie introuvable pour la catégorie ' + categoryName);
+        //                 }
+
+        //                 // Réinitialiser le formulaire
+        //                 this.reset();
+        //             } else {
+        //                 alert(data.message || 'Erreur lors de l\'ajout de l\'image.');
+        //             }
+        //         })
+        //             .catch((error) => {
+        //             console.error('Erreur:', error);
+        //         });
+        //     });
+
+        //     document.addEventListener('DOMContentLoaded', () => {
+        //         document.querySelectorAll('.delete-picture-btn').forEach(button => {
+        //             button.addEventListener('click', (event) => {
+        //                 event.preventDefault();
+        //                 const pictureId = button.getAttribute('data-id');
+
+        //                 if (!confirm('Voulez-vous vraiment supprimer cette image ?')) {
+        //                     return;
+        //                 }
+
+        //                 fetch(`/dashboard/gite/picture/${pictureId}`, {
+        //                     method: 'DELETE',
+        //                     headers: {
+        //                         'X-Requested-With': 'XMLHttpRequest',
+        //                         'Content-Type': 'application/json'
+        //                     }
+        //                 })
+        //                 .then(response => response.json())
+        //                 .then(data => {
+        //                     if (data.success) {
+        //                         // Supprimer l'image de la galerie
+        //                         button.closest('.image-item').remove();
+        //                         // alert(data.message);
+        //                     } else {
+        //                         alert('Erreur lors de la suppression : ' + data.message);
+        //                     }
+        //                 })
+        //                 .catch(error => {
+        //                     console.error('Erreur :', error);
+        //                 });
+        //             });
+        //         });
+        //     });
 
 	</script>
 
