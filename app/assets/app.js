@@ -3,8 +3,6 @@ import './styles/app.css';
 import './js/dashboard.js';
 
 
-console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
-
 function toogleMenu() {
     const toggleElements = document.querySelectorAll("[data-collapse-toggle]");
 
@@ -14,7 +12,6 @@ function toogleMenu() {
             const menu = document.querySelector(elementId);
             menu.classList.toggle("hidden");
         });
-        console.log("fonction ok")
     }
 }
 toogleMenu();

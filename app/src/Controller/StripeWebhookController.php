@@ -90,24 +90,7 @@ class StripeWebhookController
         $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $metadata->end_date));
         $reservation->setNumberAdult($metadata->number_adult);
         $reservation->setNumberKid($metadata->number_kid);
-        $reservation->setTotalNight($metadata->total_night);
-        $reservation->setPriceNight($metadata->night_price);
-        $reservation->setCleaningCharge($metadata->cleaning_charge);
-        $reservation->setSupplement($metadata->supplement);
-        $reservation->setTva($metadata->tva);
-        $reservation->setTourismTax($metadata->tax);
-        $reservation->setTotalPrice($metadata->total_price);
-        $reservation->setLastName($metadata->last_name);
-        $reservation->setFirstName($metadata->first_name);
-        $reservation->setAddress($metadata->address);
-        $reservation->setCp($metadata->cp);
-        $reservation->setCity($metadata->city);
-        $reservation->setCountry($metadata->country);
-        $reservation->setPhone($metadata->phone);
-        $reservation->setEmail($metadata->email);
-        $reservation->setIsMajor($metadata->is_major === 1); 
-        $reservation->setMessage($metadata->message);
-        $reservation->setStripePaymentId($session->payment_intent);
+        // ... Autres infos importante pour la réservation
     
         // Référence unique
         $uuid = strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
