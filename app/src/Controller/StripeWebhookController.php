@@ -76,27 +76,39 @@ class StripeWebhookController
 
 
     /**
-    * Fonction pour créé la réservation en BDD
-    */
+     * Fonction pour créer la réservation en BDD
+     */
     private function handleSuccessfulPayment($session)
     {
+        $paymentIntentId = $session->payment_intent;
+
+        // Vérifie si la réservation existe déjà
+        $existingReservation = $this->entityManager
+            ->getRepository(Reservation::class)
+            ->findOneBy(['stripe_payment_id' => $paymentIntentId]);
+
+        if ($existingReservation) {
+            $this->logger->info("Réservation déjà existante pour le paymentIntent : " . $paymentIntentId);
+            return;
+        }
 
         $this->logger->info('Stripe session reçue : ' . $session->id);
-        $this->logger->info('PaymentIntent : ' . $session->payment_intent);
+        $this->logger->info('PaymentIntent : ' . $paymentIntentId);
 
         $metadata = $session->metadata;
+
         $reservation = new Reservation();
         $reservation->setArrivalDate(\DateTime::createFromFormat('d/m/Y', $metadata->start_date));
         $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $metadata->end_date));
         $reservation->setNumberAdult($metadata->number_adult);
         $reservation->setNumberKid($metadata->number_kid);
-        $reservation->setTotalNight((int)$metadata->total_night);
-        $reservation->setPriceNight((float)$metadata->night_price);
-        $reservation->setCleaningCharge((float)$metadata->cleaning_charge);
-        $reservation->setSupplement((float)$metadata->supplement);
-        $reservation->setTva((float)$metadata->tva);
-        $reservation->setTourismTax((float)$metadata->tax);
-        $reservation->setTotalPrice((float)$metadata->total_price);
+        $reservation->setTotalNight($metadata->total_night);
+        $reservation->setPriceNight($metadata->night_price);
+        $reservation->setCleaningCharge($metadata->cleaning_charge);
+        $reservation->setSupplement($metadata->supplement);
+        $reservation->setTva($metadata->tva);
+        $reservation->setTourismTax($metadata->tax);
+        $reservation->setTotalPrice($metadata->total_price);
         $reservation->setLastName($metadata->last_name);
         $reservation->setFirstName($metadata->first_name);
         $reservation->setAddress($metadata->address);
@@ -105,10 +117,13 @@ class StripeWebhookController
         $reservation->setCountry($metadata->country);
         $reservation->setPhone($metadata->phone);
         $reservation->setEmail($metadata->email);
-        $reservation->setIsMajor($metadata->is_major === 1); 
+        $reservation->setIsMajor($metadata->is_major);
         $reservation->setMessage($metadata->message ?? '');
-        $reservation->setStripePaymentId($session->payment_intent); 
-    
+        $reservation->setStripePaymentId($paymentIntentId);
+
+        // Log ici (après instanciation)
+        $this->logger->info('Réservation Stripe payment ID : ' . $reservation->getStripePaymentId());
+
         // Référence unique
         $uuid = strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
         $reference = 'RES-' . date('Y') . '-' . $uuid;
@@ -123,12 +138,13 @@ class StripeWebhookController
         try {
             $this->entityManager->persist($reservation);
             $this->entityManager->flush();
-            $this->logger->info("Réservation confirmée et enregistrée (Webhook Stripe)");
+            $this->logger->info("Réservation confirmée et enregistrée");
         } catch (\Exception $e) {
             $this->logger->error("Erreur lors de la sauvegarde : " . $e->getMessage());
         }
     }
-    
+
+
 
     /**
      * Gestion du paiement échoué (payment_intent.payment_failed)
