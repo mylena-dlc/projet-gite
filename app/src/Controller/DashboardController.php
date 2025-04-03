@@ -135,80 +135,159 @@ class DashboardController extends AbstractController
     }
 
 
-    /**
-    * Fonction pour afficher la page revenus
-    */
+    // /**
+    // * Fonction pour afficher la page revenus
+    // */
+    // #[Route('private-zone-224/dashboard/income', name: 'admin_income')]
+    // public function showIcome(ReservationRepository $reservationRepository): Response
+    // {
+    //     // Détermine le mois et l'année en cours
+    //     $currentDate = new \DateTime();
+    //     $currentMonth = (int)$currentDate->format('m');  // Récupère le mois courant (1 à 12)
+    //     $currentYear = (int)$currentDate->format('Y');   // Récupère l'année courante
+
+    //     // Récupère toutes les réservations du mois en cours
+    //     $reservationsForCurrentMonth = $reservationRepository->findReservationsByMonth($currentMonth, $currentYear);
+
+    //     // Génère les noms des mois
+    //     $monthsLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
+        
+    //     // Génère un tableau associatif avec les mois et leurs revenus
+    //     $monthlyIncomes = [];
+    //     $years = [$currentYear - 1, $currentYear]; // Inclu l'année précédente et actuelle
+    //     foreach ($years as $year) {
+    //         for ($month = 1; $month <= 12; $month++) {
+    //             $reservations = $reservationRepository->findReservationsByMonth($month, $year);
+    //             $monthlyRevenue = array_sum(array_map(function($reservation) {
+    //                 return $reservation->getTotalPrice() 
+    //                     - $reservation->getTva() 
+    //                     - $reservation->getTourismTax();
+    //             }, $reservations));
+        
+    //             $monthlyIncomes[] = [
+    //                 'month' => $monthsLabels[$month - 1],
+    //                 'year' => $year,
+    //                 'income' => $monthlyRevenue,
+    //                 'link' => $this->generateUrl('admin_report', [
+    //                     'month' => $month,
+    //                     'year' => $year
+    //                 ])
+    //             ];
+    //         }
+    //     }
+
+    //     // Recherche de toutes les réservations
+    //     $transactions = [];
+    //     $allReservations = $reservationRepository->findBy([], ['reservation_date' => 'DESC']);
+
+    //      // Stocker chaque réservation avec la date et le montant total
+    //     foreach ($allReservations as $reservation) {
+    //         $transactions[] = [
+    //             'date' => $reservation->getReservationDate(),
+    //             'totalPrice' => $reservation->getTotalPrice(),
+    //         ];
+    //     }
+
+    //     $graphData = [];
+        
+    //     foreach ($monthlyIncomes as $item) {
+    //         $graphData[$item['month'] . ' ' . $item['year']] = $item['income'];
+    //     }
+
+    //     return $this->render('admin/income.html.twig', [
+    //         'reservationsForCurrentMonth' => $reservationsForCurrentMonth,
+    //         'labels' => $monthsLabels,
+    //         'monthlyIncomes' => $monthlyIncomes,
+    //         'transactions' => $transactions,
+    //         'years' => $years,
+    //         'currentYear' => $currentYear,
+    //         'graphData' => $graphData,
+    //     ]);
+    // }
+
+
     #[Route('private-zone-224/dashboard/income', name: 'admin_income')]
-    public function showIcome(ReservationRepository $reservationRepository): Response
-    {
-        // Détermine le mois et l'année en cours
-        $currentDate = new \DateTime();
-        $currentMonth = (int)$currentDate->format('m');  // Récupère le mois courant (1 à 12)
-        $currentYear = (int)$currentDate->format('Y');   // Récupère l'année courante
+public function showIncome(ReservationRepository $reservationRepository): Response
+{
+    $currentDate = new \DateTime();
+    $currentMonth = (int)$currentDate->format('m');
+    $currentYear = (int)$currentDate->format('Y');
 
-        // Récupère toutes les réservations du mois en cours
-        $reservationsForCurrentMonth = $reservationRepository->findReservationsByMonth($currentMonth, $currentYear);
+    // ⚙️ Mois formatés
+    $monthsLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
 
-        // Génère les noms des mois
-        $monthsLabels = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'];
-        
-        // Génère un tableau associatif avec les mois et leurs revenus
-        $monthlyIncomes = [];
-        $years = [$currentYear - 1, $currentYear]; // Inclu l'année précédente et actuelle
-        foreach ($years as $year) {
-            for ($month = 1; $month <= 12; $month++) {
-                $reservations = $reservationRepository->findReservationsByMonth($month, $year);
-                $monthlyRevenue = array_sum(array_map(function($reservation) {
-                    return $reservation->getTotalPrice() 
-                        - $reservation->getTva() 
-                        - $reservation->getTourismTax();
-                }, $reservations));
-        
-                $monthlyIncomes[] = [
-                    'month' => $monthsLabels[$month - 1],
-                    'year' => $year,
-                    'income' => $monthlyRevenue,
-                    'link' => $this->generateUrl('admin_report', [
-                        'month' => $month,
-                        'year' => $year
-                    ])
-                ];
-            }
+    // ✅ Années à afficher dans les graphes (ex: année actuelle et précédente)
+    $years = [$currentYear - 1, $currentYear];
+
+    // 💰 Structure par année pour le carousel graphique
+    $graphDataByYear = [];
+
+    foreach ($years as $year) {
+        $graphDataByYear[$year] = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $reservations = $reservationRepository->findReservationsByMonth($month, $year);
+            $monthlyRevenue = array_sum(array_map(function ($reservation) {
+                return $reservation->getTotalPrice()
+                    - $reservation->getTva()
+                    - $reservation->getTourismTax();
+            }, $reservations));
+
+            $monthLabel = $monthsLabels[$month - 1];
+            $graphDataByYear[$year][$monthLabel] = $monthlyRevenue;
         }
-
-        // Recherche de toutes les réservations
-        $transactions = [];
-        $allReservations = $reservationRepository->findBy([], ['reservation_date' => 'DESC']);
-
-         // Stocker chaque réservation avec la date et le montant total
-        foreach ($allReservations as $reservation) {
-            $transactions[] = [
-                'date' => $reservation->getReservationDate(),
-                'totalPrice' => $reservation->getTotalPrice(),
-            ];
-        }
-
-        $graphData = [];
-        
-        foreach ($monthlyIncomes as $item) {
-            $graphData[$item['month'] . ' ' . $item['year']] = $item['income'];
-        }
-
-        return $this->render('admin/income.html.twig', [
-            'reservationsForCurrentMonth' => $reservationsForCurrentMonth,
-            'labels' => $monthsLabels,
-            'monthlyIncomes' => $monthlyIncomes,
-            'transactions' => $transactions,
-            'years' => $years,
-            'currentYear' => $currentYear,
-            'graphData' => $graphData,
-        ]);
     }
 
+    // 📊 Revenus actuels pour le mois en cours
+    $reservationsForCurrentMonth = $reservationRepository->findReservationsByMonth($currentMonth, $currentYear);
+
+    // 📄 Bloc "Rapport de revenus" cliquables
+    $monthlyIncomes = [];
+    foreach ($years as $year) {
+        for ($month = 1; $month <= 12; $month++) {
+            $reservations = $reservationRepository->findReservationsByMonth($month, $year);
+            $monthlyRevenue = array_sum(array_map(function ($reservation) {
+                return $reservation->getTotalPrice()
+                    - $reservation->getTva()
+                    - $reservation->getTourismTax();
+            }, $reservations));
+
+            $monthlyIncomes[] = [
+                'month' => $monthsLabels[$month - 1],
+                'year' => $year,
+                'income' => $monthlyRevenue,
+                'link' => $this->generateUrl('admin_report', [
+                    'month' => $month,
+                    'year' => $year
+                ])
+            ];
+        }
+    }
+
+    // 💳 Liste de toutes les transactions
+    $transactions = [];
+    $allReservations = $reservationRepository->findBy([], ['reservation_date' => 'DESC']);
+    foreach ($allReservations as $reservation) {
+        $transactions[] = [
+            'date' => $reservation->getReservationDate(),
+            'totalPrice' => $reservation->getTotalPrice(),
+        ];
+    }
+
+    return $this->render('admin/income.html.twig', [
+        'reservationsForCurrentMonth' => $reservationsForCurrentMonth,
+        'monthlyIncomes' => $monthlyIncomes,
+        'transactions' => $transactions,
+        'graphDataByYear' => $graphDataByYear,
+        'years' => $years,
+        'currentYear' => $currentYear,
+    ]);
+}
+
 
 
     /**
-    * Fonction pour afficher la page revenus
+    * Fonction pour afficher la page revenus par mois + l'export en PDF
     */
     #[Route('private-zone-224/dashboard/report/{month}/{year}', name: 'admin_report')]
     #[Route('private-zone-224/dashboard/report/{month}/{year}/export', name: 'admin_report_export')]
