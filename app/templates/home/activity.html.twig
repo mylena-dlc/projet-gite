@@ -20,13 +20,13 @@
         <div id="map-activity" class="sticky top-0 left-0 w-full h-[300px] z-10 my-4" style="height: 300px;"></div> 
 
         <div class="flex justify-end">
-            <span id="gite" class=" bg-gray1 text-white px-4 py-2 rounded-xl cursor-pointer hover:bg-gray-700 transition duration-300 ease-in-out">Voir le Gîte</span>
+            <span id="gite" class=" bg-gray1 text-white px-4 py-2 rounded-lg cursor-pointer hover:bg-gray-700 transition duration-300 ease-in-out">Voir le Gîte</span>
         </div>
 
         <!-- Boutons de catégories -->
         <div id="category-filters" class="flex flex-wrap gap-2 justify-center my-6">
             {% for category in categories %}
-                <span class="category-filter cursor-pointer px-4 py-2 bg-terracota1 text-white rounded-xl border-2 border-terracota1 hover:bg-terracota2 transition duration-300 ease-in-out"
+                <span class="category-filter cursor-pointer px-4 py-2 bg-terracota1 text-white rounded-lg border-2 border-terracota1 hover:bg-terracota2 transition duration-300 ease-in-out"
                         data-category="{{ category.nameCategory }}">
                     {{ category.nameCategory }}
                 </span>
@@ -37,7 +37,7 @@
             {% for category in categories %}
                 <div class="activity-group hidden" data-category="{{ category.nameCategory }}">
                     {% for activity in category.activities %}
-                        <div class="activity-card item item-activity bg-white1 rounded-xl p-4 my-4 flex flex-col justify-center items-center cursor-pointer" 
+                        <div class="activity-card item item-activity bg-white1 rounded-lg p-4 my-4 flex flex-col justify-center items-center cursor-pointer" 
                             data-lat="{{ activity.latitude }}" 
                             data-lng="{{ activity.longitude }}" 
                             data-image="{{ asset(activity.image) }}" 

@@ -28,8 +28,10 @@ window.addEventListener("DOMContentLoaded", () => {
 		// logo.style.display = scrolled ? "none" : "block";
 		// logoContainer.style.width = scrolled ? "0" : "10rem";
 		headerNav.classList.toggle("p-2", !scrolled);
-		headerNav.classList.toggle("lg:justify-between", !scrolled);
+		// headerNav.classList.toggle("lg:justify-between", !scrolled);
 		headerNav.classList.toggle("lg:justify-center", scrolled);
+        headerNav.classList.toggle("lg:pt-0", scrolled);
+        headerNav.classList.toggle("lg:pt-14", !scrolled);
 		burger.classList.toggle("mt-2", scrolled);
 	};
 

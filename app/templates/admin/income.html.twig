@@ -9,7 +9,7 @@
 
 	<section class="p-6 mb-32 mt-6 lg:p-12">
 		<div>
-			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
+			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-lg">
 			<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
 		</div>
 		<h1 class="my-4">Revenu</h1>
@@ -61,7 +61,7 @@
         <div class="mx-6 flex gap-2">
             {% for item in monthlyIncomes %}
                 {% if item.income > 0 %}
-                    <a href="{{ item.link }}" class="bg-white1 hover:bg-terracota3 duration-300 rounded-xl p-6 aspect-square w-3/6 flex flex-col justify-center">
+                    <a href="{{ item.link }}" class="bg-white1 hover:bg-terracota3 duration-300 rounded-lg p-6 aspect-square w-3/6 flex flex-col justify-center">
                         <p class="pb-8">{{ item.year }}</p>
                         <p class="font-bold text-lg">{{ item.month }}</p>
                         <p class="text-terracota2 text-xl font-bold">{{ item.income }} €</p>

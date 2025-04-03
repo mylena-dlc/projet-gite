@@ -80,7 +80,7 @@ class ReservationType extends HoneyPotType
                 'preferred_choices' => ['FR'], // Met "France" en premier dans la liste
                 'data' => 'FR', // Définit "France" comme sélectionnée par défaut
                 'attr' => [
-                    'class' => 'flex flex-col bg-white1 rounded-xl w-3/4 p-2', 
+                    'class' => 'flex flex-col bg-white1 rounded-lg w-3/4 p-2', 
                 ],
             ])
             ->add('phone', TelType::class, [

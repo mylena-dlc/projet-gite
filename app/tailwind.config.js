@@ -13,6 +13,7 @@ module.exports = {
         gray2: "#adadad",
         green1: "#a9b4a4",
         green2: "#e6f3e0",
+        greenhover: "#697264",
         terracota1: "#6E5340",
         terracota2: "#85634d",
         terracota3: "#ecdcd3",
