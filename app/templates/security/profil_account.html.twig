@@ -52,12 +52,15 @@
 				<button type="submit" class="btn-secondary m-0 mt-4 w-auto">Changer le mot de passe</button>
 				{{ form_end(passwordForm) }}
 			</div>
+		{% else %}
+			<p>Vous êtes connecté avec cette adresse :</p>
+			<p class="font-bold mb-4">{{ app.user.email }}</p>
 		{% endif %}
 
 		<div class="line my-8"></div>
 
 		<div class="flex flex-col justify-between my-4 lg:w1/2">
-			<a href="{{ path('app_logout') }}" class="btn-primary w-full">
+			<a href="{{ path('app_logout') }}" class="btn-primary">
 				<i class="fa-solid fa-power-off"></i>
 				déconnexion
 			</a>
