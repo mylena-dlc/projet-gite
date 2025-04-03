@@ -1,4 +1,4 @@
-// -------------------- app.js optimisé avec lazy-load CSS/JS --------------------
+import './styles/app.css';
 
 // -------------------- Menu burger
 function toogleMenu() {
@@ -67,6 +67,21 @@ window.addEventListener("DOMContentLoaded", () => {
                     globalClose: true,
                     expiry: 5000,
                 });
+            });
+        });
+    }
+});
+
+// Lazy-load Carousel Fancyapps
+document.addEventListener("DOMContentLoaded", () => {
+    const carouselEl = document.querySelector("#myCarousel");
+    if (carouselEl) {
+        import("@fancyapps/ui/dist/carousel/carousel.css");
+        import("@fancyapps/ui").then(({ Carousel }) => {
+            new Carousel(carouselEl, {
+                Dots: false,
+                infinite: true,
+                transition: "slide",
             });
         });
     }

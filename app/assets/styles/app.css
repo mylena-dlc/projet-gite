@@ -38,12 +38,14 @@
   
   @layer components {
     .scrolled-header {
-      background-image: url('/assets/img/fond-banner.webp');
+      /* background-image: url('/assets/img/fond-banner.webp'); */
+      background-image: url('../img/fond-banner.webp');
+
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
-    
+
     #header {
       transition: background-image 0.5s ease-in-out, background-color 0.5s ease-in-out;
     }
