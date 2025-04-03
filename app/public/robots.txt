@@ -4,3 +4,5 @@ Disallow: /gite-compte
 Allow: /
 
 Sitemap: https://gite-rain-du-pair.fr/sitemap.xml
+
+
