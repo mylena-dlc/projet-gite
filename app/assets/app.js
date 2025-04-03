@@ -15,8 +15,8 @@ toogleMenu();
 // -------------------- Scroll header transparent/fond-banner
 window.addEventListener("DOMContentLoaded", () => {
 	const header = document.getElementById("header");
-	const logo = document.getElementById("logo");
-	const logoContainer = document.getElementById("logo-container");
+	// const logo = document.getElementById("logo");
+	// const logoContainer = document.getElementById("logo-container");
 	const headerNav = document.getElementById('header-nav');
 	const burger = document.getElementById('menu-burger');
 
@@ -25,8 +25,8 @@ window.addEventListener("DOMContentLoaded", () => {
 
 		header.classList.toggle("scrolled-header", scrolled);
 		header.classList.toggle("h-10", scrolled);
-		logo.style.display = scrolled ? "none" : "block";
-		logoContainer.style.width = scrolled ? "0" : "10rem";
+		// logo.style.display = scrolled ? "none" : "block";
+		// logoContainer.style.width = scrolled ? "0" : "10rem";
 		headerNav.classList.toggle("p-2", !scrolled);
 		headerNav.classList.toggle("lg:justify-between", !scrolled);
 		headerNav.classList.toggle("lg:justify-center", scrolled);
@@ -37,6 +37,7 @@ window.addEventListener("DOMContentLoaded", () => {
 	handleHeaderScroll();
 	window.addEventListener("scroll", handleHeaderScroll);
 });
+
 
 // -------------------- Scroll to top button
 window.addEventListener("DOMContentLoaded", () => {
@@ -87,14 +88,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// -------------------- Lazy Fancybox/Carousel
+
+// -------------------- Carousel pour les graphiques de revenus
 window.addEventListener("DOMContentLoaded", () => {
     if (document.querySelector(".f-carousel") || document.querySelector("[data-fancybox]")) {
         import("@fancyapps/ui/dist/fancybox/fancybox.css");
         import("@fancyapps/ui/dist/carousel/carousel.css");
         import("@fancyapps/ui").then(({ Fancybox, Carousel }) => {
             if (document.querySelector(".f-carousel")) {
-                new Carousel(document.querySelector(".f-carousel"), { Dots: false });
+                new Carousel(document.querySelector(".f-carousel"), {
+                    Dots: true,
+                    Navigation: false 
+                });
             }
             if (document.querySelector("[data-fancybox]")) {
                 Fancybox.bind("[data-fancybox]", {});
@@ -102,6 +107,7 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
 
 // -------------------- Lazy Splide
 window.addEventListener("DOMContentLoaded", () => {
@@ -151,6 +157,7 @@ function adjustHeroHeight() {
 window.addEventListener('load', adjustHeroHeight);
 window.addEventListener('resize', adjustHeroHeight);
 
+
 // -------------------- Page FAQ toggle
 window.addEventListener("DOMContentLoaded", () => {
     const faqButtons = document.querySelectorAll('.faq-question');
@@ -173,3 +180,6 @@ window.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+
+

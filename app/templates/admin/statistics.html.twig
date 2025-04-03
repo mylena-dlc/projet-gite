@@ -7,16 +7,14 @@
 
 	{% include "_partials/_header.html.twig" %}
 
-	<section class="p-6 mb-32 mt-24 lg:p-12">
+	<section class="p-6 mb-32 mt-6 lg:p-12">
 
         <div>
             <a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
-                <i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
+                <i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour
+            </a>
         </div>
-
         <h1 class="my-4">Statistiques</h1>
-
-
 		<div class="space-y-4">
             <h3>Avis</h3>
             <div class="flex mx-4"> 
@@ -51,57 +49,117 @@
             <h3>Taux de remplissage</h3>
                 <div id="myCarousel" class="f-carousel">
                     {% for data in monthlyData %}
-                        <div class="f-carousel__slide">
+                        <div class="f-carousel__slide" data-chart-id="chart{{ loop.index }}">
                             <h4>Taux d'occupation pour {{ data.month }} {{ data.year }}</h4>
                             <p class="font-bold">{{ data.occupancyRate }}%</p>
                             <div class="mx-10">
-                                <canvas id="chart{{ loop.index }}"></canvas>
+                                <canvas 
+                                    id="chart{{ loop.index }}" 
+                                    data-chart-initialized="false"
+                                    data-reserved="{{ data.totalNightsReserved }}"
+                                    data-available="{{ data.daysInMonth - data.totalNightsReserved }}">
+                                </canvas>
                             </div>
                         </div>
                     {% endfor %}
                 </div>
-
 		</div>
 	</section>
 	{% include "_partials/_footer_admin.html.twig" %}
+    {% block custom_javascripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.css" />
+<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js"></script>
 
-    {# {% block custom_javascripts %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@5.0/dist/carousel/carousel.css"/>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const carousel = new Carousel(document.getElementById("myCarousel"), {
+            Dots: false,
+            Navigation: false,
+        });
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        carousel.on("change", (carouselInstance, slide) => {
+            if (!slide || !slide.el) return;
 
-        // Initialisation du carousel
-        const container = document.getElementById("myCarousel");
-        const options = { infinite: false };
-        new Carousel(container, options);
+            const chartId = slide.el.dataset.chartId;
+            const canvas = document.getElementById(chartId);
 
-            // Initialisation du graphique
-            {% for data in monthlyData %}
-                // Identifiant unique pour chaque graphique
-                let ctx{{ loop.index }} = document.getElementById('chart{{ loop.index }}').getContext('2d');
-            
-                // Données pour le graphique
-                let data{{ loop.index }} = {
-                    labels: ['Nuits réservées', 'Nuits disponibles'],
-                    datasets: [{
-                        data: [{{ data.totalNightsReserved }}, {{ data.daysInMonth - data.totalNightsReserved }}],
-                        backgroundColor: ['#b58869', '#a9b4a4'], 
-                        hoverOffset: 4
-                    }]
-                };
+            if (canvas && canvas.dataset.chartInitialized === "false") {
+                const ctx = canvas.getContext("2d");
 
-                // Configuration du graphique
-                new Chart(ctx{{ loop.index }}, {
-                    type: 'doughnut',
-                    data: data{{ loop.index }},
+                new Chart(ctx, {
+                    type: "doughnut",
+                    data: {
+                        labels: ["Nuits réservées", "Nuits disponibles"],
+                        datasets: [{
+                            data: [
+                                parseInt(canvas.dataset.reserved),
+                                parseInt(canvas.dataset.available)
+                            ],
+                            backgroundColor: ["#b58869", "#a9b4a4"],
+                            hoverOffset: 4
+                        }]
+                    },
                     options: {
-                        responsive: true,
+                        responsive: true
                     }
                 });
-            {% endfor %}
+
+                canvas.dataset.chartInitialized = "true";
+            }
         });
-    </script>
+
+        // On initialise manuellement le premier slide
+        if (carousel.slides.length > 0) {
+            carousel.emit("change", carousel, carousel.slides[0]);
+        }
+    });
+</script>
+{% endblock %}
+
+
+
+    {# {% block custom_javascripts %}
+   <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const carouselStats = document.querySelector("#myCarousel");
+
+            if (carouselStats) {
+                const instance = new Fancybox.Carousel(carouselStats, {
+                    Dots: true,
+                    Navigation: false,
+                });
+
+                instance.on("change", (carousel, slide) => {
+                    const chartId = slide.el.dataset.chartId;
+                    const canvas = document.getElementById(chartId);
+
+                    if (canvas && canvas.dataset.chartInitialized === "false") {
+                        const ctx = canvas.getContext("2d");
+
+                        new Chart(ctx, {
+                            type: "doughnut",
+                            data: {
+                                labels: ["Nuits réservées", "Nuits disponibles"],
+                                datasets: [{
+                                    data: [
+                                        parseInt(canvas.dataset.reserved),
+                                        parseInt(canvas.dataset.available)
+                                    ],
+                                    backgroundColor: ["#b58869", "#a9b4a4"],
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: { responsive: true }
+                        });
+
+                        canvas.dataset.chartInitialized = "true";
+                    }
+                });
+                instance.emit("change", instance, instance.slides[0]);
+            }
+    });
+
+</script>
     {% endblock %}  #}
 {% endblock %}
