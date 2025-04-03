@@ -482,13 +482,13 @@ class ReservationController extends AbstractController
     
         // Attente douce que le webhook ait créé la réservation
         $reservation = null;
-        $timeout = 10; // max 10 secondes
+        $timeout = 3; // max 3 secondes
         $elapsed = 0;
     
         while (!$reservation && $elapsed < $timeout) {
             usleep(300000); // 300 ms
             $reservation = $em->getRepository(Reservation::class)->findOneBy([
-                'stripe_paymentId' => $paymentIntentId
+                'stripe_payment_id' => $paymentIntentId
             ]);
             $elapsed += 0.3;
         }
