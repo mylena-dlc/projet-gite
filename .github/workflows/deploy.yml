@@ -24,18 +24,18 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-          
+
             cd /var/www/projet-gite/app
 
-            # S'assurer que l'utilisateur SSH a bien les droits
+            # S'assurer que l'utilisateur SSH a bien les droits pour git
             sudo chown -R ubuntu:ubuntu .
 
-            # Nettoyage pour éviter les conflits si des fichiers sont modifiés localement
+            # Nettoyage pour éviter les conflits
             git reset --hard
             git clean -fd
             git pull origin main
 
-            # Installation des dépendances
+            # Installation des dépendances front
             npm install
             npm run build
 
@@ -43,10 +43,11 @@ jobs:
             docker compose build php 
             docker compose up -d php 
 
+            # Donner les bons droits à tout /var/www avant les commandes Symfony
+            docker compose exec -T --user=root php chown -R www-data:www-data /var/www
+            docker compose exec -T --user=root php chmod -R 775 /var/www
+
             # Clear + Warmup du cache Symfony en prod
             docker compose exec -T php php bin/console cache:clear --env=prod
             docker compose exec -T php php bin/console cache:warmup --env=prod
 
-            # Permissions (important pour que Symfony fonctionne bien)
-            docker compose exec -T --user=root php chown -R www-data:www-data /var/www/var
-            docker compose exec -T --user=root php chmod -R 775 /var/www/var
