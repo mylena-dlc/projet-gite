@@ -482,7 +482,7 @@ class ReservationController extends AbstractController
     
         // Attente douce que le webhook ait créé la réservation
         $reservation = null;
-        $timeout = 20; // max 20 secondes
+        $timeout = 10; // max 10 secondes
         $elapsed = 0;
     
         while (!$reservation && $elapsed < $timeout) {
