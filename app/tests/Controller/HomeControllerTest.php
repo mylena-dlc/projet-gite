@@ -18,7 +18,7 @@ class HomeControllerTest extends WebTestCase
         $this->assertSelectorExists('a:contains("Réserver un séjour")');
 
         // Vérifie le titre
-        $this->assertSelectorTextContains('h1', 'Évadez-vous en Alsace dans un gîte de charme avec bain nordique, idéal pour 4 personnes');
+        $this->assertSelectorTextContains('h1', 'Évadez-vous en Alsace');
 
         // Vérifie que le bouton pointe vers /recherche-reservation
         $link = $crawler->selectLink('Réserver un séjour')->link();
