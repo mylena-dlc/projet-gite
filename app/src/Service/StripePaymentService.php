@@ -90,7 +90,6 @@ class StripePaymentService
                 'country' => $reservationDetails['country'],
                 'is_major' => $reservationDetails['isMajor'],
                 'message' => $reservationDetails['message'] ?? '',
-
             ]
         ]);
 

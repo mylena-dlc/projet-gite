@@ -100,7 +100,7 @@ class Reservation
     private ?Token $token = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $stripe_paymentId = null;
+    private ?string $stripe_payment_id = null;
 
     /**
      * @var Collection<int, Review>
@@ -474,12 +474,12 @@ class Reservation
 
     public function getStripePaymentId(): ?string
     {
-        return $this->stripe_paymentId;
+        return $this->stripe_payment_id;
     }
 
-    public function setStripePaymentId(?string $stripe_paymentId): static
+    public function setStripePaymentId(?string $stripe_payment_id): static
     {
-        $this->stripe_paymentId = $stripe_paymentId;
+        $this->stripe_payment_id = $stripe_payment_id;
 
         return $this;
     }
