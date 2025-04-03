@@ -13,37 +13,37 @@
 
 		<div class="my-6 flex space-x-4 p-2 overflow-x-auto md:overflow-x-visible whitespace-nowrap scrollbar-hide snap-x snap-mandatory">
 			{% if ongoingReservation %}
-				<span onclick="showReservations('ongoing', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+				<span onclick="showReservations('ongoing', this)" class="cursor-pointer bg-terracota1 rounded-lg px-4 py-2 text-white inline-block snap-start border-2 border-transparent
 					 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
 					En cours ({{ ongoingReservation|length }})
 				</span>
 			{% endif %}
 
 			{% if reservationsToConfirms %}
-				<span onclick="showReservations('confirm', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+				<span onclick="showReservations('confirm', this)" class="cursor-pointer bg-terracota1 rounded-lg px-4 py-2 text-white inline-block snap-start border-2 border-transparent
 					 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
 					Demande de réservation ({{ reservationsToConfirms|length }})
 				</span>
 			{% endif %}
 
-			<span onclick="showReservations('upcoming', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+			<span onclick="showReservations('upcoming', this)" class="cursor-pointer bg-terracota1 rounded-lg px-4 py-2 text-white inline-block snap-start border-2 border-transparent
 				 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
 				À venir ({{ upcomingReservations|length }})
 			</span>
 
-			<span onclick="showReservations('previous', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+			<span onclick="showReservations('previous', this)" class="cursor-pointer bg-terracota1 rounded-lg px-4 py-2 text-white inline-block snap-start border-2 border-transparent
 				 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
 				Passée(s) ({{ previousReservations|length }})
 			</span>
 
             {% if reservationsRefuseds %}
-                <span onclick="showReservations('refuse', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+                <span onclick="showReservations('refuse', this)" class="cursor-pointer bg-terracota1 rounded-lg px-4 py-2 text-white inline-block snap-start border-2 border-transparent
                         hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
                     Refusée(s) ({{ reservationsRefuseds|length }})
                 </span>
             {% endif %} 
 
-            <span onclick="showReservations('cancel', this)" class="cursor-pointer bg-terracota1 rounded-xl px-4 py-2 text-white inline-block snap-start border-2 border-transparent
+            <span onclick="showReservations('cancel', this)" class="cursor-pointer bg-terracota1 rounded-lg px-4 py-2 text-white inline-block snap-start border-2 border-transparent
                 hover:bg-terracota2 hover:border-terracota2 transition duration-300 ease-in-out">
                 Annulée(s) ({{ reservationsCancelled|length }})
             </span>
@@ -57,7 +57,7 @@
 		<div id="confirm" class="m-4 {% if defaultCategory != 'confirm' %}hidden{% endif %}">
 			{% if reservationsToConfirms %}
 				{% for reservationsToConfirm in reservationsToConfirms %}
-					<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+					<div class="flex flex-col bg-white1 rounded-lg pt-4 my-4 border border-terracota2">
 						<div class="flex justify-between">
 							<div>
                                 <p class="font-bold pt-2 pl-4">{{ reservationsToConfirm.firstName }}
@@ -86,7 +86,7 @@
 		<!-- Conteneur de la réservation en cours -->
 		<div id="ongoingReservation" class="m-4 {% if defaultCategory != 'ongoing' %}hidden{% endif %}">
 			{% if ongoingReservation %}
-				<div class="flex flex-col bg-terracota3 rounded-xl pt-4 my-4 border border-terracota2">
+				<div class="flex flex-col bg-terracota3 rounded-lg pt-4 my-4 border border-terracota2">
 					<div class="flex justify-between">
 						<div>
 							<p class="font-bold pt-2 pl-4">{{ ongoingReservation.firstName }}
@@ -113,7 +113,7 @@
 					<p class="text-center text-gray-500">Aucune réservation à venir.</p>
 				{% else %}
 						{% for upcomingReservation in upcomingReservations[:4] %}
-							<div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+							<div class="flex flex-col bg-white1 rounded-lg pt-4 my-4 border border-terracota2">
 								<!-- Calcul du nombre de jours jusqu'à l'arrivée -->
 								{% set today = "now"|date("U") %}
 								{% set arrivalDate = upcomingReservation.arrivalDate|date("U") %}
@@ -159,7 +159,7 @@
             <!-- Toutes les réservations masquées par défaut -->
             <div id="allUpcomingReservations" class="hidden">
                 {% for upcomingReservation in upcomingReservations[4:] %}
-                    <div  class="flex flex-col bg-terracota3 rounded-xl pt-4 my-4 border border-terracota2">
+                    <div  class="flex flex-col bg-terracota3 rounded-lg pt-4 my-4 border border-terracota2">
 
                         <!-- Calcul du nombre de jours jusqu'à l'arrivée -->
                         {% set today = "now"|date("U") %}
@@ -203,7 +203,7 @@
                     <p class="text-center text-gray-500">Aucune réservation passée.</p>
                 {% else %}
                     {% for previousReservation in previousReservations %}
-                        <div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+                        <div class="flex flex-col bg-white1 rounded-lg pt-4 my-4 border border-terracota2">
                             <div class="flex justify-between">
                                 <div>
                                     <p class="font-bold pt-2 pl-4">{{ previousReservation.firstName }}
@@ -243,7 +243,7 @@
                 <!-- Toutes les réservations masquées par défaut -->
                 <div id="allPreviousReservations" class="hidden">
                     {% for previousReservation in previousReservations[4:] %}
-                        <div class="flex flex-col bg-terracota3 rounded-xl pt-4 my-4 border border-terracota2">
+                        <div class="flex flex-col bg-terracota3 rounded-lg pt-4 my-4 border border-terracota2">
                             <div class="flex justify-between">
                                 <div>
                                     <p class="font-bold pt-2 pl-4">{{ previousReservation.firstName }}
@@ -270,7 +270,7 @@
                 <!-- Conteneur des réservations refusées -->
                 <div id="refuse" class="m-4 hidden">
                     {% for reservationsRefused in reservationsRefuseds %}
-                        <div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+                        <div class="flex flex-col bg-white1 rounded-lg pt-4 my-4 border border-terracota2">
                             <div class="flex justify-between">
                                 <div>
                                     <p class="font-bold pt-2 pl-4">{{ reservationsRefused.firstName }}
@@ -296,7 +296,7 @@
                 <!-- Conteneur des réservations annulée -->
                 <div id="cancel" class="m-4 hidden">
                 {% for reservation in reservationsCancelled %}
-                    <div class="flex flex-col bg-white1 rounded-xl pt-4 my-4 border border-terracota2">
+                    <div class="flex flex-col bg-white1 rounded-lg pt-4 my-4 border border-terracota2">
                         <div class="flex justify-between">
                             <div>
                                 <p class="font-bold pt-2 pl-4">{{ reservation.firstName }}

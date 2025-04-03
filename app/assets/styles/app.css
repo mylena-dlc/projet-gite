@@ -20,7 +20,7 @@
     }
     
     input {
-      @apply bg-white1 rounded-xl w-3/4 p-2 block;
+      @apply bg-white1 rounded-lg w-3/4 p-2 block;
       outline: none; 
       border: 1px solid var(--terracota1); 
     }
@@ -51,16 +51,16 @@
     }
     
     .btn-primary {
-      @apply w-1/2 m-auto block text-lg font-normal bg-terracota1 text-white1 font-heading rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+      @apply w-1/2 m-auto block text-lg font-normal bg-terracota1 text-white1 font-heading rounded-lg uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
       @apply md:w-1/3 lg:w-1/6;
     }
 
     .btn-secondary {
-      @apply w-3/12 m-auto block text-sm font-normal bg-terracota1 text-white1 font-heading rounded-xl uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+      @apply w-3/12 m-auto block text-sm font-normal bg-terracota1 text-white1 font-heading rounded-lg uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
     }
 
     .btn-span {
-      @apply bg-terracota1 text-white1 font-heading rounded-xl;
+      @apply bg-terracota1 text-white1 font-heading rounded-lg;
     }
 
     .line {
@@ -183,10 +183,10 @@
     #header {
       font-size: clamp(0.8rem, 2vw, 1rem);
     }
-
+/* 
     #main-nav ul {
       gap: clamp(0.5rem, 2vw, 2rem);
-    }
+    } */
 
     .jq-ry-container {
       padding: 0;
@@ -200,6 +200,18 @@
       height: 0;
       width: 0;
       z-index: -1;
+    }
+
+    a.ViewProfileButton, a.FollowButton {
+      background-color: #6E5340;
+    }
+
+    .PrimaryCTA a {
+      color: #6E5340;
+    }
+
+    a.ViewProfileButton:hover, a.FollowButton:hover {
+      background-color: #ecdcd3;
     }
 
     @media (min-width: 1024px) { 

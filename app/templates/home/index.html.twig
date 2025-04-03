@@ -22,9 +22,9 @@
         </div>
     </section> #}
 
-    <section id="hero-section" class="relative w-full flex items-center">
+    <section id="hero-section" class="relative w-full flex items-center justify-center">
         <img 
-            src="{{ asset('assets/img/evadez-vous-alsace.jpg') }}" 
+            src="{{ asset('assets/img/test-4.webp') }}" 
             alt="Vue d'ensemble du gîte" 
             class="absolute inset-0 w-full h-full object-cover z-0" 
             loading="eager" 
@@ -34,22 +34,21 @@
         
         {# <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10"></div> #}
 
-        <div class="relative z-20 max-w-lg px-4 ml-[10%]">
-            <h1 class="text-xl uppercase mb-4 text-gray1 tracking-normal font-semibold text-start">
+        <div class="relative z-20 max-w-lg flex flex-col items-center justify-center">
+            <h1 class="text-4xl uppercase mb-4 text-gray1 tracking-widest font-semibold text-start">
                 Évadez-vous en Alsace
             </h1>
-            <h2 class="normal-case mb-4">Gîte de charme avec bain nordique, idéal pour 4 personnes</h2>
-            <a href="{{ path('app_search_reservation') }}" class="btn-primary w-1/2 m-0">
+            <h2 class="normal-case mb-4 text-center">Gîte de charme avec bain nordique<br> & vue sur les montagnes</h2>
+            <a href="{{ path('app_search_reservation') }}" class="btn-primary w-1/2 m-0 bg-greenhover hover:bg-green1">
                 Réserver un séjour
             </a>
         </div>
     </section>
 
 
-    <section class="mt-6 min-h-[400px]">
+    {# <section class="mt-6 min-h-[400px]">
         <h2 class="mb-4 pl-4 lg:pl-40">Entre nature et tranquilité</h2>
         <div class="relative pb-12">
-            <div class="absolute bottom-0 right-0 w-full z-0 bg-cover bg-center opacity-30 fond-home" style=" background-image: url('/assets/img/fond.webp');"></div>
             <div class="relative p-4 lg:px-40 z-10 w-full flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-8">
                 <p class="w-full lg:w-1/2">
                     Bienvenue au<strong class="color"> Gîte du Rain du Pair</strong>, un havre de paix situé dans un ancien corps de ferme récemment rénové, perché sur les hauteurs d'Orbey,
@@ -60,12 +59,44 @@
                     <strong class="color"> séjour nature et détente</strong> en Alsace. Profitez d'un hébergement cosy, à deux pas des pistes de ski du Lac Blanc et des sentiers de randonnée dans les Vosges.    
                 </p>
                 <figure class="my-6 w-full lg:w-1/2 flex justify-center">
-                    <img src="{{ asset('assets/img/sejour-gite-alsace.webp') }}" loading="lazy" alt="Séjour lumineux du gîte en Alsace avec canapé et grande baie vitrée" class="border w-3/5 m-auto aspect-square object-cover" style="border-radius: 20% 50% 20% 50%;">
+                    <img src="{{ asset('assets/img/sejour-gite-alsace.webp') }}" loading="lazy" alt="Séjour lumineux du gîte en Alsace avec canapé et grande baie vitrée" class="border w-3/5 m-auto aspect-square object-cover rounded-lg">
                 </figure>
             </div>
-        </div>
+        </div> #}
 
-        <div class="py-6 lg:py-0 lg:p-8 relative">
+        <section class="mt-10 min-h-[400px]">
+            <h2 class="mb-4 pl-4 lg:pl-0 text-center">Entre nature et tranquillité</h2>
+            <div class="relative pb-12">
+                <!-- Texte centré -->
+                <div class="relative p-4 lg:px-40 z-10 w-full">
+                    <p class="text-base leading-relaxed text-center mx-[30%] my-2">
+                        Bienvenue au <strong class="color">Gîte du Rain du Pair</strong>, un havre de paix situé dans un ancien corps de ferme récemment rénové, perché sur les hauteurs d'Orbey, <strong class="color">en Alsace.</strong>
+                        Proche de la station de ski du Lac Blanc, notre <strong>hébergement</strong> avec <strong class="color">bain nordique</strong> vous offre une expérience unique pour des <strong>vacances en Alsace</strong>.
+                        Découvrez le confort et l'authenticité de notre <strong class="color">gîte avec bain nordique</strong>, idéal pour un <strong class="color">séjour nature et détente</strong> en Alsace.
+                    </p>
+                </div>
+                <div class="flex min-h-[400px] mx-[25%] gap-2">
+                    <!-- Image portrait gauche -->
+                    <div class="w-1/3">
+                        <img src="{{ asset('assets/img/gite-orbey-alsace-montagne.webp') }}" alt="Image portrait" class="rounded-xl object-cover h-full w-full" />
+                    </div>
+                    
+                    <!-- Image carrée du centre -->
+                    <div class="flex flex-col w-1/3">
+                        <img src="{{ asset('assets/img/gite-alsace-orbey-chambre.webp') }}" alt="Image carrée" class="rounded-xl object-cover h-full w-full pb-4" />
+                        <img src="{{ asset('assets/img/gite-alsace-orbey-chambre.webp') }}" alt="Image carrée" class="rounded-xl object-cover h-full w-full" />
+                    </div>
+                    
+                    <!-- Image portrait droite -->
+                    <div class="w-1/3">
+                        <img src="{{ asset('assets/img/gite-orbey-alsace-montagne.webp') }}" alt="Image portrait" class="rounded-xl object-cover h-full w-full" />
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <div class="py-6 lg:py-12 lg:px-12 relative">
             <div class="absolute left-0 top-0 w-full h-full z-[-1]" style="background-image: url('{{ asset('/assets/img/fond-banner.jpg') }}'); background-size: cover; background-position: center;"></div>
             <h2 class="b-4 text-center pt-8">Les petits +</h2>
 
@@ -129,7 +160,7 @@
                             <figure class="w-[40%] lg:w-1/4">
                                 <img src="{{ asset( 'assets/img/bain-nordique-gite-alsace.webp' ) }}" 
                                     alt="Expérience relaxante dans un bain nordique en Alsace" 
-                                    class="aspect-square object-cover overflow-hidden m-auto w-46 h-46 rounded-xl" loading="lazy" />
+                                    class="aspect-square object-cover overflow-hidden m-auto w-46 h-46 rounded-lg" loading="lazy" />
                             </figure>
                             <p class="w-[100%] p-6">
                                 Offrez-vous un moment de détente unique dans notre <strong class="">bain nordique</strong> chauffé au feu de bois, face à une vue imprenable sur la vallée. <br>
