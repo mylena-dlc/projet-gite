@@ -454,16 +454,11 @@ class SecurityController extends AbstractController
         $totalPrice = $reservation->getTotalPrice();
         $refundAmount = ($totalPrice * $refundPercentage) / 100;
 
-        // Récupérer la méthode de paiement et l'id du paiement
-        $paymentMethod = $reservation->getPaymentMethod();
+        // Récupérer l'id du paiement
         $paymentIntentId = $reservation->getStripePaymentId();
 
         try {
-            if ($paymentMethod === 'stripe') {
-                $refundService->processStripeRefund($paymentIntentId, $refundAmount);
-            } else {
-                throw new \Exception('Méthode de paiement inconnue.');
-            }
+            $refundService->processStripeRefund($paymentIntentId, $refundAmount);
         } catch (\Exception $e) {
             $this->addFlash('error', 'Erreur lors du traitement du remboursement, veuillez contacter le propriétaire ' . $e->getMessage());
             return $this->redirectToRoute('app_home');

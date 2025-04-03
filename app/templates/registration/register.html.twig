@@ -19,7 +19,7 @@
 			<h1>Créer un compte</h1>
 				<div class="flex flex-col items-center justify-center p-3 my-2 border rounded-lg text-xl">
 				<a href="{{ path('auth_oauth_connect', {service: 'google'}) }}" class="flex flex-col items-center justify-center">
-					<img src="{{ asset('assets/img/logo_google.png') }}" alt="Logo de connexion Google" class="w-10"/>se connecter avec google
+					<img src="{{ asset('assets/img/logo-google.png') }}" alt="Logo de connexion Google" class="w-10"/>se connecter avec google
 				</a>
 		</div>
 			<div class="line"></div>
@@ -43,11 +43,16 @@
 					</span>
 				</button>
 			</div>
-			{{ form_widget(registrationForm.agreeTerms) }}
-			<label for="{{ registrationForm.agreeTerms.vars.id }}">
-					Cochez cette case pour accepter <a href="{{ path('app_mentions_legales') }}">les conditions d'utilisation.</a>
+			<label for="{{ registrationForm.agreeTerms.vars.id }}" class="flex items-start gap-2 text-sm">
+				{{ form_widget(registrationForm.agreeTerms, { attr: { class: 'w-auto' } }) }}
+				<span>
+					Cochez cette case pour accepter 
+					<a href="{{ path('app_mentions_legales') }}" class="underline text-terracota1">les conditions d'utilisation</a>.
+				</span>
 			</label>
 			{{ form_errors(registrationForm.agreeTerms) }}
+
+			
 			<button type="submit" class="btn-primary">s'inscrire</button>
 			{{ form_end(registrationForm) }}
 		</div>

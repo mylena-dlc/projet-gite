@@ -78,3 +78,8 @@ when@prod:
                 channels: [deprecation]
                 path: php://stderr
                 formatter: monolog.formatter.json
+            payment:
+                level: info
+                type: stream
+                path: "%kernel.logs_dir%/payment/payment.prod.log"
+                channels: ["payment"]
