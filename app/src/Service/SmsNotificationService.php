@@ -8,7 +8,6 @@ use Symfony\Component\Notifier\Message\SmsMessage;
 
 class SmsNotificationService
 {
-
     private TexterInterface $texter;
     private LoggerInterface $logger;
 
@@ -26,10 +25,9 @@ class SmsNotificationService
             $sms = new SmsMessage($to, $message);
             $this->texter->send($sms);
     
-            $this->logger->info("✅ SMS envoyé avec succès à $to !");
+            $this->logger->info("SMS envoyé avec succès à $to !");
         } catch (\Exception $e) {
-            $this->logger->error("❌ Erreur d'envoi de SMS : " . $e->getMessage());
+            $this->logger->error("Erreur d'envoi de SMS : " . $e->getMessage());
         }
-}
-
+    }
 }

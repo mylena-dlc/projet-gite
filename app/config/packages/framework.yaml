@@ -2,6 +2,7 @@
 framework:
     secret: '%env(APP_SECRET)%'
     default_locale: 'fr'
+    timezone: 'Europe/Paris'
     translator:
         fallbacks:
             - 'fr'
