@@ -7,7 +7,7 @@
 
 	{% include "_partials/_header.html.twig" %}
 
-	<section class="p-6 mb-32 mt-24 lg:p-12">
+	<section class="p-6 mb-32 mt-6 lg:p-12">
 		<div>
 			<a href="javascript:history.back()" class="my-4 border px-2 mb-4 rounded-xl">
 			<i class="fa-solid fa-chevron-left pr-2 text-sm"></i>Retour</a>
@@ -19,9 +19,18 @@
                     {% set totalHorsTaxe = totalHorsTaxe + (reservation.totalPrice - reservation.tva - reservation.tourismTax) %}
                 {% endfor %}
 		<p class="text-2xl font-bold text-terracota2">{{ totalHorsTaxe }} €</p>
-        <div class="my-6">
+        {# <div class="my-6">
             <canvas id="incomeChart" data-graph='{{ graphData|json_encode|e("html_attr") }}'></canvas>
+        </div> #}
+        <div id="carousel-graph" class="f-carousel">
+            {% for year, data in graphDataByYear %}
+                <div class="f-carousel__slide">
+                    <h4 class="text-center text-lg font-bold mb-4">{{ year }}</h4>
+                    <canvas class="graph-canvas" data-year="{{ year }}" data-graph='{{ data|json_encode|e("html_attr") }}'></canvas>
+                </div>
+            {% endfor %}
         </div>
+
 
 		<h3 class="py-6">Transactions</h3>
 		<div class="mr-32">
@@ -64,47 +73,36 @@
     </section>
     {% include "_partials/_footer_admin.html.twig" %}
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.graph-canvas').forEach(canvas => {
+            const graphData = JSON.parse(canvas.dataset.graph);
+            const ctx = canvas.getContext('2d');
 
-{# <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Récupération des données pour le graphique
-    const graphData = {{ graphData|json_encode|raw }}; // Données formatées pour le graphique
-    const labels = Object.keys(graphData); // Labels (mois et année)
-    const incomes = Object.values(graphData); // Revenus associés
-
-    const backgroundColors = [
-        'rgba(169, 180, 164)', // Vert pastel
-        'rgba(199, 169, 148)', // Beige pastel
-        'rgba(108, 133, 97)',  // Vert foncé
-        'rgba(233, 196, 203)'  // Rose pastel
-    ];
-
-    // Configuration du graphique
-    const ctx = document.getElementById('incomeChart').getContext('2d');
-    const incomeChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Revenus mensuels',
-                    data: incomes,
-                    backgroundColor: incomes.map(
-                        (_, index) => backgroundColors[index % backgroundColors.length]
-                    ),
-                    borderWidth: 1
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(graphData),
+                    datasets: [{
+                        label: `Revenus mensuels`,
+                        data: Object.values(graphData),
+                        backgroundColor: 'rgba(110, 83, 64, 0.8)', // couleur unique
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
                 }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
+            });
+        });
     });
-</script> #}
+    </script>
+
 
 {% endblock %}
