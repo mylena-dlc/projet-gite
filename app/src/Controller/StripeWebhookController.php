@@ -80,23 +80,22 @@ class StripeWebhookController
      */
     private function handleSuccessfulPayment($session)
     {
-        $paymentIntentId = $session->payment_intent;
-
-        // Vérifie si la réservation existe déjà
+        $this->logger->info('Webhook Stripe reçu');
+    
+        $paymentIntent = $session->payment_intent;
+        $this->logger->info('PaymentIntent : ' . $paymentIntent);
+    
         $existingReservation = $this->entityManager
             ->getRepository(Reservation::class)
-            ->findOneBy(['stripe_payment_id' => $paymentIntentId]);
-
+            ->findOneBy(['stripe_payment_id' => $paymentIntent]);
+    
         if ($existingReservation) {
-            $this->logger->info("Réservation déjà existante pour le paymentIntent : " . $paymentIntentId);
+            $this->logger->info("Réservation déjà existante pour le PaymentIntent : " . $paymentIntent);
             return;
         }
-
-        $this->logger->info('Stripe session reçue : ' . $session->id);
-        $this->logger->info('PaymentIntent : ' . $paymentIntentId);
-
+    
         $metadata = $session->metadata;
-
+    
         $reservation = new Reservation();
         $reservation->setArrivalDate(\DateTime::createFromFormat('d/m/Y', $metadata->start_date));
         $reservation->setDepartureDate(\DateTime::createFromFormat('d/m/Y', $metadata->end_date));
@@ -117,32 +116,38 @@ class StripeWebhookController
         $reservation->setCountry($metadata->country);
         $reservation->setPhone($metadata->phone);
         $reservation->setEmail($metadata->email);
-        $reservation->setIsMajor($metadata->is_major);
+        $reservation->setIsMajor(filter_var($metadata->is_major, FILTER_VALIDATE_BOOLEAN));
         $reservation->setMessage($metadata->message ?? '');
-        $reservation->setStripePaymentId($paymentIntentId);
-
-        // Log ici (après instanciation)
-        $this->logger->info('Réservation Stripe payment ID : ' . $reservation->getStripePaymentId());
-
-        // Référence unique
+        $reservation->setStripePaymentId($paymentIntent);
+    
+        // Générer une référence unique
         $uuid = strtoupper(substr(bin2hex(random_bytes(3)), 0, 6));
         $reference = 'RES-' . date('Y') . '-' . $uuid;
         $reservation->setReference($reference);
-
-        // Relations
+    
+        // Lier user & gîte
         $user = $this->entityManager->getRepository(User::class)->find($metadata->user_id);
         $gite = $this->entityManager->getRepository(Gite::class)->find($metadata->gite_id);
+    
+        if (!$user || !$gite) {
+            $this->logger->error("Erreur : utilisateur ou gîte introuvable !");
+            return;
+        }
+    
         $reservation->setUser($user);
         $reservation->setGite($gite);
-
+    
+        $this->logger->info('Réservation Stripe payment ID : ' . $reservation->getStripePaymentId());
+    
         try {
             $this->entityManager->persist($reservation);
             $this->entityManager->flush();
-            $this->logger->info("Réservation confirmée et enregistrée");
+            $this->logger->info("Réservation enregistrée avec succès !");
         } catch (\Exception $e) {
-            $this->logger->error("Erreur lors de la sauvegarde : " . $e->getMessage());
+            $this->logger->error("Erreur lors de la sauvegarde de la réservation : " . $e->getMessage());
         }
     }
+    
 
 
 

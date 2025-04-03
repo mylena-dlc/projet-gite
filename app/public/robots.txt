@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /private-zone-224
+Disallow: /gite-compte
+Allow: /
+
+Sitemap: https://gite-rain-du-pair.fr/sitemap.xml
+
+
