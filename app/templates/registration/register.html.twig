@@ -5,61 +5,90 @@
 {% block body %}
 {% include "_partials/_header.html.twig" %}
 
-	<div class="container mt-6 lg:p-12">
+	<div class="p-4 mb-4 lg:mb-6 mt-6 lg:p-12">
 
-		<div class="flex flex-col gap-3.5">
-			<p class="text-center my-4">Déjà un compte ? Connecter vous
-				<a href="{{ path('app_login') }}" class="text-terracota1 hover:underline">ici</a>
-			</p>
+		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
 
-			<h1>Créer un compte</h1>
+		<div class="lg:flex">
+			<div class="flex flex-col gap-3.5 lg:w-1/2 lg:border-r lg:border-gray-300 lg:p-8">
+				<h1>Créer un compte</h1>
 				<div class="flex flex-col items-center justify-center p-3 my-2 border rounded-lg text-xl">
-				<a href="{{ path('auth_oauth_connect', {service: 'google'}) }}" class="flex flex-col items-center justify-center">
-					<img src="{{ asset('assets/img/logo-google.png') }}" alt="Logo de connexion Google" class="w-10"/>se connecter avec google
-				</a>
-		</div>
-			<div class="line"></div>
-
-			<p class="text-center mb-8">ou avec une adresse mail</p>
-		</div>
-
-		<div class="flex flex-col gap-3.5">
-			{{ form_errors(registrationForm) }}
-
-            {{ form_start(registrationForm, { attr: { class: 'flex flex-col gap-3.5' } }) }}
-			{{ form_row(registrationForm.email) }}
-			<div class="relative flex flex-col items-center">
-				{{ form_row(registrationForm.plainPassword, {
-					'label': 'Mot de passe',
-					'attr': {'class': 'mt-2 pr-10 pl-3 border rounded-lg w-full input-password'}
-				}) }}
-				<button type="button" class="absolute right-0 bottom-2 flex items-center justify-center w-6 h-6" onclick="togglePassword()">
-					<span id="eye-icon-container">
-						<i id="eye-icon" class="fa-solid fa-eye text-gray-500 cursor-pointer w-5 h-5 flex items-center justify-center pt-1"></i>
-					</span>
-				</button>
+					<a href="{{ path('auth_oauth_connect', {service: 'google'}) }}" class="flex flex-col items-center justify-center">
+						<img src="{{ asset('assets/img/logo-google.png') }}" alt="Logo Google" class="w-20 mb-2" />
+						S'inscrire avec Google
+					</a>
+				</div>
+				<p class="text-center my-4">Déjà un compte ? Connectez-vous
+					<a href="{{ path('app_login') }}" class="text-terracota1 hover:underline">ici</a>
+				</p>
+				<div class="line lg:hidden"></div>
 			</div>
-			<label for="{{ registrationForm.agreeTerms.vars.id }}" class="flex items-start gap-2 text-sm">
-				{{ form_widget(registrationForm.agreeTerms, { attr: { class: 'w-auto' } }) }}
-				<span>
-					Cochez cette case pour accepter 
-					<a href="{{ path('app_mentions_legales') }}" class="underline text-terracota1">les conditions d'utilisation</a>.
-				</span>
-			</label>
-			{{ form_errors(registrationForm.agreeTerms) }}
 
-			
-			<button type="submit" class="btn-primary">s'inscrire</button>
-			{{ form_end(registrationForm) }}
+			<div class="flex flex-col gap-3.5 lg:w-1/2 lg:p-8">
+				<p class="text-center mb-4">Créez votre compte avec votre adresse e-mail :</p>
+
+				{{ form_start(registrationForm, { attr: { class: 'flex flex-col gap-3.5' } }) }}
+
+					{{ form_row(registrationForm.email) }}
+
+					<div class="relative w-2/3 lg:w-full">
+						{{ form_label(registrationForm.plainPassword.first) }}
+
+						{{ form_widget(registrationForm.plainPassword.first, {
+							attr: {
+								class: 'form-control input-password1 w-full pr-12',
+								autocomplete: 'new-password',
+								placeholder: 'Choississez un mot de passe'
+							}
+						}) }}
+						<button type="button" class="absolute right-1 bottom-2 flex items-center justify-center w-6 h-6" onclick="togglePassword()">
+							<span id="eye-icon-container-register">
+								<i id="eye-icon-register" class="fa-solid fa-eye text-gray-500 cursor-pointer w-5 h-5 flex items-center justify-center pt-1"></i>
+							</span>
+						</button>
+					</div>
+
+					<div class="relative w-2/3 lg:w-full">
+						{{ form_label(registrationForm.plainPassword.second) }}
+
+						{{ form_widget(registrationForm.plainPassword.second, {
+							attr: {
+								class: 'form-control input-password2 w-full pr-12',
+								autocomplete: 'new-password',
+								placeholder: 'Confimer votre mot de passe'
+							}
+						}) }}
+						<button type="button" class="absolute right-1 bottom-2 flex items-center justify-center w-6 h-6" onclick="togglePassword()">
+							<span id="eye-icon-container-register2">
+								<i id="eye-icon-register2" class="fa-solid fa-eye text-gray-500 cursor-pointer w-5 h-5 flex items-center justify-center pt-1"></i>
+							</span>
+						</button>
+					</div>
+
+					<label for="{{ registrationForm.agreeTerms.vars.id }}" class="flex gap-2 text-sm items-center">
+						{{ form_widget(registrationForm.agreeTerms, { attr: { class: 'w-auto mt-[2px]' } }) }}
+						<span class="leading-snug">
+							Cochez cette case pour accepter
+							<a href="{{ path('app_mentions_legales') }}" class="underline text-terracota1">les conditions d'utilisation</a>.
+						</span>
+					</label>
+					{{ form_errors(registrationForm.agreeTerms) }}
+
+					<button type="submit" class="btn-primary w-auto">S'inscrire</button>
+				{{ form_end(registrationForm) }}
+			</div>
 		</div>
 	</div>
 
 	{% include "_partials/_footer.html.twig" %}
+
 	{% block custom_javascripts %}
 	<script>
 		function togglePassword() {
-			const passwordInput = document.querySelector('.input-password');
-			const eyeIcon = document.getElementById('eye-icon');
+			const passwordInput = document.querySelector('.input-password1');
+			const passwordInput2 = document.querySelector('.input-password2');
+			const eyeIcon = document.getElementById('eye-icon-register');
+			const eyeIcon2 = document.getElementById('eye-icon-register2');
 			if (passwordInput.type === "password") {
 				passwordInput.type = "text";
 				eyeIcon.classList.remove("fa-eye");
@@ -69,8 +98,17 @@
 				eyeIcon.classList.remove("fa-eye-slash");
 				eyeIcon.classList.add("fa-eye");
 			}
+			if (passwordInput2.type === "password") {
+				passwordInput2.type = "text";
+				eyeIcon2.classList.remove("fa-eye");
+				eyeIcon2.classList.add("fa-eye-slash");
+			} else {
+				passwordInput2.type = "password";
+				eyeIcon2.classList.remove("fa-eye-slash");
+				eyeIcon2.classList.add("fa-eye");
+			}
 		}
 	</script>
-{% endblock %}
+	{% endblock %}
 
 {% endblock %}
