@@ -6,15 +6,17 @@
 
 {% include "_partials/_header.html.twig" %}
 
-<div class="p-4 flex flex-col justify-center items-center">
-    <h1>Page non trouvée</h1>
-    <p>La page que vous recherchez n'a pas été trouvée.</p>
+    <div class="flex flex-col min-h-[calc(100vh-80px)] p-6 mt-6 lg:p-12"> 
+        <div class="flex-grow flex items-center justify-center text-center p-4">
+            <div>
+                <h1 class="text-2xl font-bold mb-4">Page non trouvée</h1>
+                <p>La page que vous recherchez n'a pas été trouvée.</p>
+                <a href="{{ path('app_home') }}" class="btn-primary my-4">Retour à l'accueil</a>
+            </div>
+        </div>
+    </div>
 
-    <a href="{{ path('app_home') }}" class="btn-primary my-4">Retour à l'accueil</a>
-</div>
+{% include "_partials/_footer.html.twig" %}
 
-    {% include "_partials/_footer.html.twig" %}
-
-    
 {% endblock %}                                          
                                                     
