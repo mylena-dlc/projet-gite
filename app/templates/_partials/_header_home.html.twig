@@ -1,16 +1,15 @@
 <header>
-	{# <nav id="header" class="bg-gray-100 fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase shadow-sm" style="background-image: url('/assets/img/fond-banner.webp');"> #}
-	<nav id="header-default" class="bg-transparent fixed w-full h-min-[45px] z-50 top-0 start-0 lg:px-10 uppercase transition-all duration-300 ease-in-out" style="background-image: url('/assets/img/fond-banner.webp');">
-		<div class="flex items-center justify-center flex-wrap" id="header-nav-default">
-			<div id="menu-burger" class="absolute top-0 right-0 p-4 lg:hidden">
+	<nav id="header" class="bg-transparent fixed w-full  z-50 top-0 start-0 lg:px-10 uppercase transition-all duration-300 ease-in-out">
+		<div class="flex items-center justify-center flex-wrap lg:pt-14" id="header-nav">
+			<div id="menu-burger" class="lg:hidden">
 				<button aria-label="Ouvrir le menu" data-collapse-toggle="#main-nav">
-					<svg class="w-7 h-7 text-gray1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 17 14">
+					<svg class="w-7 h-7 mr-4 text-gray1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewbox="0 0 17 14">
 						<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 1h15M1 7h15M1 13h15"/>
 					</svg>
 				</button>
 			</div>
 
-			<div class="w-full min-h-[40px] hidden lg:block lg:w-max " id="main-nav">
+			<div class="w-full min-h-[60px] hidden lg:block lg:w-max " id="main-nav">
 				<ul class="bg-gray-50 text-xl p-6 lg:p-0 border border-gray-200 flex flex-col lg:flex-row lg:bg-transparent lg:border-0 lg:mt-0 gap-8 lg:py-2">
 					{# <li class="nav-item">
 						<a href="https://www.instagram.com/giteraindupair/" target="_blank" aria-label="Instagram du Gîte" class="text-xl hover:text-[var(--color1)]">
