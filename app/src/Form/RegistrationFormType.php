@@ -23,6 +23,10 @@ class RegistrationFormType extends HoneyPotType
         $builder
             ->add('email', EmailType::class, [
                 'required' => true,
+                'attr' => [
+                    'placeholder' => 'Entrer votre e-mail',
+                    'class' => 'w-2/3 lg:w-full',
+                ],
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
@@ -37,11 +41,19 @@ class RegistrationFormType extends HoneyPotType
                 'type' => PasswordType::class,
                 'first_options'  => [
                     'label' => 'Mot de passe',
-                    'attr' => ['autocomplete' => 'new-password'],
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                        'placeholder' => 'Entrer un mot de passe',
+                        'class' => 'input-password form-control pr-10',
+                    ],
                 ],
                 'second_options' => [
                     'label' => 'Confirmez le mot de passe',
-                    'attr' => ['autocomplete' => 'new-password'],
+                    'attr' => [
+                        'autocomplete' => 'new-password',
+                        'placeholder' => 'Confirmer le mot de passe',
+                        'class' => 'input-password form-control pr-10',
+                    ],
                 ],
                 'invalid_message' => 'Les mots de passe ne correspondent pas.',
                 'mapped' => false,
@@ -51,10 +63,9 @@ class RegistrationFormType extends HoneyPotType
                         'message' => 'Mot de passe obligatoire',
                     ]),
                     new Regex([
-                        'pattern' => '~^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()-_+=<>?])(?!.*\s).{12,}$~',
+                        'pattern' => '~^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*()\-_=+<>?])(?!.*\s).{12,}$~',
                         'match' => true,
-                        'message' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule,
-                         un chiffre et avoir au moins 12 caractères.',
+                        'message' => 'Le mot de passe doit contenir au moins une majuscule, une minuscule, un chiffre, un caractère spécial et faire 12 caractères minimum.',
                     ]),
                 ],
             ]);

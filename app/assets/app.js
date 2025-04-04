@@ -53,24 +53,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// -------------------- Message flash
-window.addEventListener("DOMContentLoaded", () => {
-    const flashContainer = document.getElementById("flash-messages");
-    if (flashContainer) {
-        import("flashy-js").then(Flashy => {
-            const messages = JSON.parse(flashContainer.dataset.messages || '[]');
-            messages.forEach(msg => {
-                Flashy.default("#flash-messages", {
-                    type: msg.type || 'info',
-                    title: msg.title || 'Message',
-                    message: msg.message || '',
-                    globalClose: true,
-                    expiry: 5000,
-                });
-            });
-        });
-    }
-});
+
 
 // -------------------- Ajuste hauteur hero dynamiquement page d'accueil
 function adjustHeroHeight() {
