@@ -15,27 +15,21 @@ toogleMenu();
 // -------------------- Scroll header transparent/fond-banner
 window.addEventListener("DOMContentLoaded", () => {
 	const header = document.getElementById("header");
-	// const logo = document.getElementById("logo");
-	// const logoContainer = document.getElementById("logo-container");
 	const headerNav = document.getElementById('header-nav');
 	const burger = document.getElementById('menu-burger');
 
 	const handleHeaderScroll = () => {
 		const scrolled = window.scrollY > 100;
-
 		header.classList.toggle("scrolled-header", scrolled);
 		header.classList.toggle("h-10", scrolled);
-		// logo.style.display = scrolled ? "none" : "block";
-		// logoContainer.style.width = scrolled ? "0" : "10rem";
 		headerNav.classList.toggle("p-2", !scrolled);
-		// headerNav.classList.toggle("lg:justify-between", !scrolled);
 		headerNav.classList.toggle("lg:justify-center", scrolled);
         headerNav.classList.toggle("lg:pt-0", scrolled);
         headerNav.classList.toggle("lg:pt-14", !scrolled);
 		burger.classList.toggle("mt-2", scrolled);
 	};
 
-	// Appelle la fonction au chargement (utile si on recharge en scroll)
+	// Appelle la fonction au chargement 
 	handleHeaderScroll();
 	window.addEventListener("scroll", handleHeaderScroll);
 });
