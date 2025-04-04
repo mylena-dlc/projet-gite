@@ -6,13 +6,13 @@
 
     {% include "_partials/_header.html.twig" %}
 
-    <div class="flex flex-col min-h-[calc(100vh-80px)] p-6 mt-6 lg:p-12"> 
+    <div class="flex flex-col min-h-[55vh] p-6 mt-6 lg:p-12"> 
         <div class="flex-grow flex items-center justify-center text-center p-4">
             <div>
                 <h1 class="text-2xl font-bold mb-4">Oups ! Une erreur est survenue</h1>
                 <p>Le serveur a rencontré un problème inattendu.</p>
                 <p>Pas de panique, notre équipe s'en occupe</p>
-                <a href="{{ path('app_home') }}" class="btn-primary my-4">Retour à l'accueil</a>
+                <a href="{{ path('app_home') }}" class="btn-primary my-4 w-full">Retour à l'accueil</a>
             </div>
         </div>
     </div>
