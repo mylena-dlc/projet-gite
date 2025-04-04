@@ -47,7 +47,7 @@
             <div class="line"></div>
 
             <h3>Taux de remplissage</h3>
-                <div id="myCarousel" class="f-carousel">
+                <div id="statistic-carousel" class="f-carousel">
                     {% for data in monthlyData %}
                         <div class="f-carousel__slide" data-chart-id="chart{{ loop.index }}">
                             <h4>Taux d'occupation pour {{ data.month }} {{ data.year }}</h4>
@@ -73,7 +73,7 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const carousel = new Carousel(document.getElementById("myCarousel"), {
+        const carousel = new Carousel(document.getElementById("statistic-carousel"), {
             Dots: false,
             Navigation: false,
         });
