@@ -201,15 +201,15 @@
     }
 
     a.ViewProfileButton, a.FollowButton {
-      background-color: #6E5340;
+      background-color: #6E5340 !important;
     }
 
     .PrimaryCTA a {
-      color: #6E5340;
+      color: #6E5340 !important;
     }
 
     a.ViewProfileButton:hover, a.FollowButton:hover {
-      background-color: #ecdcd3;
+      background-color: #ecdcd3 !important;
     }
 
     @media (min-width: 1024px) { 

@@ -8,112 +8,78 @@
 
 {% include "_partials/_header_home.html.twig" %}
 
-<div class="">
-    {# <section id="hero-section" class="relative w-full flex justify-center items-center">
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('/assets/img/IMG_9092.webp');"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent"></div>
-        <div class="relative z-10 max-w-lg px-4">
-            <h1 class="text-xl mb-4 text-gray1 tracking-normal normal-case font-semibold mx-6 text-start">
-                Évadez-vous en Alsace dans un gîte de charme avec bain nordique, idéal pour 4 personnes.
-            </h1>
-            <a href="{{ path('app_search_reservation') }}" class="btn-primary w-full">
-                Réserver un séjour
-            </a>
-        </div>
-    </section> #}
-
-    {# <section id="hero-section" class="relative w-full flex items-center justify-center">
-        <img 
-            src="{{ asset('assets/img/gite-orbey-alsace-nature-montagne-sejour-lac-blanc.webp') }}" 
-            alt="Vue d'ensemble du gîte" 
-            class="absolute inset-0 w-full h-full object-cover z-0" 
-            loading="eager" 
-            fetchpriority="high" 
-            decoding="async" 
-        /> #}
+    <div class="">
         <section id="hero-section" class="relative w-full h-[80vh] flex items-center justify-center overflow-hidden">
-        <img 
-            src="{{ asset('assets/img/gite-orbey-alsace-nature-montagne-sejour-lac-blanc.webp') }}" 
-            alt="Vue d'ensemble du gîte" 
-            class="w-full h-full object-cover" 
-            width="1920"
-            height="1080"
-            loading="eager" 
-            fetchpriority="high" 
-            decoding="async" 
-        />
-        
-        {# <div class="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10"></div> #}
-
-        <div class="relative z-20 max-w-lg flex flex-col items-center justify-center">
-            <h1 class="text-4xl uppercase mb-4 text-gray1 tracking-widest font-semibold text-start">
-                Évadez-vous en Alsace
-            </h1>
-            <h2 class="normal-case mb-4 text-center">Gîte de charme avec bain nordique<br> & vue sur les montagnes</h2>
-            <a href="{{ path('app_search_reservation') }}" class="btn-primary w-1/2 m-0 bg-greenhover hover:bg-green1">
-                Réserver un séjour
-            </a>
-        </div>
-    </section>
-
-
-    {# <section class="mt-6 min-h-[400px]">
-        <h2 class="mb-4 pl-4 lg:pl-40">Entre nature et tranquilité</h2>
-        <div class="relative pb-12">
-            <div class="relative p-4 lg:px-40 z-10 w-full flex flex-col lg:flex-row lg:items-center lg:justify-between lg:gap-8">
-                <p class="w-full lg:w-1/2">
-                    Bienvenue au<strong class="color"> Gîte du Rain du Pair</strong>, un havre de paix situé dans un ancien corps de ferme récemment rénové, perché sur les hauteurs d'Orbey,
-                    <strong class="color"> en Alsace.</strong>
-                    <br class=""><br class=""> Proche de la station de ski du Lac Blanc, notre <strong>hébergement</strong> avec <strong class="color">bain nordique</strong> vous offre une expérience unique pour des
-                    <strong>vacances en Alsace</strong>. <br class=""> <br class="">
-                    Découvrez le confort et l'authenticité de notre<strong class="color"> gîte avec bain nordique</strong>, idéal pour un
-                    <strong class="color"> séjour nature et détente</strong> en Alsace. Profitez d'un hébergement cosy, à deux pas des pistes de ski du Lac Blanc et des sentiers de randonnée dans les Vosges.    
-                </p>
-                <figure class="my-6 w-full lg:w-1/2 flex justify-center">
-                    <img src="{{ asset('assets/img/sejour-gite-alsace.webp') }}" loading="lazy" alt="Séjour lumineux du gîte en Alsace avec canapé et grande baie vitrée" class="border w-3/5 m-auto aspect-square object-cover rounded-lg">
-                </figure>
+            <div class="absolute inset-0 z-0">
+                <img 
+                    src="{{ asset('assets/img/gite-orbey-alsace-nature-montagne-sejour-lac-blanc.webp') }}" 
+                    alt="Vue d'ensemble du gîte" 
+                    class="w-full h-full object-cover" 
+                    width="1920"
+                    height="1080"
+                    loading="eager"
+                    fetchpriority="high"
+                    decoding="async"
+                />
             </div>
-        </div> #}
+            <div class="absolute inset-0 bg-gradient-to-t from-white/50 to-transparent z-10"></div>
+            <div class="relative z-10 max-w-lg text-center">
+                <h1 class="text-4xl uppercase mb-4 tracking-widest font-semibold">
+                    Évadez-vous en Alsace
+                </h1>
+                <h2 class="normal-case mb-4">Gîte de charme avec bain nordique<br> & vue sur les montagnes</h2>
+                <a href="{{ path('app_search_reservation') }}" class="btn-primary w-1/2 m-auto bg-greenhover hover:bg-green1">
+                    Réserver un séjour
+                </a>
+            </div>
+        </section>
 
         <section class="mt-10 min-h-[400px]">
             <h2 class="mb-4 pl-4 lg:pl-0 text-center">Entre nature et tranquillité</h2>
             <div class="relative pb-12">
-                <!-- Texte centré -->
-                <div class="relative p-4 lg:px-40 z-10 w-full">
+                <div class="relative lg:px-40 z-10 w-full">
                     <p class="text-base leading-relaxed text-center mx-auto max-w-3xl px-4 my-2">
                         Bienvenue au <strong class="color">Gîte du Rain du Pair</strong>, un havre de paix situé dans un ancien corps de ferme récemment rénové, perché sur les hauteurs d'Orbey, <strong class="color">en Alsace.</strong>
                         Proche de la station de ski du Lac Blanc, notre <strong>hébergement</strong> avec <strong class="color">bain nordique</strong> vous offre une expérience unique pour des <strong>vacances en Alsace</strong>.
                         Découvrez le confort et l'authenticité de notre <strong class="color">gîte avec bain nordique</strong>, idéal pour un <strong class="color">séjour nature et détente</strong> en Alsace.
                     </p>
                 </div>
-                <div class="flex min-h-[400px] mx-[25%] gap-2">
-                    <!-- Image portrait gauche -->
-                    <div class="w-1/3">
-                        <img src="{{ asset('assets/img/gite-orbey-alsace-logement-sejour.webp') }}" alt="Image portrait" class="rounded-xl object-cover h-full w-full" />
+                <div class="flex min-h-[300px] mx-[2%] lg:mx-[25%] gap-2 my-6">
+                    <div class="w-1/3 overflow-hidden rounded-xl">
+                        <img src="{{ asset('assets/img/gite-orbey-alsace-logement-sejour.webp') }}"
+                            alt="Image portrait"
+                            class="object-cover w-full h-full transition duration-500 ease-in-out hover:scale-110" />
                     </div>
-                    
-                    <!-- Image carrée du centre -->
                     <div class="flex flex-col w-1/3 gap-2">
-                        <img src="{{ asset('assets/img/gite-alsace-orbey-lac-blanc.webp') }}" alt="Image carrée" class="rounded-xl object-cover h-full w-full" />
-                        <img src="{{ asset('assets/img/gite-orbey-vacances-logement.webp') }}" alt="Image carrée" class="rounded-xl object-cover h-full w-full" />
+                        <div class="overflow-hidden rounded-xl">
+                            <img src="{{ asset('assets/img/gite-alsace-orbey-lac-blanc.webp') }}"
+                                alt="Image carrée"
+                                class="object-cover w-full h-full transition duration-500 ease-in-out hover:scale-110" />
+                        </div>
+                        <div class="overflow-hidden rounded-xl">
+                            <img src="{{ asset('assets/img/gite-orbey-vacances-logement.webp') }}"
+                                alt="Image carrée"
+                                class="object-cover w-full h-full transition duration-500 ease-in-out hover:scale-110" />
+                        </div>
                     </div>
-                    
-                    <!-- Image portrait droite -->
-                    <div class="w-1/3">
-                        <img src="{{ asset('assets/img/gite-orbe-alsace-nature-sejour.webp') }}" alt="Image portrait" class="rounded-xl object-cover h-full w-full" />
+                    <div class="w-1/3 overflow-hidden rounded-xl">
+                        <img src="{{ asset('assets/img/gite-orbe-alsace-nature-sejour.webp') }}"
+                            alt="Image portrait"
+                            class="object-cover w-full h-full transition duration-500 ease-in-out hover:scale-110" />
                     </div>
                 </div>
             </div>
         </section>
 
-
         <div class="py-6 lg:py-12 lg:px-12 relative">
             <div class="absolute left-0 top-0 w-full h-full z-[-1]" style="background-image: url('{{ asset('/assets/img/fond-banner.webp') }}'); background-size: cover; background-position: center;"></div>
             <h2 class="b-4 text-center pt-8">Les petits +</h2>
-
             <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 text-xl uppercase font-thin leading-tight">
                 <div class="relative flex items-center justify-center h-40 ">
-                    <img src="{{ asset('assets/img/icon-bain-nordique.webp') }}" loading="lazy" alt="Bain nordique" class="absolute w-40 opacity-20">
+                    <img src="{{ asset('assets/img/icon-bain-nordique.webp') }}"
+                     loading="lazy" 
+                     alt="Bain nordique"
+                     class="absolute w-40 opacity-20">
                         <p class="absolute">
                             Bain nordique
                         </p>
@@ -144,7 +110,7 @@
             <h2 class="pl-4 pb-4 lg:hidden"> le <strong class="font-light">gîte</strong></h2>
             <h3 class="pl-4 lg:hidden font-light text-center">Un lieu plein de charme</h3>
             <div class="lg:flex">
-                <div class="lg:w-1/2">
+                <div class="lg:w-2/3">
                     <h2 class="hidden lg:block lg:pl-40 lg:mt-8 "> le <strong class="font-light">gîte</strong></h2>
                     <h3 class="hidden lg:block lg:pl-40 lg:font-light lg:pb-2">Un lieu plein de charme</h3>
                     <p class="p-4 lg:pr-4 lg:pl-8 lg:pt-0 lg:pb-0">
@@ -171,6 +137,8 @@
                             <figure class="w-[40%] lg:w-1/4">
                                 <img src="{{ asset( 'assets/img/bain-nordique-gite-alsace.webp' ) }}" 
                                     alt="Expérience relaxante dans un bain nordique en Alsace" 
+                                    width="200"
+                                    height="200"
                                     class="aspect-square object-cover overflow-hidden m-auto w-46 h-46 rounded-lg" loading="lazy" />
                             </figure>
                             <p class="w-[100%] p-6">
@@ -198,11 +166,11 @@
                     </div>
                 </div>
 
-                <div id="myCarousel" class="f-carousel carousel-gite lg:w-1/2">
+                <div id="home-carousel" class="f-carousel carousel-gite lg:w-1/3">
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-salle-de-bain.webp' ) }}" alt="Chambre spacieuse du gîte en Alsace avec lit 160x200 et salle de bain privative" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-cuisine.webp' ) }}" alt="Location gîte à Orbey avec cuisine équipée et espace convivial pour préparer vos repas en Alsace" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-sejour.webp' ) }}" alt="Espace détente du gîte à Orbey avec coin salon et décoration chaleureuse" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
-                    <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
+                    <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne.webp' ) }}" alt="Vue imprenable sur les montagnes depuis le gîte en Alsace, proche du Lac Blanc" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/sejour-alsace-gite-orbey-hebergement.webp' ) }}" alt="Hébergement tout confort en Alsace avec literie haut de gamme et décoration naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                     <img src="{{ asset( 'assets/img/gite-alsace-orbey-montagne-nature.webp' ) }}" alt="Hébergement cosy en Alsace avec literie de qualité et ambiance naturelle" loading="lazy" class="f-carousel__slide aspect-square object-cover" />
                 </div>
@@ -211,7 +179,7 @@
     </section>
 
     <section class="relative h-[500px] bg-cover bg-center bg-fixed text-white flex items-center justify-center transition-transform duration-500 ease-in-out" style="background-image: url('{{ asset('assets/img/banniere-gite-alsace-orbey.webp') }}');">
-        <div class="absolute inset-0 bg-black bg-opacity-70"></div>
+        <div class="absolute inset-0 bg-black bg-opacity-60"></div>
         <div class="relative text-center bg-opacity-50 p-6">
             <p class="font-bold text-2xl lg:text-3xl lg:leading-[1.5]">
                 Réservez votre<strong class="font-bold"> hébergement tout équipé à Orbey</strong>
@@ -290,8 +258,6 @@
                                         {{ review.comment }}
                                     </p>
                                 </div>
-                                {# <p class="mt-4 italic">Réponse du propriétaire :</p>
-                                <p class="italic">{{ review.response }}</p> #}
                             </div>
                         </li>
                     {% endfor %}
