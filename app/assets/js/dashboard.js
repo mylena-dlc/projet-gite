@@ -161,24 +161,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// -------------------- Carousel pour les graphiques de revenus
-window.addEventListener("DOMContentLoaded", () => {
-    if (document.querySelector(".f-carousel") || document.querySelector("[data-fancybox]")) {
-        import("@fancyapps/ui/dist/fancybox/fancybox.css");
-        import("@fancyapps/ui/dist/carousel/carousel.css");
-        import("@fancyapps/ui").then(({ Fancybox, Carousel }) => {
-            if (document.querySelector(".f-carousel")) {
-                new Carousel(document.querySelector(".f-carousel"), {
-                    Dots: true,
-                    Navigation: false 
-                });
-            }
-            if (document.querySelector("[data-fancybox]")) {
-                Fancybox.bind("[data-fancybox]", {});
-            }
-        });
-    }
-});
+
 
 // -------------------- Page Gite
 

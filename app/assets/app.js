@@ -15,8 +15,11 @@ toogleMenu();
 // -------------------- Scroll header page d'accueil
 window.addEventListener("DOMContentLoaded", () => {
 	const header = document.getElementById("header");
-	const headerNav = document.getElementById('header-nav');
-	const burger = document.getElementById('menu-burger');
+	const headerNav = document.getElementById("header-nav");
+	const burger = document.getElementById("menu-burger");
+
+	// Vérifie qu'on est bien sur la page avec le bon header
+	if (!header || !headerNav || !burger) return;
 
 	const handleHeaderScroll = () => {
 		const scrolled = window.scrollY > 100;
@@ -24,15 +27,15 @@ window.addEventListener("DOMContentLoaded", () => {
 		header.classList.toggle("h-10", scrolled);
 		headerNav.classList.toggle("p-2", !scrolled);
 		headerNav.classList.toggle("lg:justify-center", scrolled);
-        headerNav.classList.toggle("lg:pt-0", scrolled);
-        headerNav.classList.toggle("lg:pt-14", !scrolled);
+		headerNav.classList.toggle("lg:pt-0", scrolled);
+		headerNav.classList.toggle("lg:pt-14", !scrolled);
 		burger.classList.toggle("mt-2", scrolled);
 	};
 
-	// Appelle la fonction au chargement 
 	handleHeaderScroll();
 	window.addEventListener("scroll", handleHeaderScroll);
 });
+
 
 
 // -------------------- Bouton Scroll 
@@ -82,7 +85,7 @@ window.addEventListener('load', adjustHeroHeight);
 window.addEventListener('resize', adjustHeroHeight);
 
 
-// Lazy-load Carousel Fancyapps
+// -------------------- Carousel d'images page d'accueil
 document.addEventListener("DOMContentLoaded", () => {
     const carouselEl = document.querySelector("#home-carousel");
     if (carouselEl) {
@@ -98,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// -------------------- Lazy Splide
+// -------------------- Carousel d'avis page d'accueil
 window.addEventListener("DOMContentLoaded", () => {
     const splideElement = document.querySelector("#splide");
     if (splideElement) {
