@@ -7,14 +7,19 @@
         <meta name="description" content="{% block meta_description %}{%endblock%}">
         <link rel="icon" href="{{ asset( 'assets/img/favicon.jpg' ) }}" type="image/png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"> #}
+
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.onload=null;this.media='all';" />
+
+        
         {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@splidejs/splide/dist/css/splide.min.css"> #}
         {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.css"> #}
         {# <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.css" defer/> #}
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rateYo/2.3.2/jquery.rateyo.min.css">
         {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/noty.min.css"> #}
         {# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noty/3.2.0-beta/themes/mint.min.css"> #}
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+        {# <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" /> #}
+        <link rel="preload" as="image" href="/assets/img/gite-orbey-alsace-nature-montagne-sejour-lac-blanc.webp" type="image/webp" fetchpriority="high">
 
         {% block stylesheets %}
             {{ encore_entry_link_tags('app') }}
@@ -83,7 +88,7 @@
             {% block custom_javascripts %}{% endblock %} {# JS spécifique à chaque template #}
         {% endblock %}
     </head>
-    <body>
+    <body class="min-h-screen flex flex-col">
         {# <flash-messages id="flash-messages" data-max-messages="5" class="z-[999]"></flash-messages> #}
         <flash-messages
             id="flash-messages"
@@ -92,7 +97,7 @@
             data-messages='{{ app.session.flashbag.all() | json_encode | e('html_attr') }}'>
         </flash-messages>
 
-        <main>
+        <main class="flex-grow">
         {% block body %}{% endblock %}
         </main>
     
