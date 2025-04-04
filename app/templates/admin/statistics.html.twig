@@ -47,119 +47,97 @@
             <div class="line"></div>
 
             <h3>Taux de remplissage</h3>
-                <div id="statistic-carousel" class="f-carousel">
-                    {% for data in monthlyData %}
-                        <div class="f-carousel__slide" data-chart-id="chart{{ loop.index }}">
-                            <h4>Taux d'occupation pour {{ data.month }} {{ data.year }}</h4>
-                            <p class="font-bold">{{ data.occupancyRate }}%</p>
-                            <div class="mx-10">
-                                <canvas 
-                                    id="chart{{ loop.index }}" 
-                                    data-chart-initialized="false"
-                                    data-reserved="{{ data.totalNightsReserved }}"
-                                    data-available="{{ data.daysInMonth - data.totalNightsReserved }}">
-                                </canvas>
-                            </div>
+            <div id="statistic-carousel" class="f-carousel">
+                {% for data in monthlyData %}
+                    <div class="f-carousel__slide stat-slide" data-chart-id="chart{{ loop.index }}">
+                        <h4>Taux d'occupation pour {{ data.month }} {{ data.year }}</h4>
+                        <p class="font-bold">{{ data.occupancyRate }}%</p>
+                        <div class="mx-10">
+                            <canvas 
+                                id="chart{{ loop.index }}" 
+                                data-chart-initialized="false"
+                                data-reserved="{{ data.totalNightsReserved }}"
+                                data-available="{{ data.daysInMonth - data.totalNightsReserved }}"
+                                class="w-full max-w-[250px] mx-auto">
+                            </canvas>
                         </div>
-                    {% endfor %}
-                </div>
+                    </div>
+                {% endfor %}
+            </div>
+           
+</div>
+
 		</div>
 	</section>
 	{% include "_partials/_footer_admin.html.twig" %}
+
     {% block custom_javascripts %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.css" />
-<script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.css" />
+        <script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/carousel/carousel.umd.js"></script>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const carousel = new Carousel(document.getElementById("statistic-carousel"), {
-            Dots: false,
-            Navigation: false,
-        });
+       <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                // Fonction de carousel
+                const container = document.getElementById("statistic-carousel");
+                if (!container || typeof Carousel === "undefined") return;
 
-        carousel.on("change", (carouselInstance, slide) => {
-            if (!slide || !slide.el) return;
-
-            const chartId = slide.el.dataset.chartId;
-            const canvas = document.getElementById(chartId);
-
-            if (canvas && canvas.dataset.chartInitialized === "false") {
-                const ctx = canvas.getContext("2d");
-
-                new Chart(ctx, {
-                    type: "doughnut",
-                    data: {
-                        labels: ["Nuits réservées", "Nuits disponibles"],
-                        datasets: [{
-                            data: [
-                                parseInt(canvas.dataset.reserved),
-                                parseInt(canvas.dataset.available)
-                            ],
-                            backgroundColor: ["#b58869", "#a9b4a4"],
-                            hoverOffset: 4
-                        }]
-                    },
-                    options: {
-                        responsive: true
-                    }
-                });
-
-                canvas.dataset.chartInitialized = "true";
-            }
-        });
-
-        // On initialise manuellement le premier slide
-        if (carousel.slides.length > 0) {
-            carousel.emit("change", carousel, carousel.slides[0]);
-        }
-    });
-</script>
-{% endblock %}
-
-
-
-    {# {% block custom_javascripts %}
-   <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const carouselStats = document.querySelector("#myCarousel");
-
-            if (carouselStats) {
-                const instance = new Fancybox.Carousel(carouselStats, {
-                    Dots: true,
+                const carousel = new Carousel(container, {
+                    Dots: false,
                     Navigation: false,
-                });
+                    slidesPerPage: 1, 
+                    breakpoints: {
+                        "(min-width: 1024px)": {
+                        slidesPerPage: 3
+                        }
+                    }
+                    });
+                // Fonction d'initialisation du graphique
+                const initChart = (canvas) => {
+                    if (!canvas || canvas.dataset.chartInitialized === "true") return;
 
-                instance.on("change", (carousel, slide) => {
+                    const ctx = canvas.getContext("2d");
+
+                    new Chart(ctx, {
+                        type: "doughnut",
+                        data: {
+                            labels: ["Nuits réservées", "Nuits disponibles"],
+                            datasets: [{
+                                data: [
+                                    parseInt(canvas.dataset.reserved),
+                                    parseInt(canvas.dataset.available)
+                                ],
+                                backgroundColor: ["#b58869", "#a9b4a4"],
+                                hoverOffset: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    });
+
+                    canvas.dataset.chartInitialized = "true";
+                };
+
+                // Quand on change de slide on initialise le canvas si besoin
+                carousel.on("settle", (carouselInstance, slide) => {
+                    if (!slide || !slide.el) return;
+
                     const chartId = slide.el.dataset.chartId;
                     const canvas = document.getElementById(chartId);
-
-                    if (canvas && canvas.dataset.chartInitialized === "false") {
-                        const ctx = canvas.getContext("2d");
-
-                        new Chart(ctx, {
-                            type: "doughnut",
-                            data: {
-                                labels: ["Nuits réservées", "Nuits disponibles"],
-                                datasets: [{
-                                    data: [
-                                        parseInt(canvas.dataset.reserved),
-                                        parseInt(canvas.dataset.available)
-                                    ],
-                                    backgroundColor: ["#b58869", "#a9b4a4"],
-                                    hoverOffset: 4
-                                }]
-                            },
-                            options: { responsive: true }
-                        });
-
-                        canvas.dataset.chartInitialized = "true";
-                    }
+                    initChart(canvas);
                 });
-                instance.emit("change", instance, instance.slides[0]);
-            }
-    });
 
-</script>
-    {% endblock %}  #}
+                // Petit délai pour s'assurer que tout est visible
+                setTimeout(() => {
+                    if (carousel.slides.length > 0) {
+                        const firstSlide = carousel.slides[0];
+                        const canvas = document.getElementById(firstSlide.el.dataset.chartId);
+                        initChart(canvas);
+                    }
+                }, 200);
+            });
+    </script>
+
+{% endblock %}
 {% endblock %}
