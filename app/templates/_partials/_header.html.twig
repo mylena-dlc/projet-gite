@@ -1,7 +1,15 @@
 <header>
 	{# <nav id="header" class="bg-gray-100 fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase shadow-sm" style="background-image: url('/assets/img/fond-banner.webp');"> #}
-	<nav id="header" class="bg-transparent fixed w-full z-50 top-0 start-0 transition-all duration-300 lg:px-10 uppercase">
-		<div class="flex items-center justify-center flex-wrap " id="header-nav">
+	<nav id="header" class="bg-transparent fixed w-full z-50 top-0 start-0 lg:px-10 uppercase transition-all duration-300 ease-in-out">
+			{# <div>
+				<figure>
+				<a href="{{ path('app_home') }}">
+					<img src="{{ asset('assets/img/logo-copie.webp') }}" alt="Logo gîte du Rain du pair" class="w-24 h-auto"/>
+				</a>
+			</figure> 
+			</div> #}
+	
+	<div class="flex items-center justify-center flex-wrap lg:pt-14" id="header-nav">
 			 {# <div id="logo-container" class="w-32 ml-4 sm:w-36 md:w-40 lg:w-44 xl:w-48 transition-all duration-300">
 				<figure id="logo">
 					<a href="{{ path('app_home') }}">
@@ -9,6 +17,7 @@
 					</a>
 				</figure> 
 		 	</div> #}
+
 
 			<div id="menu-burger" class="lg:hidden">
 				<button aria-label="Ouvrir le menu" data-collapse-toggle="#main-nav">
@@ -18,8 +27,8 @@
 				</button>
 			</div>
 
-			<div class="w-full min-h-[60px] hidden lg:block lg:w-max" id="main-nav">
-				<ul class="bg-gray-50 font-medium p-6 lg:p-0 border border-gray-200 flex flex-col lg:flex-row lg:bg-transparent lg:border-0 lg:mt-0">
+			<div class="w-full min-h-[60px] hidden lg:block lg:w-max " id="main-nav">
+				<ul class="bg-gray-50 text-xl p-6 lg:p-0 border border-gray-200 flex flex-col lg:flex-row lg:bg-transparent lg:border-0 lg:mt-0 gap-8 lg:py-2">
 					{# <li class="nav-item">
 						<a href="https://www.instagram.com/giteraindupair/" target="_blank" aria-label="Instagram du Gîte" class="text-xl hover:text-[var(--color1)]">
 							<i class="fa-brands fa-instagram pr-2"></i>

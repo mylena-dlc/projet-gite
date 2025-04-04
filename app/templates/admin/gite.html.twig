@@ -15,19 +15,19 @@
 			<div class="flex flex-col">
 				<h3 class="mb-4"> <i class="fa-solid fa-house-chimney-window pr-2"></i> INFOS</h3>
 				<div class="flex gap-2 mb-4">
-					<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col justify-between w-3/6">
+					<div class="bg-white1 rounded-lg p-4 aspect-square flex flex-col justify-between w-3/6">
 						<i class="fa-solid fa-person text-center text-2xl"></i>
 						<p class="font-thin pt-2">Capacité</p>
 						<p id="capacity-value">{{ gite.capacity }} personnes</p>
 						<i class="fa-solid fa-pen text-terracota1 text-sm cursor-pointer text-center mt-2 mx-auto rounded-full border border-terracota1" onclick="openEditModal('capacity', {{ gite.id }}, {{ gite.capacity }})" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"></i>
 					</div>
-					<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col justify-between w-3/6">
+					<div class="bg-white1 rounded-lg p-4 aspect-square flex flex-col justify-between w-3/6">
 						<i class="fa-regular fa-money-bill-1 text-center text-2xl"></i>
 						<p class="font-thin pt-2">Prix de la nuit</p>
 						<p id="price-value">{{ gite.price }} €</p>
 						<i class="fa-solid fa-pen text-terracota1 text-sm cursor-pointer text-center mt-2 mx-auto rounded-full border border-terracota1" onclick="openEditModal('price', {{ gite.id }}, {{ gite.price }})" style="width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;"></i>
 					</div>
-					<div class="bg-white1 rounded-xl p-4 aspect-square flex flex-col justify-between w-3/6">
+					<div class="bg-white1 rounded-lg p-4 aspect-square flex flex-col justify-between w-3/6">
 						<i class="fa-solid fa-broom text-center text-2xl"></i>
 						<p class="font-thin pt-2">Prix du forfait ménage</p>
 						<p id="cleaningCharge-value">{{ gite.cleaningCharge }} €</p>
