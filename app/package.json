@@ -32,7 +32,7 @@
         "@fullcalendar/interaction": "^6.1.15",
         "@fullcalendar/timegrid": "^6.1.15",
         "@splidejs/splide": "^4.1.4",
-        "chart.js": "^4.4.7",
+        "chart.js": "^4.4.8",
         "flashy-js": "^0.4.0",
         "jquery": "^3.7.1",
         "leaflet": "^1.9.4",

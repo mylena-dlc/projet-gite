@@ -212,6 +212,25 @@
       background-color: #ecdcd3 !important;
     }
 
+    @layer utilities {
+      .stat-slide {
+        width: 100%;
+      }
+    
+      @media (min-width: 768px) {
+        .stat-slide {
+          width: 50%; /* 2 par ligne */
+        }
+      }
+    
+      @media (min-width: 1024px) {
+        .stat-slide {
+          width: 33.3333%; /* 3 par ligne */
+        }
+      }
+    }
+    
+
     @media (min-width: 1024px) { 
       h1, h2 {
         @apply text-2xl;
