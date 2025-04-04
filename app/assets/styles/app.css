@@ -33,10 +33,12 @@
     ul {
       display: inline-flex;
     }
-  
   }
   
   @layer components {
+    #flash-messages {
+      bottom: 5px !important;
+    }
     .scrolled-header {
       background-image: url('../img/fond-banner.webp');
       background-size: cover;
@@ -49,7 +51,7 @@
     }
 
     .btn-primary {
-      @apply w-1/2 m-auto block text-lg font-normal bg-terracota1 text-white1 font-heading rounded-lg uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
+      @apply w-1/2 m-auto block text-base font-normal bg-terracota1 text-white1 font-heading rounded-lg uppercase tracking-widest p-2 text-center hover:bg-terracota2 duration-300;
       @apply md:w-1/3 lg:w-1/6;
     }
 
@@ -198,6 +200,7 @@
       height: 0;
       width: 0;
       z-index: -1;
+      background-color: transparent !important;
     }
 
     a.ViewProfileButton, a.FollowButton {

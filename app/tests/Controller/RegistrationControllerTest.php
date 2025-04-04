@@ -10,7 +10,7 @@ class RegistrationControllerTest extends WebTestCase
     public function testGetRequestToRegistrationPageReturnSuccessfulResponse(): void 
     {
         $client = static::createClient();
-        $client->request('GET', '/register');
+        $client->request('GET', '/inscription');
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1', 'Créer un compte');
@@ -19,19 +19,17 @@ class RegistrationControllerTest extends WebTestCase
     public function testSpamBotsAreNotWelcome(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/register');
+        $client->request('GET', '/inscription');
 
-        $client->submitForm(
-            "s'inscrire",
-            [
-                'registration_form[email]' => 'test@example.com',
-                'registration_form[plainPassword][first]' => 'TestPassword123!',
-                'registration_form[plainPassword][second]' => 'TestPassword123!',
-                'registration_form[agreeTerms]' => true,
-                'registration_form[numberPhone]' => 'boobies',
-                'registration_form[numberFax]' => 'booooob',
-            ]
-        );
+        $client->submitForm('submit_registration', [
+            'registration_form[email]' => 'test@example.com',
+            'registration_form[plainPassword][first]' => 'TestPassword123!',
+            'registration_form[plainPassword][second]' => 'TestPassword123!',
+            'registration_form[agreeTerms]' => true,
+            'registration_form[numberPhone]' => 'boobies',
+            'registration_form[numberFax]' => 'booooob',
+        ]);
+        
 
         // Vérifie la redirection vers /
         $this->assertResponseRedirects('/');

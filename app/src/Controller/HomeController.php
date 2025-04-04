@@ -44,11 +44,12 @@ class HomeController extends AbstractController
             'categories' => $categories,
             'picturesByCategory' => $picturesByCategory,
             'reviews' => $reviews
-
         ]);
     }
 
-
+    /**
+    * Fonction de recherche de réservation
+    */
     #[Route('/recherche-reservation', name: 'app_search_reservation', defaults: ['_public_access' => true])]
     public function reservation(ReservationRepository $reservationRepository, FactoryInterface $factory, SluggerInterface $slugger): Response
     {

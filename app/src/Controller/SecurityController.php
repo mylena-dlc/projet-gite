@@ -25,6 +25,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use KnpU\OAuth2ClientBundle\Client\ClientRegistry;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,8 +39,7 @@ class SecurityController extends AbstractController
     ];
 
     #[Route(path: '/connexion', name: 'app_login')]
-    public function login(AuthenticationUtils $authenticationUtils, Request $request, Security $security, FactoryInterface $factory, SluggerInterface $slugger): Response
-    
+    public function login(AuthenticationUtils $authenticationUtils, FactoryInterface $factory, SluggerInterface $slugger, TranslatorInterface $translator): Response 
     {
         // if ($this->getUser()) {
         //     return $this->redirectToRoute('target_path');
@@ -51,6 +51,10 @@ class SecurityController extends AbstractController
 
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
+        if ($error) {
+            $translatedMessage = $translator->trans($error->getMessageKey(), $error->getMessageData(), 'security');
+            $this->addFlash('error', $translatedMessage);
+        }
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
 
@@ -68,9 +72,15 @@ class SecurityController extends AbstractController
         throw new \LogicException('This method can be blank - it will be intercepted by the logout key on your firewall.');
     }
 
+
     #[Route('/mot-de-passe-oublie', name: 'app_reset_password')]
-    public function forgottenPassword(Request $request, UserRepository $userRepository, JWTService $jwt, SendEmailService $mail) : Response
+    public function forgottenPassword(Request $request, UserRepository $userRepository, JWTService $jwt, SendEmailService $mail, FactoryInterface $factory, SluggerInterface $slugger,) : Response
     {
+        $breadcrumb = $factory->createItem('root');
+        $breadcrumb->addChild('Accueil', ['route' => 'app_home']);
+        $breadcrumb->addChild('Mot de passe oublié');  
+        $slug = $slugger->slug('connexion');
+
         $form = $this->createForm(ResetPasswordRequestFormType::class);
 
         $form->handlerequest($request);
@@ -121,7 +131,9 @@ class SecurityController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
             return $this->render('security/reset_password_request.html.twig', [
-                'resetPassRequestForm' => $form->createView()
+                'resetPassRequestForm' => $form->createView(),
+                'breadcrumb' => $breadcrumb,
+                'slug' => $slug,
             ]);
     }
 
@@ -135,13 +147,11 @@ class SecurityController extends AbstractController
             EntityManagerInterface $em,
         ): Response
         {
-            
             // On vérifie si le token est valide (cohérent, pas expiré et signature correcte)
             if($jwt->isValid($token) && !$jwt->isExpired($token) && $jwt->check($token, $this->getParameter('app.jwtsecret'))){
                 // Le token est valide
                 // On récupère les données (payload)
                 $payload = $jwt->getPayload($token);
-                
                 
                 // On récupère le user
                 $user = $userRepository->find($payload['user_id']);
@@ -171,23 +181,23 @@ class SecurityController extends AbstractController
         }
 
 
-    #[Route("/connexion/{service}", name: 'auth_oauth_connect', methods: ['GET'])]
-    public function connect(string $service, ClientRegistry $clientRegistry): RedirectResponse
-    {
-        if (! in_array($service, array_keys(self::SCOPES), true)) {
-            throw $this->createNotFoundException();
+        #[Route("/connexion/{service}", name: 'auth_oauth_connect', methods: ['GET'])]
+        public function connect(string $service, ClientRegistry $clientRegistry): RedirectResponse
+        {
+            if (! in_array($service, array_keys(self::SCOPES), true)) {
+                throw $this->createNotFoundException();
+            }
+
+            return $clientRegistry
+                ->getClient($service)
+                ->redirect(self::SCOPES[$service]);
         }
 
-        return $clientRegistry
-            ->getClient($service)
-            ->redirect(self::SCOPES[$service]);
-    }
-
-    #[Route('/oauth/check/{service}', name: 'auth_oauth_check', methods: ['GET', 'POST'])]
-    public function check(): Response
-    {
-        return new Response(status: 200);
-    }
+        #[Route('/oauth/check/{service}', name: 'auth_oauth_check', methods: ['GET', 'POST'])]
+        public function check(): Response
+        {
+            return new Response(status: 200);
+        }
 
 
     /**
@@ -488,7 +498,7 @@ class SecurityController extends AbstractController
         // Envoyer un e-mail à l'administrateur
         $mail->sendAdminNotification(
             'contact@gite-rain-du-pair.fr',
-            'admin@giteraindupair.com',
+            'admin@gite-rain-du-pair.fr',
             'Annulation de réservation',
             'admin_cancel_reservation',
             [

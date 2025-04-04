@@ -5,7 +5,7 @@
 {% block body %}
 {% include "_partials/_header.html.twig" %}
 
-	<section class="p-4 mb-32 lg:mb-6 mt-6 lg:p-12">
+	<section class="p-4 mb-4 lg:mb-6 mt-6 lg:p-12">
 	
 		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
 
@@ -17,13 +17,9 @@
 						<p class="btn-secondary lg:m-0"><a href="{{ path('app_logout') }}">Me déconnecter</a></p>
 					</div>
 				{% endif %}
-				
-				{% if error %}
-					<div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-				{% endif %}
 				<h2>Nouveau client</h2>
 				<p>Créez un compte pour réserver votre séjour en toute simplicité et accéder à vos informations à tout moment.</p>
-				<a href="{{ path('app_register')}}" class="btn-primary">Créer un compte</a>
+				<a href="{{ path('app_register')}}" class="btn-primary w-auto">Créer un compte</a>
 				<div class="line lg:hidden"></div>
 			</div>
 
@@ -59,7 +55,7 @@
 
 					<input type="hidden" name="_target_path" value="{{ app.request.getSession().get('_security.main.target_path', path('app_home')) }}">
 
-					<button class="btn-primary" type="submit"> Connexion</button>
+					<button class="btn-primary w-auto" type="submit"> Connexion</button>
 					<p class="text-center hover:underline">
 						<a href="{{ path ('app_reset_password') }}">Mot de passe oublié ?</a>
 					</p>
@@ -71,7 +67,6 @@
 	{% include "_partials/_footer.html.twig" %}
 
 	{% block custom_javascripts %}
-
 	<script>
 		function togglePassword() {
 			const passwordInput = document.querySelector('.input-password');

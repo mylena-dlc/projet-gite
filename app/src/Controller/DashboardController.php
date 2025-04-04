@@ -749,8 +749,8 @@ public function showIncome(ReservationRepository $reservationRepository): Respon
 
         // Envoyer un e-mail à l'administrateur
         $mail->sendAdminNotification(
+            'admin@gite-rain-du-pair.fr',
             'contact@gite-rain-du-pair.fr',
-            'admin@giteraindupair.com',
             'Nouvelle réservation confirmée',
             'admin_confirm_reservation',
             [
@@ -869,7 +869,7 @@ public function showIncome(ReservationRepository $reservationRepository): Respon
                 // Envoyer la notification à l'administrateur
                 $mail->sendAdminNotification(
                     'contact@gite-rain-du-pair.fr',
-                    'admin@giteraindupair.com',
+                    'admin@gite-rain-du-pair.fr',
                     'Nouvel avis à confirmer',
                     'admin_review',
                     [
