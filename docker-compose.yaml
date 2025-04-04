@@ -56,6 +56,7 @@ services:
     volumes:
       - ./phpmyadmin/htaccess:/var/www/html/.htaccess
       - ./phpmyadmin/htpasswd:/etc/phpmyadmin/.htpasswd
+      - /var/www/certs/.well-known:/var/www/html/.well-known:ro
     restart: unless-stopped
     networks:
       - default

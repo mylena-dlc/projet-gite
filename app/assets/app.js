@@ -12,7 +12,7 @@ function toogleMenu() {
 }
 toogleMenu();
 
-// -------------------- Scroll header transparent/fond-banner
+// -------------------- Scroll header page d'accueil
 window.addEventListener("DOMContentLoaded", () => {
 	const header = document.getElementById("header");
 	const headerNav = document.getElementById('header-nav');
@@ -35,7 +35,7 @@ window.addEventListener("DOMContentLoaded", () => {
 });
 
 
-// -------------------- Scroll to top button
+// -------------------- Bouton Scroll 
 window.addEventListener("DOMContentLoaded", () => {
     const backToTopButton = document.getElementById("backToTop");
     if (backToTopButton) {
@@ -50,7 +50,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// -------------------- Flashy notifications
+// -------------------- Message flash
 window.addEventListener("DOMContentLoaded", () => {
     const flashContainer = document.getElementById("flash-messages");
     if (flashContainer) {
@@ -69,9 +69,22 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
+// -------------------- Ajuste hauteur hero dynamiquement page d'accueil
+function adjustHeroHeight() {
+    const header = document.querySelector('header');
+    const heroSection = document.getElementById('hero-section');
+    if (header && heroSection) {
+        const headerHeight = header.offsetHeight;
+        heroSection.style.height = `calc(100vh - ${headerHeight}px)`;
+    }
+}
+window.addEventListener('load', adjustHeroHeight);
+window.addEventListener('resize', adjustHeroHeight);
+
+
 // Lazy-load Carousel Fancyapps
 document.addEventListener("DOMContentLoaded", () => {
-    const carouselEl = document.querySelector("#myCarousel");
+    const carouselEl = document.querySelector("#home-carousel");
     if (carouselEl) {
         import("@fancyapps/ui/dist/carousel/carousel.css");
         import("@fancyapps/ui").then(({ Carousel }) => {
@@ -80,26 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 infinite: true,
                 transition: "slide",
             });
-        });
-    }
-});
-
-
-// -------------------- Carousel pour les graphiques de revenus
-window.addEventListener("DOMContentLoaded", () => {
-    if (document.querySelector(".f-carousel") || document.querySelector("[data-fancybox]")) {
-        import("@fancyapps/ui/dist/fancybox/fancybox.css");
-        import("@fancyapps/ui/dist/carousel/carousel.css");
-        import("@fancyapps/ui").then(({ Fancybox, Carousel }) => {
-            if (document.querySelector(".f-carousel")) {
-                new Carousel(document.querySelector(".f-carousel"), {
-                    Dots: true,
-                    Navigation: false 
-                });
-            }
-            if (document.querySelector("[data-fancybox]")) {
-                Fancybox.bind("[data-fancybox]", {});
-            }
         });
     }
 });
@@ -124,7 +117,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// -------------------- Lazy Leaflet
+// -------------------- Leaflet
 window.addEventListener("DOMContentLoaded", () => {
     const mapEl = document.getElementById("map") || document.getElementById("map-activity");
     if (mapEl) {
@@ -141,17 +134,7 @@ window.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// -------------------- Ajuste hauteur hero dynamiquement
-function adjustHeroHeight() {
-    const header = document.querySelector('header');
-    const heroSection = document.getElementById('hero-section');
-    if (header && heroSection) {
-        const headerHeight = header.offsetHeight;
-        heroSection.style.height = `calc(100vh - ${headerHeight}px)`;
-    }
-}
-window.addEventListener('load', adjustHeroHeight);
-window.addEventListener('resize', adjustHeroHeight);
+
 
 
 // -------------------- Page FAQ toggle

@@ -29,39 +29,39 @@ window.showAllTransactions = function () {
 };
 
 // -------------------- Page Statistiques
-document.addEventListener('DOMContentLoaded', () => {
-    const dashboardCarousel = document.getElementById("myCarousel");
+// document.addEventListener('DOMContentLoaded', () => {
+//     const dashboardCarousel = document.getElementById("myCarousel");
 
-    // Si on est sur la page admin dashboard
-    if (dashboardCarousel) {
-        // Initialisation du carousel
-        new Carousel(dashboardCarousel, { infinite: false });
+//     // Si on est sur la page admin dashboard
+//     if (dashboardCarousel) {
+//         // Initialisation du carousel
+//         new Carousel(dashboardCarousel, { infinite: false });
 
-        // Initialisation des graphes Chart.js
-        const charts = document.querySelectorAll("canvas[id^='chart']");
-        charts.forEach((canvas) => {
-            const ctx = canvas.getContext("2d");
-            const reserved = parseInt(canvas.dataset.reserved);
-            const total = parseInt(canvas.dataset.total);
+//         // Initialisation des graphes Chart.js
+//         const charts = document.querySelectorAll("canvas[id^='chart']");
+//         charts.forEach((canvas) => {
+//             const ctx = canvas.getContext("2d");
+//             const reserved = parseInt(canvas.dataset.reserved);
+//             const total = parseInt(canvas.dataset.total);
 
-            new Chart(ctx, {
-                type: "doughnut",
-                data: {
-                    labels: ["Nuits réservées", "Nuits disponibles"],
-                    datasets: [{
-                        data: [reserved, total - reserved],
-                        backgroundColor: ["#b58869", "#a9b4a4"],
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    cutout: '70%',
-                }
-            });
-        });
-    }
-});
+//             new Chart(ctx, {
+//                 type: "doughnut",
+//                 data: {
+//                     labels: ["Nuits réservées", "Nuits disponibles"],
+//                     datasets: [{
+//                         data: [reserved, total - reserved],
+//                         backgroundColor: ["#b58869", "#a9b4a4"],
+//                         hoverOffset: 4
+//                     }]
+//                 },
+//                 options: {
+//                     responsive: true,
+//                     cutout: '70%',
+//                 }
+//             });
+//         });
+//     }
+// });
 
 
 // -------------------- Page d'accueil
@@ -161,7 +161,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-
+// -------------------- Carousel pour les graphiques de revenus
+window.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector(".f-carousel") || document.querySelector("[data-fancybox]")) {
+        import("@fancyapps/ui/dist/fancybox/fancybox.css");
+        import("@fancyapps/ui/dist/carousel/carousel.css");
+        import("@fancyapps/ui").then(({ Fancybox, Carousel }) => {
+            if (document.querySelector(".f-carousel")) {
+                new Carousel(document.querySelector(".f-carousel"), {
+                    Dots: true,
+                    Navigation: false 
+                });
+            }
+            if (document.querySelector("[data-fancybox]")) {
+                Fancybox.bind("[data-fancybox]", {});
+            }
+        });
+    }
+});
 
 // -------------------- Page Gite
 
