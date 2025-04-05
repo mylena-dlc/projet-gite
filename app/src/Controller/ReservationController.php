@@ -4,11 +4,13 @@ namespace App\Controller;
 
 use Stripe\Stripe;
 use App\Entity\Reservation;
+use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use App\Form\ReservationType;
 use App\Service\DompdfService;
 use Knp\Menu\FactoryInterface;
 use App\Entity\ReservationExtra;
+use App\Service\LocationService;
 use App\Service\SendEmailService;
 use App\Form\ReservationExtraType;
 use App\Repository\GiteRepository;
@@ -22,7 +24,6 @@ use App\Service\StripePaymentService;
 use App\Service\StripePaiementService;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ReservationRepository;
-use App\Service\LocationService;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -98,10 +99,6 @@ class ReservationController extends AbstractController
 
             // Récupération des données de session si elles existent
             $session = $request->getSession();
-
-            // Supprimer les informations liées au token et aux extras
-            // $session->remove('reservation_details_token');
-            // $session->remove('reservation_extras');
     
             $reservationDetails = $session->get('reservation_details');
             // Si des données de session existent, on initialise les variables
@@ -167,8 +164,8 @@ class ReservationController extends AbstractController
 
                     // Stockage dans la session 
                     $session->set('reservation_details', [
-                        'startDate' => $startDate->format('d/m/Y'),
-                        'endDate' => $endDate->format('d/m/Y'),
+                        'startDate' => $startDate->format($dateFormat),
+                        'endDate' => $endDate->format($dateFormat),
                         'numberAdult' => $numberAdult,
                         'numberKid' => $numberKid,
                         'totalNight' => $totalNight,
@@ -205,42 +202,82 @@ class ReservationController extends AbstractController
 
 
     /**
-    * Fonction pour ajouter un extra
-    */
+     * Fonction pour ajouter un extra (limité à un seul pour la durée du séjour)
+     */
     #[Route('/reservation/ajouter-option', name: 'add_reservation_extra', methods: ['POST'])]
-    public function addExtra(Request $request, ExtraRepository $extraRepository, SessionInterface $session): JsonResponse
+    public function addExtra(Request $request, ExtraRepository $extraRepository, SessionInterface $session, LoggerInterface $logger): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-    
+
         if (empty($data['date'])) {
             return new JsonResponse(['success' => false, 'message' => 'Date invalide.']);
         }
-    
+
+        // Récupération des détails du séjour
+        $reservationDetails = $session->get('reservation_details', []);
+        $logger->info('DEBUG | Données session réservation', $reservationDetails);
+
+        if (!isset($reservationDetails['startDate']) || !isset($reservationDetails['endDate'])) {
+            return new JsonResponse(['success' => false, 'message' => 'Les dates du séjour sont introuvables.']);
+        }
+
+        // Conversion des dates
+        $arrival = \DateTime::createFromFormat('d/m/Y', $reservationDetails['startDate']);
+        $departure = \DateTime::createFromFormat('d/m/Y', $reservationDetails['endDate']);
+        $selectedDate = \DateTime::createFromFormat('Y-m-d', $data['date']);
+
+        if (!$arrival || !$departure || !$selectedDate) {
+            $logger->error('Erreur lors du parsing des dates', [
+                'arrival_raw' => $reservationDetails['startDate'],
+                'departure_raw' => $reservationDetails['endDate'],
+                'selected_raw' => $data['date'],
+            ]);
+
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Erreur lors de la conversion des dates.'
+            ]);
+        }
+
+        // Vérification que la date est dans la plage du séjour
+        if ($selectedDate < $arrival || $selectedDate > $departure) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'La date sélectionnée doit être comprise dans la durée du séjour.'
+            ]);
+        }
+
         // Récupération de l'extra par défaut 
         $extra = $extraRepository->find(2);
-    
-        $reservationExtras = $session->get('reservation_extras', []);
-        // Vérifiez si l'extra existe déjà dans la session
-        foreach ($reservationExtras as $existingExtra) {
-            if ($existingExtra['extra_id'] == $extra->getId() && $existingExtra['date'] == $data['date']) {
-                // return new JsonResponse(['success' => false, 'message' => 'Cet extra a déjà été ajouté.']);
-            }
-        }
+
+
+
+// Vérifie si cet extra spécifique est déjà présent
+$reservationExtras = $session->get('reservation_extras', []);
+
+        $logger->info('DEBUG | Contenu de reservation_extras', $reservationExtras);
+
+foreach ($reservationExtras as $existingExtra) {
+    if ($existingExtra['extra_id'] == $extra->getId()) {
+        return new JsonResponse([
+            'success' => false,
+            'message' => 'Un accès au bain nordique est déjà ajouté pour ce séjour.'
+        ]);
+    }
+}
+        // Ajout de l'extra
         $reservationExtras[] = [
             'extra_id' => $extra->getId(),
             'extraName' => $extra->getName(),
             'price' => $extra->getPrice(),
             'date' => $data['date'],
         ];
-    
-        $session->set('reservation_extras', $reservationExtras);
-    
-        $totalExtraPrice = array_sum(array_column($reservationExtras, 'price'));
 
-        // Récupérer le totalPrice depuis la session
-        $reservationDetails = $session->get('reservation_details', []);
+        $session->set('reservation_extras', $reservationExtras);
+
+        $totalExtraPrice = array_sum(array_column($reservationExtras, 'price'));
         $totalPrice = $reservationDetails['totalPrice'];
-    
+
         return new JsonResponse([
             'success' => true,
             'message' => 'L\'extra a été ajouté avec succès.',
@@ -249,7 +286,8 @@ class ReservationController extends AbstractController
             'newTotalPrice' => $totalPrice + $totalExtraPrice,
         ]);
     }
-    
+
+
 
     /**
     * Fonction pour supprimer un extra
