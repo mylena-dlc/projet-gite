@@ -1,252 +1,233 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Réservation à Orbey | Séjournez dans notre gîte en Alsace{% endblock %}
-
 {% block meta_description %}{{ description }}{% endblock %}
 
 {% block body %}
 	{% include "_partials/_header.html.twig" %}
 
-	<div class="p-4 mt-6 lg:p-12">
+	<div class="p-4 my-6 lg:p-12">
+		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
 
-		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }} 
+		<h1 class="mb-4 mt-2">Réservation</h1>    
+		<h3 class="font-bold">Quand voulez-vous voyager ?</h3>
+	</div>
 
-        <h1 class="mb-4 mt-2">Réservation</h1>    
-        <h3 class="font-bold">Quand voulez-vous voyager ?</h3>
+	<div class="lg:flex px-4 lg:px-12">
+		<div class="w-full lg:w-1/2 lg:border-r lg:border-gray-300 lg:pr-10">
+			<form method="POST" action="{{ path('app_reservation') }}">
+				<input type="hidden" id="startDate" name="startDate" readonly>
+				<input type="hidden" id="endDate" name="endDate" readonly>
 
-        <form method="POST" action="{{ path('app_reservation') }}">
-            <input type="hidden" id="startDate" name="startDate" readonly>
-            <input type="hidden" id="endDate" name="endDate" readonly>
+				<div id="calendar" class="w-auto mx-auto p-4 lg:p-0 lg:h-[600px]"></div>
 
-            <div id="calendar" class="w-auto mx-auto p-4 lg:p-12 lg:h-[600px]"></div>
-            <div class="flex flex-col justify-around lg:flex-row md:items-center w-full mb-2 lg:mb-4">
-                <div class="flex items-center justify-center">                
-                    <div class="bg-gray2 w-[30px] h-[15px] rounded-md mr-2" aria-label="Dates non disponibles"></div> 
-                    <p class="italic">Dates non disponibles</p>
+				<div class="flex flex-col justify-around lg:items-start w-full mb-2 lg:my-4 px-4">
+					<div class="flex items-center mb-2">                
+						<div class="bg-gray2 w-[30px] h-[15px] rounded-md mr-2" aria-label="Dates non disponibles"></div> 
+						<p class="italic text-sm">Dates non disponibles</p>
+					</div>
+					<div class="flex items-center mb-2">
+						<div class="bg-transparent w-[30px] h-[15px] rounded-md mr-2 border border-gray-500" aria-label="Dates disponibles"></div> 
+						<p class="italic text-sm">Dates disponibles</p>
+					</div>
+					<p id="resetButton" class="text-center underline hover:cursor-pointer py-1 text-sm">Effacer les dates</p>
+				</div>
+		</div>
 
-                    <div class="bg-transparent w-[30px] h-[15px] rounded-md mr-2 ml-6 border border-gray-500" aria-label="Dates disponibles"></div> 
-                    <p class="italic">Dates disponibles</p>
-                </div>
-                <p id="resetButton" class="btn-secondary hover:cursor-pointer m-auto lg:m-0 flex justify-center w-auto px-2 py-1">Effacer les dates</p>
-            </div>
+		<!-- Colonne droite : formulaire -->
+		<div class="w-full lg:w-1/2 lg:pl-10 mt-6 lg:mt-0">
+			<div id="message" class="text-center italic bg-slate-100 border-l-4 border-slate-500 text-tarracota1 p-3 rounded-md shadow-md empty:hidden">
+				<i class="fa-solid fa-circle-info"></i> Sélectionnez la date d'arrivée
+			</div>
 
-            <div id="message" class="text-center italic bg-slate-100 border-l-4 border-slate-500 text-tarracota1 p-3 rounded-md shadow-md empty:hidden"><i class="fa-solid fa-circle-info"></i> Sélectionnez la date d'arrivée</div>
-            <h3 class="font-bold my-4">Dates</h3>
-            <p id="selectedDates" class="bg-white1 rounded-lg w-3/4 p-2">Aucune date sélectionnée</p> 
-            <h3 class="font-bold my-4">Combien de personnes ?</h3>
-            <div class="flex justify-around">
-                <div class="w-1/2">
-                    <label for="numberAdult">Adulte(s)</label>
-                    <input type="number" id="numberAdult" name="numberAdult" min="1" max="4" value="1" required>
-                </div>
-                <div class="w-1/2">
-                    <label for="numberKid">Enfant(s)</label>
-                    <input type="number" id="numberKid" name="numberKid" max="3" min="0">
-                </div>
-            </div> 
-            <button type="submit" class="btn-primary mt-4">Réserver</button>
-        </form>
+			<h3 class="font-bold my-4">Dates</h3>
+			<p id="selectedDates" class="bg-white1 rounded-lg w-3/4 p-2">Aucune date sélectionnée</p> 
 
-        <!-- Modale d'erreur -->
-        <div id="errorModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50">
-            <div class="bg-white1 p-6 rounded-lg shadow-lg w-2/3 lg:w-1/3">
-                <h2 class="text-xl font-semibold"> <i class="fa-solid fa-circle-exclamation"></i>Erreur</h2>
-                <p id="modalMessage" class="mt-2"></p>
-                <button id="closeModal" class="mt-4 px-4 py-2 btn-secondary w-auto">
-                    Fermer
-                </button>
-            </div>
-        </div>
-    </div>
+			<h3 class="font-bold my-4">Combien de personnes ?</h3>
+			<div class="flex justify-around gap-4">
+				<div class="w-1/2">
+					<label for="numberAdult">Adulte(s)</label>
+					<input type="number" id="numberAdult" name="numberAdult" min="1" max="4" value="1" required>
+				</div>
+				<div class="w-1/2">
+					<label for="numberKid">Enfant(s)</label>
+					<input type="number" id="numberKid" name="numberKid" max="3" min="0">
+				</div>
+			</div> 
+
+			<button type="submit" class="btn-primary mt-4">Réserver</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Modale d’erreur -->
+	<div id="errorModal" class="fixed inset-0 bg-gray-900 bg-opacity-50 flex items-center justify-center hidden z-50">
+		<div class="bg-white1 p-6 rounded-lg shadow-lg w-2/3 lg:w-1/3">
+			<h2 class="text-xl font-semibold"><i class="fa-solid fa-circle-exclamation"></i> Erreur</h2>
+			<p id="modalMessage" class="mt-2"></p>
+			<button id="closeModal" class="mt-4 px-4 py-2 btn-secondary w-auto">Fermer</button>
+		</div>
+	</div>
 
 	{% include "_partials/_footer.html.twig" %}
 
-    {% block custom_javascripts %}
-    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+	{% block custom_javascripts %}
+	<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
-    <script>
-        const reservedDates = {{ reservedDates|raw }};
-        document.addEventListener('DOMContentLoaded', () => {
-            const resetButton = document.getElementById('resetButton');
-            const calendarEl = document.getElementById('calendar');
-            const selectedDatesEl = document.getElementById('selectedDates');
-            const startDateInput = document.getElementById('startDate');
-            const endDateInput = document.getElementById('endDate');
-            const messageEl = document.getElementById('message'); 
+	<script>
+		const reservedDates = {{ reservedDates|raw }};
+		document.addEventListener('DOMContentLoaded', () => {
+			const resetButton = document.getElementById('resetButton');
+			const calendarEl = document.getElementById('calendar');
+			const selectedDatesEl = document.getElementById('selectedDates');
+			const startDateInput = document.getElementById('startDate');
+			const endDateInput = document.getElementById('endDate');
+			const messageEl = document.getElementById('message'); 
 
-            let startDateSelected = null;
-            let endDateSelected = null;
-            let isStartDateSelected = false; // Pour savoir si la date d'arrivée est sélectionnée
-            const minNights = 2;
+			let startDateSelected = null;
+			let endDateSelected = null;
+			let isStartDateSelected = false;
+			const minNights = 2;
 
-            const calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                locale: 'fr',
-                height: '530px',
-                selectable: true,
-                selectMirror: true,
-                headerToolbar: {
-                    right: 'prev,next'
-                },
-                // Affichage des dates réservées 
-                events: reservedDates, 
-                validRange: {
-                    start: new Date().toISOString() // Ne permet que les dates à partir de la date du jour
-                },
+			const calendar = new FullCalendar.Calendar(calendarEl, {
+				initialView: 'dayGridMonth',
+				locale: 'fr',
+				height: '530px',
+				selectable: true,
+				selectMirror: true,
+				headerToolbar: {
+					right: 'prev,next'
+				},
+				events: reservedDates, 
+				validRange: {
+					start: new Date().toISOString()
+				},
+				select: function (info) {
+					const selectedDate = new Date(info.startStr);
+					const isReserved = reservedDates.some(event => {
+						const reservedStart = new Date(event.start);
+						const reservedEnd = new Date(event.end);
+						return selectedDate >= reservedStart && selectedDate < reservedEnd;
+					});
 
-            // Message de sélection des dates
-            select: function (info) {
-                const selectedDate = new Date(info.startStr);
-                const isReserved = reservedDates.some(event => {
-                    const reservedStart = new Date(event.start);
-                    const reservedEnd = new Date(event.end);
-                    return selectedDate >= reservedStart && selectedDate < reservedEnd;
-                });
+					if (isReserved) {
+						showModal('Cette date est déjà réservée.');
+						resetSelection();
+						return;
+					}
 
-                // Vérification si la date sélectionnée est réservée
-                if (isReserved) {
-                    showModal('Cette date est déjà réservée.');
-                    resetSelection();
-                    return;
-                }
+					if (!isStartDateSelected) {
+						startDateSelected = selectedDate;
+						startDateInput.value = selectedDate.toLocaleDateString('fr-FR');
+						selectedDatesEl.textContent = `Date d'arrivée: ${startDateInput.value}`;
+						messageEl.textContent = "Sélectionnez la date de départ (minimum 2 nuits).";
+						isStartDateSelected = true;
 
-                if (!isStartDateSelected) {
-                    // Première date sélectionnée (date d'arrivée)
-                    startDateSelected = selectedDate;
-                    startDateInput.value = selectedDate.toLocaleDateString('fr-FR');
-                    selectedDatesEl.textContent = `Date d'arrivée: ${startDateInput.value}`;
-                    messageEl.textContent = "Sélectionnez la date de départ (minimum 2 nuits).";
-                    isStartDateSelected = true;
+						calendar.addEvent({
+							id: 'highlight',
+							start: info.startStr,
+							end: info.startStr,
+							display: 'background',
+							backgroundColor: '#a9b4a4',
+							classNames: ['fc-highlight']
+						});
+					} else {
+						endDateSelected = selectedDate;
 
-                     // Ajout d'un fond pour la plage de couleur des dates selectionnées
-                    calendar.addEvent({
-                        id: 'highlight',
-                        start: info.startStr,
-                        end: info.startStr, // On l'étendra quand la fin sera sélectionnée
-                        display: 'background',
-                        backgroundColor: '#a9b4a4',
-                        classNames: ['fc-highlight']
-                    });
+						if (endDateSelected < startDateSelected) {
+							showModal("La date de départ ne peut pas être antérieure à la date d'arrivée.");
+							resetSelection(); 
+							return;
+						}
 
-                } else {
-                    // Deuxième date sélectionnée (date de départ)
-                    endDateSelected = selectedDate;
+						const hasReservedDates = reservedDates.some(event => {
+							const reservedStart = new Date(event.start);
+							const reservedEnd = new Date(event.end);
+							return (startDateSelected < reservedEnd && endDateSelected > reservedStart);
+						});
 
-                    // Vérification si la date de départ est avant la date d'arrivée
-                    if (endDateSelected < startDateSelected) {
-                        showModal("La date de départ ne peut pas être antérieure à la date d'arrivée.");
-                        resetSelection(); 
-                        return;
-                    }
+						if (hasReservedDates) {
+							showModal("Votre sélection inclut des dates déjà réservées. Veuillez choisir une autre période.");
+							resetSelection();
+							return;
+						}
 
-                    // Vérifier si la plage sélectionnée contient des dates réservées
-                    const hasReservedDates = reservedDates.some(event => {
-                        const reservedStart = new Date(event.start);
-                        const reservedEnd = new Date(event.end);
-                        
-                        // Vérifier si une date réservée est entre les dates sélectionnées
-                        return (startDateSelected < reservedEnd && endDateSelected > reservedStart);
-                    });
+						const diffTime = Math.abs(endDateSelected - startDateSelected);
+						const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+						if (diffDays < minNights) {
+							showModal(`La durée minimale de séjour est de ${minNights} nuit(s).`);
+							resetSelection();
+							return;
+						}
 
-                    if (hasReservedDates) {
-                        showModal("Votre sélection inclut des dates déjà réservées. Veuillez choisir une autre période.");
-                        resetSelection();
-                        return;
-                    }
+						endDateInput.value = endDateSelected.toLocaleDateString('fr-FR');
+						selectedDatesEl.textContent = `Date d'arrivée: ${startDateInput.value} - Date de départ: ${endDateInput.value}`;
+						messageEl.textContent = "";
 
-                    // Vérification de la durée minimale (2 nuits)
-                    const diffTime = Math.abs(endDateSelected - startDateSelected);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Nombre de jours entre les deux dates
-                    if (diffDays < minNights) {
-                        showModal(`La durée minimale de séjour est de ${minNights} nuit(s).`);
-                        resetSelection();
-                        return;
-                    }
+						calendar.getEventById('highlight')?.remove();
+						calendar.addEvent({
+							id: 'highlight',
+							start: startDateSelected.toISOString().split('T')[0], 
+							end: endDateSelected.toISOString().split('T')[0], 
+							display: 'background',
+							backgroundColor: '#e6f3e0',
+							classNames: ['fc-highlight']
+						});
+					}
+				},
+			});
 
-                    endDateInput.value = endDateSelected.toLocaleDateString('fr-FR');
-                    selectedDatesEl.textContent = `Date d'arrivée: ${startDateInput.value} - Date de départ: ${endDateInput.value}`;
-                    messageEl.textContent = ""; // Réinitialiser le message d'indication
-                    // Supprime le précédent marquage et ajoute la plage complète
-                    calendar.getEventById('highlight')?.remove();
-                    calendar.addEvent({
-                        id: 'highlight',
-                        start: startDateSelected.toISOString().split('T')[0], 
-                        end: endDateSelected.toISOString().split('T')[0], 
-                        display: 'background',
-                        backgroundColor: '#e6f3e0',
-                        classNames: ['fc-highlight']
-                    });
-                }
-            },
-        });
+			function resetSelection() {
+				startDateInput.value = '';
+				endDateInput.value = '';
+				selectedDatesEl.textContent = 'Aucune date sélectionnée';
+				messageEl.textContent = "Sélectionnez la date d'arrivée";
+				calendar.getEventById('highlight')?.remove();
+				calendar.render();
+				startDateSelected = null;
+				endDateSelected = null;
+				isStartDateSelected = false;
+			}
 
-            // Fonction pour réinitialiser les dates sélectionnées
-            function resetSelection() {
-                // Effacer les dates sélectionnées dans le formulaire
-                startDateInput.value = '';
-                endDateInput.value = '';
-                selectedDatesEl.textContent = 'Aucune date sélectionnée';
-                messageEl.textContent = "Sélectionnez la date d'arrivée";
+			resetButton.addEventListener('click', resetSelection);
+			calendar.render();
 
-                // Supprimer la surbrillance des dates sélectionnées
-                calendar.getEventById('highlight')?.remove();
+			const numberAdult = document.getElementById('numberAdult');
+			const numberKid = document.getElementById('numberKid');
 
-                // Initialisation du calendrier
-                calendar.render();
+			const validateTotal = () => {
+				const adultCount = parseInt(numberAdult.value, 10) || 0;
+				const kidCount = parseInt(numberKid.value, 10) || 0;
+				const total = adultCount + kidCount;
 
-                // Réinitialiser les variables
-                startDateSelected = null;
-                endDateSelected = null;
-                isStartDateSelected = false;
-            }
+				if (total > 4) {
+					if (numberKid === document.activeElement) {
+						numberKid.value = Math.max(0, 4 - adultCount);
+					} else if (numberAdult === document.activeElement) {
+						numberAdult.value = Math.max(1, 4 - kidCount);
+					}
+				}
+			};
 
-            // Bouton reset
-            resetButton.addEventListener('click', resetSelection);
+			numberAdult.addEventListener('input', validateTotal);
+			numberKid.addEventListener('input', validateTotal);
 
-        
-            calendar.render();
+			function showModal(message) {
+				const modal = document.getElementById('errorModal');
+				const modalMessage = document.getElementById('modalMessage');
+				modalMessage.textContent = message; 
+				modal.classList.remove('hidden'); 
 
-
-        // Formulaire du nombre de voyageurs
-        document.addEventListener('DOMContentLoaded', () => {
-            const numberAdult = document.getElementById('numberAdult');
-            const numberKid = document.getElementById('numberKid');
-
-            const validateTotal = () => {
-                const adultCount = parseInt(numberAdult.value, 10) || 0;
-                const kidCount = parseInt(numberKid.value, 10) || 0;
-                const total = adultCount + kidCount;
-
-                // Empêcher le dépassement de 4
-                if (total > 4) {
-                    if (numberKid === document.activeElement) {
-                        numberKid.value = Math.max(0, 4 - adultCount); // Ajuster les enfants
-                    } else if (numberAdult === document.activeElement) {
-                        numberAdult.value = Math.max(1, 4 - kidCount); // Ajuster les adultes
-                    }
-                }
-            };
-            numberAdult.addEventListener('input', validateTotal);
-            numberKid.addEventListener('input', validateTotal);
-        });
-
-        // Modale d'erreur
-        function showModal(message) {
-            const modal = document.getElementById('errorModal');
-            const modalMessage = document.getElementById('modalMessage');
-            modalMessage.textContent = message; 
-            modal.classList.remove('hidden'); 
-
-            document.getElementById('closeModal').addEventListener('click', () => {
-                modal.classList.add('hidden'); 
-            });
-            modal.addEventListener('click', (event) => {
-                if (event.target === modal) { // Vérifie si on clique sur l'arrière-plan
-                    modal.classList.add('hidden');
-                }
-            })
-        }
-    })
-    </script>
-{% endblock %}
+				document.getElementById('closeModal').addEventListener('click', () => {
+					modal.classList.add('hidden'); 
+				});
+				modal.addEventListener('click', (event) => {
+					if (event.target === modal) {
+						modal.classList.add('hidden');
+					}
+				});
+			}
+		});
+	</script>
+	{% endblock %}
 {% endblock %}

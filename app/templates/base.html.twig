@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <title>{% block title %}Welcome!{% endblock %}</title>
-    
         <meta name="description" content="{% block meta_description %}{% endblock %}">
         <link rel="icon" href="{{ asset( 'assets/img/favicon.jpg' ) }}" type="image/png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -47,8 +46,8 @@
                     (tarteaucitron.job = tarteaucitron.job || []).push('instagram');
                 }); 
             </script>
-            <script src="https://unpkg.com/flashy-js@latest/dist/flashy.min.js"></script>
-             <script>
+            <script src="https://unpkg.com/flashy-js@latest/dist/flashy.min.js" defer></script>
+            <script>
                      document.addEventListener('DOMContentLoaded', function () {
                          const flashMessagesElement = document.querySelector('#flash-messages');
  
@@ -60,6 +59,12 @@
                                      message: "{{ message|e('js') }}", // Encode le message pour JS
                                      globalClose: true, // Fermeture globale activée
                                      expiry: 5000 // Expiration en millisecondes
+                                     flashMessagesElement.classList.add('pointer-events-auto');
+
+setTimeout(() => {
+    flashMessagesElement.classList.remove('pointer-events-auto');
+}, 5000); // ou même 5500ms pour être sûr que le message ait disparu
+
                                  });
                              {% endfor %}
                          {% endfor %}
@@ -71,13 +76,13 @@
             {% block custom_javascripts %}{% endblock %} {# JS spécifique à chaque template #}
         {% endblock %}
     </head>
-    <body class="min-h-screen flex flex-col">
-        <flash-messages id="flash-messages" data-max-messages="5" class="z-[999] bottom-0"></flash-messages>
 
+    <body class="min-h-screen flex flex-col">
+        {# <flash-messages id="flash-messages" data-max-messages="5" class="z-[999] bottom-0"></flash-messages> #}
+        <flash-messages id="flash-messages" data-max-messages="5" class="fixed inset-x-0 bottom-4 z-[999] pointer-events-none"></flash-messages>
         <main class="flex-grow">
-        {% block body %}{% endblock %}
+            {% block body %}{% endblock %}
         </main>
-    
         <button id="backToTop" aria-label="Revenir en haut de la page" class="fixed bottom-16 right-6 bg-gray1 text-white p-3 rounded-lg shadow-lg transition-opacity opacity-0 hover:bg-gray2">
             <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/>

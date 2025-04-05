@@ -10,11 +10,10 @@
 {% block body %}
 	{% include "_partials/_header.html.twig" %}
 
-	<div class="p-4 mt-6 lg:p-12">
-
-		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
-
-		<h1 class="mb-4 mt-2">confirmer votre demande<br class="hidden lg:block"> de réservation</h1>
+		<div class="p-4 mt-6 lg:p-12">
+			{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
+			<h1 class="mb-4 mt-2">confirmer votre demande<br class="lg:hidden"> de réservation</h1>
+		</div>
 
 		{% if not app.user  %}
 			<p class="font-bold">Veuillez vous connecter pour confirmer votre réservation 
@@ -22,17 +21,23 @@
 			Ou créer un compte <a aria-current="page" href="{{ path('app_register') }}"> par ici<i class="fa-solid fa-circle-arrow-right"></i></a></p>      
 		{% endif %}  
 
-		<section class="py-4">
-			<p class="font-bold">Ajoutez l'accès au bain nordique<br> à votre réservation</p>
-			{{ form_start(extraForm, { 'attr': { 'id': 'extraForm' } }) }}
-			{{ form_row(extraForm.date, { 'label': 'Choisissez une soirée' }) }}
-				<button type="submit" id="addExtraButton" class="btn-secondary my-4 w-full">Ajouter à la réservation</button>
-			{{ form_end(extraForm) }}
-			<div id="extraMessage" class="text-green-500 hidden mt-4"></div>
-		</section>
-
-		<section class="py-4">
-			<h3><i class="fa-solid fa-plus mr-2"></i> Extras ajoutés</h3>
+		<div class="px-4 lg:px-12 lg:py-4 lg:flex lg:gap-8">
+			<section class="py-4 w-full lg:w-1/2 lg:pr-6 lg:border-r lg:border-gray-300">
+				<p class="font-bold">Ajoutez l'accès au bain nordique<br class="lg:hidden"> à votre réservation</p>
+				{{ form_start(extraForm, { 'attr': { 'id': 'extraForm' } }) }}
+					{{ form_row(extraForm.date, {
+						'label': 'Choisissez une soirée',
+						'attr': {
+							'min': arrivalDate|date('Y-m-d'),
+							'max': departureDate|date('Y-m-d')
+						}
+					}) }}
+					<button type="submit" id="addExtraButton" class="btn-secondary my-4 w-auto ml-0">Ajouter à la réservation</button>
+				{{ form_end(extraForm) }}
+				<div id="extraMessage" class="text-green-500 hidden mt-4"></div>
+			</section>
+			<section class="py-4 w-full lg:w-1/2 lg:pl-6">
+				<h3><i class="fa-solid fa-plus mr-2"></i> Extras ajoutés</h3>
 				<div id="extrasList">
 					{% if reservationExtras is not empty %}
 						{% for extra in reservationExtras %}
@@ -47,183 +52,187 @@
 						<p>Aucun extra ajouté.</p>
 					{% endif %}
 				</div>
-			<p>Total des extras : <span id="totalExtrasPrice">{{ totalExtraPrice|number_format(2, ',', ' ') }}</span> € HT</p>
-		</section>
-		<div class="line"></div>
-		<section class="flex my-4 justify-between">
-			<div>
-				<h3><i class="fa-solid fa-circle-user mr-2"></i> connexion</h3>
-				<p>Vous êtes connecter avec ce compte:</p>
-				<p class="font-bold">{{ app.user.email }}</p>
-				<p>Connectez-vous avec un autre compte
-					<a class="underline" href="{{ path('app_login') }}">ici</a>
-				</p>
-			</div>
-		</section>
-		<section class="py-4">
-			<h3><i class="fa-solid fa-address-book mr-2"></i> Vos coordonnées</h3>
-			<p class="my-2 italic text-sm">* Ces champs sont obligatoires</p>
-			{{ form_start(form) }}
-
-			<div class="pb-4">
-				{{ form_row(form.last_name, {'label_attr': {'class': 'input-required'}}) }}
-			</div>
-			<div class="pb-4">
-				{{ form_row(form.first_name, {'label_attr': {'class': 'input-required'}}) }}
-			</div>
-			<div class="my-4 pb-4">
-				{{ form_row(form.country, {'attr': {'id': 'reservation_country'}}) }}
-			</div>
-			<div class="pb-4">
-				{{ form_row(form.address, {'label_attr': {'class': 'input-required'}}) }}
-			</div>
-
-			<div class="pb-4">
-				{{ form_row(form.cp, {'label_attr': {'class': 'input-required'}, 'attr': {'id': 'reservation_cp'}}) }}
-			</div>
-			<div class="pb-4">
-				{{ form_row(form.city, {'label_attr': {'class': 'input-required mr-4'}, 'attr': {'id': 'reservation_city'}}) }}
-			</div>
-
-
-			<div class="pb-4">
-				{{ form_row(form.phone) }}
-			</div>
-			<div class="my-4 flex items-center pb-4">
-				{{ form_widget(form.is_major, {'attr': {'class': 'mr-2 w-1/12'}}) }}
-				{{ form_label(form.is_major, null, {'label_attr': {'class': 'mb-0 input-required'}}) }}
-			</div>
-		</section>
-
-		<section class="py-4">
-			<h3> <i class="fa-solid fa-comment mr-2"></i> Envoyer un message à l'hôte</h3>
-			{{ form_row(form.message, {
-				'attr': {
-					'class': 'bg-white1 w-full p-2',
-					'placeholder': 'Dites-nous en un peu plus à propos de votre demande de réservation',
-					'rows': 20,
-					'cols': 30,
-					'style': 'height: 200px;',
-				}
-			}) }}
-		</section>
-
-		<section class="py-4">
-			<h3><i class="fa-solid fa-exclamation mr-2"></i> important</h3>
-			<p>Votre réservation ne sera pas confirmée tant que le propriétaire n'aura pas accepté votre demande, dans les 24 heures maximun.
-				Le montant de votre réservation ne sera débité qu'à cette date.</p>
-		</section>
-
-		<section class="py-4">
-			<h3><i class="fa-solid fa-money-bill-1-wave mr-2"></i> Détails du prix</h3>
-			<div class="px-14">
-				<div class="flex justify-between">
-					{% set totalNightPrice = nightPrice * totalNight %}
-					<p>{{ nightPrice|number_format(2, ',', ' ') }}
-						€ x
-						{{ totalNight }}
-						nuits
-					</p>
-					<p>{{ totalNightPrice|number_format(2, ',', ' ') }}
-						€
-					</p>
-				</div>
-				<div class="flex justify-between">
-					<p>Supplément</p>
-					<p>{{ supplement|number_format(2, ',', ' ') }}
-						€</p>
-				</div>
-				<div class="flex justify-between">
-					<p class="italic text-xs">Un supplément peut s’apliquer en fonction des dates (les week-ends ou pendant les vacances scolaires par exemple)</p>
-				</div>
-				<div class="flex justify-between">
-					<p>Forfait ménage</p>
-					<p>{{ cleaningCharge|number_format(2, ',', ' ') }}€</p>
-				</div>
-				<div class="flex justify-between">
-					<p>Taxe de séjour</p>
-					<p>{{ tax|number_format(2, ',', ' ') }}€</p>
-				</div>
-				<div class="flex justify-between">
-					<p>TVA</p>
-					<p>{{ tva|number_format(2, ',', ' ') }}€</p>
-				</div>
-
-				<div class="flex justify-between">
-					<p>Code promo
-						{% if promoCode %}
-							<span class="italic">({{ promoCode }})</span>
-						</p>
-					{% endif %}
-					{% if promoCode %}
-						<p>-
-							{{ discount }}
-							%</p>
-					{% else %}
-						<p class="italic">Vous n'avez pas de code promo</p>
-					{% endif %}
-				</div>
-				<div id="promoMessage" class="text-red-500 text-sm mt-2 hidden"></div>
-
-				<div class="flex justify-between font-bold pt-4">
-					{% if reservationExtras is not empty %}
-						<ul>
-							{% for extraData in reservationExtras %}
-								<li>
-									{{ extraData.extraName }}
-									-
-									{{ extraData.date }}
-									-
-									{{ extraData.price|number_format(2, ',', ' ') }}
-									€
-								</li>
-							{% endfor %}
-						</ul>
-						<p>Total des extras :
-							{{ totalExtraPrice|number_format(2, ',', ' ') }}
-							€</p>
-					{% endif %}
-
-					<p>Total TTC :</p>
-					<p id="totalPrice">
-						{% set finalTotal = totalPrice + totalExtraPrice %}
-						{% if promoCode %}
-							<span class="line-through decoration-red-500 mr-2 inline">{{ totalPrice|number_format(2, ',', ' ') }}
-								€</span>
-							<span class="inline">{{ finalTotal|number_format(2, ',', ' ') }}
-								€</span>
-						{% else %}
-							{{ finalTotal|number_format(2, ',', ' ') }}
-							€
-						{% endif %}
-					</p>
-				</div>
-			</div>
-
-			<div class="line mx-0"></div>
-
-			<div class="my-6">
-				<h3><i class="fa-solid fa-money-check mr-2"></i> Méthodes de paiement</h3>
-				<div class="payment-methods px-6">
-					<div class="flex">
-						<img src="{{ asset( 'assets/img/stripe-logo.png' ) }}" alt="Stripe" class="w-1/2 mr-4"/>
-
-						<img src="{{ asset( 'assets/img/paypal.png' ) }}" alt="Stripe" class="w-1/2"/>
-					</div>
-					<p class="text-center">Paiement par carte bancaire ou Paypal</p>
-				</div>
-			</div>
-			<div class="">
-				<div class="line mx-0"></div>
-				<p class="text-center">En cliquant sur le bouton ci-dessous, j'accepte
-					<a href="{{ path('app_condition_generales_vente') }}" target="_blank" class="underline">les conditions générales de ventes</a>.
-				</p>
-				<button type="submit" class="btn-primary my-4 w-full">Demande de réservation</button>
-				{{ form_end(form) }}	
+				<p>Total du supplément : <span id="totalExtrasPrice">{{ totalExtraPrice|number_format(2, ',', ' ') }}</span> € HT</p>
+			</section>
 		</div>
-		</section>
+			<div class="line"></div>
+			<div class="px-4 lg:px-12 lg:py-4">
+			<section class="flex my-4 justify-between">
+				<div>
+					<h3><i class="fa-solid fa-circle-user mr-2"></i> connexion</h3>
+					<p>Vous êtes connecter avec ce compte : <span class="font-bold">{{ app.user.email }}</span></p>
+					<p>Connectez-vous avec un autre compte <a class="underline" href="{{ path('app_login') }}">ici</a></p>
+				</div>
+			</section>
+			<section class="py-4">
+				<h3><i class="fa-solid fa-address-book mr-2"></i> Vos coordonnées</h3>
+				<p class="my-2 italic text-sm">* Ces champs sont obligatoires</p>
+				{{ form_start(form) }}
 
-		<section class="flex items-center justify-between bg-white1 sticky bottom-0 z-10 p-6 -mx-4 px-4 -mb-4 text-xl">
+				<div class="pb-4">
+					{{ form_row(form.last_name, {'label_attr': {'class': 'input-required'}}) }}
+				</div>
+				<div class="pb-4">
+					{{ form_row(form.first_name, {'label_attr': {'class': 'input-required'}}) }}
+				</div>
+				<div class="pb-4">
+					{{ form_row(form.country, {'attr': {'id': 'reservation_country'}}) }}
+				</div>
+				<div class="pb-4">
+					{{ form_row(form.address, {'label_attr': {'class': 'input-required'}}) }}
+				</div>
+				<div class="pb-4">
+					{{ form_row(form.cp, {'label_attr': {'class': 'input-required'}, 'attr': {'id': 'reservation_cp'}}) }}
+				</div>
+				<div class="pb-4 h-[50px]">
+					{{ form_row(form.city, {'label_attr': {'class': 'input-required mr-4'}, 'attr': {'id': 'reservation_city'}}) }}
+				</div>
+				<div class="pb-4">
+					{{ form_row(form.phone) }}
+				</div>
+				<div class="pb-4">
+					{{ form_row(form.is_major, {
+						'label_attr': {'class': 'input-required mr-2'},
+						'row_attr': {'class': 'flex items-center row-rev space-x-2'},
+						'attr': {'class': 'w-auto'}
+					}) }}
+				</div>
+			</section>
+
+			<section class="py-4">
+				<h3> <i class="fa-solid fa-comment mr-2"></i> Envoyer un message à l'hôte</h3>
+				{{ form_row(form.message, {
+					'attr': {
+						'class': 'bg-white1 w-full p-2',
+						'placeholder': 'Dites-nous en un peu plus à propos de votre demande de réservation',
+						'rows': 20,
+						'cols': 30,
+						'style': 'height: 200px;',
+					}
+				}) }}
+			</section>
+
+			<section class="py-4">
+				<h3><i class="fa-solid fa-exclamation mr-2"></i> important</h3>
+				<p>Votre réservation ne sera pas confirmée tant que le propriétaire n'aura pas accepté votre demande, dans les 24 heures maximun.
+					Le montant de votre réservation ne sera débité qu'à cette date.</p>
+			</section>
+
+			<section class="py-4">
+				<h3><i class="fa-solid fa-money-bill-1-wave mr-2"></i> Détails du prix</h3>
+				<div class="px-14">
+					<div class="flex justify-between">
+						{% set totalNightPrice = nightPrice * totalNight %}
+						<p>{{ nightPrice|number_format(2, ',', ' ') }}
+							€ x
+							{{ totalNight }}
+							nuits
+						</p>
+						<p>{{ totalNightPrice|number_format(2, ',', ' ') }}
+							€
+						</p>
+					</div>
+					<div class="flex justify-between">
+						<p>Supplément</p>
+						<p>{{ supplement|number_format(2, ',', ' ') }}
+							€</p>
+					</div>
+					<div class="flex justify-between">
+						<p class="italic text-xs">Un supplément peut s'apliquer en fonction des dates (les week-ends ou pendant les vacances scolaires par exemple)</p>
+					</div>
+					<div class="flex justify-between">
+						<p>Forfait ménage</p>
+						<p>{{ cleaningCharge|number_format(2, ',', ' ') }}€</p>
+					</div>
+					<div class="flex justify-between">
+						<p>Taxe de séjour</p>
+						<p>{{ tax|number_format(2, ',', ' ') }}€</p>
+					</div>
+					<div class="flex justify-between">
+						<p>TVA</p>
+						<p>{{ tva|number_format(2, ',', ' ') }}€</p>
+					</div>
+
+					<div class="flex justify-between">
+						<p>Code promo
+							{% if promoCode %}
+								<span class="italic">({{ promoCode }})</span>
+							</p>
+						{% endif %}
+						{% if promoCode %}
+							<p>-
+								{{ discount }}
+								%</p>
+						{% else %}
+							<p class="italic">Vous n'avez pas de code promo</p>
+						{% endif %}
+					</div>
+					<div id="promoMessage" class="text-red-500 text-sm mt-2 hidden"></div>
+
+					<div class="flex justify-between font-bold pt-4">
+						{% if reservationExtras is not empty %}
+							<ul>
+								{% for extraData in reservationExtras %}
+									<li>
+										{{ extraData.extraName }}
+										-
+										{{ extraData.date }}
+										-
+										{{ extraData.price|number_format(2, ',', ' ') }}
+										€
+									</li>
+								{% endfor %}
+							</ul>
+							<p>Total des extras :
+								{{ totalExtraPrice|number_format(2, ',', ' ') }}
+								€</p>
+						{% endif %}
+
+						<p>Total TTC :</p>
+						<p id="totalPrice">
+							{% set finalTotal = totalPrice + totalExtraPrice %}
+							{% if promoCode %}
+								<span class="line-through decoration-red-500 mr-2 inline">{{ totalPrice|number_format(2, ',', ' ') }}
+									€</span>
+								<span class="inline">{{ finalTotal|number_format(2, ',', ' ') }}
+									€</span>
+							{% else %}
+								{{ finalTotal|number_format(2, ',', ' ') }}
+								€
+							{% endif %}
+						</p>
+					</div>
+				</div>
+
+				<div class="line mx-0"></div>
+
+				<div class="my-6">
+					<h3><i class="fa-solid fa-money-check mr-2"></i> Méthodes de paiement</h3>
+					<div class="payment-methods px-6">
+						<div class="flex justify-center items-center gap-6 flex-wrap">
+							<img src="{{ asset('assets/img/stripe-logo.png') }}"
+								alt="Stripe"
+								class="h-10 w-auto object-contain" />
+				
+							<img src="{{ asset('assets/img/paypal.png') }}"
+								alt="Paypal"
+								class="h-10 w-auto object-contain" />
+						</div>
+						<p class="text-center lg:text-left mt-2">Paiement par carte bancaire ou Paypal</p>
+					</div>
+				</div>
+
+				<div class="">
+					<div class="line mx-0"></div>
+					<p class="text-center">En cliquant sur le bouton ci-dessous, j'accepte
+						<a href="{{ path('app_condition_generales_vente') }}" target="_blank" class="underline">les conditions générales de ventes</a>.
+					</p>
+					<button type="submit" class="btn-primary my-4 w-auto">Demande de réservation</button>
+					{{ form_end(form) }}	
+			</section>
+		</div>
+
+		<section class="flex items-center justify-between lg:justify-center bg-white1 sticky bottom-0 z-10 p-8 -mx-4 -mb-4 text-xl">
 			<div class="">
 				<div class="flex flex-col ">
 					<p class="font-bold">Dates</p>
@@ -255,9 +264,9 @@
 
 	{% block custom_javascripts %}
 		<script>
-		
 			document.addEventListener('DOMContentLoaded', () => {
 				const addExtraButton = document.getElementById('addExtraButton');
+				const extrasList = document.getElementById('extrasList');
 					if (addExtraButton) {
 						addExtraButton.addEventListener('click', function (e) {
 						e.preventDefault();
@@ -289,24 +298,23 @@
 
 							// Mettre à jour la liste des extras
 							extrasList.innerHTML = ''; // Réinitialise la liste avant de la remplir
-								data.reservationExtras.forEach(extra => {
-									const div = document.createElement('div');
-									div.classList.add('flex', 'items-center', 'space-x-4');
-									div.setAttribute('data-extra-id', extra.extra_id);
+							data.reservationExtras.forEach(extra => {
+								const div = document.createElement('div');
+								div.classList.add('flex', 'items-center', 'space-x-4');
+								div.setAttribute('data-extra-id', extra.extra_id);
 
-									const extraText = document.createElement('p');
-									extraText.textContent = ` - ${extra.date} - ${extra.price} €`;
+								const extraText = document.createElement('p');
+								extraText.textContent = ` - ${extra.date} - ${extra.price} €`;
 
-									const deleteButton = document.createElement('button');
-									deleteButton.classList.add('delete-extra');
-									deleteButton.setAttribute('data-extra-id', extra.extra_id);
-									deleteButton.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+								const deleteButton = document.createElement('button');
+								deleteButton.classList.add('delete-extra');
+								deleteButton.setAttribute('data-extra-id', extra.extra_id);
+								deleteButton.innerHTML = `<i class="fa-solid fa-trash"></i>`;
 
-									div.appendChild(extraText);
-									div.appendChild(deleteButton);
-									extrasList.appendChild(div);
-								});
-
+								div.appendChild(extraText);
+								div.appendChild(deleteButton);
+								extrasList.appendChild(div);
+							});
 
 							// Mettre à jour le total des extras
 							const totalExtrasPriceElement = document.getElementById('totalExtrasPrice');
@@ -359,7 +367,6 @@
 			});
 
 	// Ajout dynamique des villes et du pays en fonction du code postal renseigné
-
  	document.addEventListener("DOMContentLoaded", function() {
      const postalCodeInput = document.getElementById('reservation_cp');
      const citySelect = document.getElementById('reservation_city');

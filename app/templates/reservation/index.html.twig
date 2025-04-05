@@ -1,126 +1,123 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Gîte à Orbey, Alsace | Réservation et tarifs
-{% endblock %}
+{% block title %}Gîte à Orbey, Alsace | Réservation et tarifs{% endblock %}
 
-{% block meta_description %}
-	{{ description }}
-{% endblock %}
+{% block meta_description %}{{ description }}{% endblock %}
 
 {% block body %}
+
 	{% include "_partials/_header.html.twig" %}
 
 	<div class="p-4 mt-6 lg:p-12">
-
-		{# Affichage du fil d'Ariane #}
 		{{ knp_menu_render(breadcrumb, {'template': 'menu/breadcrumb.html.twig'}) }}
-
 		<h1 class="mb-4 mt-2">Demande de réservation</h1>
-		<section class="flex justify-between">
-			<div class="w-1/2">
-				<h3> <i class="fa-solid fa-calendar-days mr-2"></i>vos dates</h3>
-				<p>Date d'arrivée :</p>
-				<p class="font-bold">{{ startDate|format_date(locale: 'fr') }}</p>
-				<p>Date de départ :</p>
-				<p class="font-bold">{{ endDate|format_date(locale: 'fr') }}</p>
-			</div>
-			<div class="w-1/2">
-				<h3><i class="fa-solid fa-user-group mr-2"></i> Nombre de personne(s)</h3>
-				<p><strong>{{ numberAdult }}</strong> adulte(s)</p>
-					{% if numberKid > 1 %}
-						<p><strong>{{ numberKid }}</strong> enfant(s)</p>
-					{% endif %}
-			</div>
-		</section>
+	</div>
 
-		<section class="py-2 mt-4">
-			<h3><i class="fa-solid fa-circle-info mr-2"></i> informations</h3>
-			<div class="lg:flex lg:justify-center lg:mx-4">
-				<div>
-					<p>Arrivée à partir de 16h00</p>
-					<p>Départ avant 11h00</p>
-					<div class="line mx-0 lg:hidden"></div>
-				</div>
-				<div>
-					<p>Les lits sont faits à l'arrivée et le linge de bain est inclus.</p>
-					<p>Arrivée autonome grâce à une boîte à clés.</p>
-					<div class="line mx-0 lg:hidden"></div>
-				</div>
-				<div>
-					<p>Logement non fumeur</p>
-					<p>Animaux non admis</p>
-					<p>Fête interdite</p>
-				</div>
-			</div>
-		</section>
+	<section class="flex flex-col lg:flex-row justify-between px-4 lg:px-12 lg:py-4">
+		<div class="w-full lg:w-1/2 mb-4 lg:mb-0">
+			<h3><i class="fa-solid fa-calendar-days mr-2"></i>Vos dates</h3>
+			<p class="lg:inline">Date d'arrivée :</p>
+			<p class="font-bold lg:inline">{{ startDate|format_date(locale: 'fr') }}</p><br>
+			<p class="lg:inline">Date de départ :</p>
+			<p class="font-bold lg:inline">{{ endDate|format_date(locale: 'fr') }}</p>
+		</div>
+		<div class="w-full lg:w-1/2">
+			<h3><i class="fa-solid fa-user-group mr-2"></i> Nombre de personne(s)</h3>
+			<p><strong>{{ numberAdult }}</strong> {{ numberAdult == 1 ? 'enfant' : 'enfants' }}</p>
+			{% if numberKid > 0 %}
+				<p><strong>{{ numberKid }}</strong> {{ numberKid == 1 ? 'enfant' : 'enfants' }}</p>
+			{% endif %}
+		</div>
+	</section>
 
-		<section class="py-2 mt-4">
-			<h3><i class="fa-solid fa-house mr-2"></i> Ce que propose ce logement</h3>
-			<div class="lg:flex">
-				<div class="lg:w-1/2">
-					<p>Chauffage au sol au rez de chaussé</p>
-					<p>Radiateur électrique à l'étage</p>
-					<p>Sèche-serviette électrique</p>
-					<p>Lave-vaisselle</p>
-					<p>Four</p>
-					<p>Micro-onde</p>
-					<p>Plaque de cuisson induction</p>
-					<p>Réfrigirateur</p>
-					<p>Machine à café Senseo</p>
-					<p>Bouilloir électrique</p>
-					<p>Grille-pain</p>
-					<p>Appareil à raclette</p>
-					<p>Appareil à fondue</p>
-				</div>
+	<section class="py-4 px-4 lg:px-12">
+		<h3><i class="fa-solid fa-circle-info mr-2"></i> Informations</h3>
+		<div class="lg:flex lg:justify-center lg:gap-12 mt-2">
+			<div class="lg:border-r lg:border-gray-300 lg:pr-6">
+				<p>Arrivée à partir de 16h00</p>
+				<p>Départ avant 11h00</p>
 				<div class="line mx-0 lg:hidden"></div>
-			
-				<div class="lg:w-1/2">
-					<p>Aspirateur</p>
-					<p>Lave-linge et étendoir</p>
-					<p>Sèche-cheveux</p>
-					<p>Télévision</p>
-					<p>Wifi</p>
-					<p>Détecteur de fumée</p>
+			</div>
+			<div class="lg:border-r lg:border-gray-300 lg:px-6">
+				<p>Les lits sont faits à l'arrivée et le linge de bain est inclus.</p>
+				<p>Arrivée autonome grâce à une boîte à clés.</p>
 				<div class="line mx-0 lg:hidden"></div>
-					<p>Parking privé</p>
-					<p>Coin repas extérieur</p>
-					<p>Plancha à gaz</p>
-					<p>Bain nordique (en supplément)</p>
-				</div>
 			</div>
-		</section>
-		<div class="line mx-0"></div>
-		<section class="py-2">
-			<h3><i class="fa-solid fa-ban mr-2"></i> Conditions d'annulation</h3>
-			<p>Annulation gratuite pendant 48 heures.</p>
-			<p>Si vous annulez 7 jours avant la date d'arrivée, vous aurez droit à un remboursement partiel.</p>
-			<p>Consultez les conditions d'utilisations pour en savoir plus.</p>
-		</section>
-		<div class="line mx-0"></div>
-		<section class="pb-4">
-			<h3><i class="fa-solid fa-plus mr-2"></i> Extra</h3>
-			<p>La terasse du logement dispose d'un bain nordique privatif.
-				Pour en profiter, la réservation est obligatoire.</p>
-			<p>Choissiez une date pendant votre séjour : le bain sera chauffé et prêt à partir de 19h ce jour là, et vous pourrez en profiter de manière illimitée tout au long de la soirée.</p>
-		
-			<p class="font-bold"><i class="fa-solid fa-circle-info"></i> Vous pouvez ajouter le bain nordique à votre réservation, sur la page suivante.</p>
-			<div class="flex items-center my-4">
-				<figure class="p-2 w-1/2 lg:w-1/5">
-					<img src="{{ asset( 'assets/img/bain-nordique-gite-alsace.webp' ) }}" alt="bain nordique en Alsace" class="aspect-square object-cover rounded-lg"/>
-				</figure>
-				<div class="p-2 w-1/2 lg:ml-4">
-					<h3>Bain nordique</h3>
-					<p>4 à 6 personnes</p>
-					<p>Projecteur led</p>
-					<p>Sytème hydro-massage</p>
-					<p class="font-bold">59 € la soirée <span class="italic">(ilimitée)</span>
-					</p>
-				</div>
+			<div class="lg:pl-6">
+				<p>Logement non fumeur</p>
+				<p>Animaux non admis</p>
+				<p>Fête interdite</p>
 			</div>
-		</section>
+		</div>
+	</section>
 
-		<section class="flex flex-col items-center justify-around bg-white1 sticky bottom-0 z-10 p-4 -mx-4 -mb-4 lg:-mb-12 lg:-mx-12">
-			<div id="btn-detail" class="cursor-pointer border-b border-gray-500 border-opacity-70 hover:border-opacity-100 transition duration-300 mb-2">Voir les détails</div>
+	<section class="py-4 px-4 lg:px-12">
+		<h3><i class="fa-solid fa-house mr-2"></i> Ce que propose ce logement</h3>
+		<div class="lg:grid lg:grid-cols-3 lg:gap-4 mt-2">
+			<div>
+				<p>Chauffage au sol au rez de chaussé</p>
+				<p>Radiateur électrique à l'étage</p>
+				<p>Sèche-serviette électrique</p>
+				<p>Lave-vaisselle</p>
+				<p>Four</p>
+				<p>Micro-onde</p>
+				<p>Plaque de cuisson induction</p>
+				<p>Réfrigirateur</p>
+			</div>
+			<div>
+				<p>Machine à café Senseo</p>
+				<p>Bouilloir électrique</p>
+				<p>Grille-pain</p>
+				<p>Appareil à raclette</p>
+				<p>Appareil à fondue</p>
+				<p>Aspirateur</p>
+				<p>Lave-linge et étendoir</p>
+				<p>Sèche-cheveux</p>
+			</div>
+			<div>
+				<p>Télévision</p>
+				<p>Wifi</p>
+				<p>Détecteur de fumée</p>
+				<p>Parking privé</p>
+				<p>Coin repas extérieur</p>
+				<p>Plancha à gaz</p>
+				<p>Bain nordique (en supplément)</p>
+			</div>
+		</div>
+	</section>
+
+	<div class="line mx-4"></div>
+
+	<section class="py-4 px-4 lg:px-12">
+		<h3><i class="fa-solid fa-ban mr-2"></i> Conditions d'annulation</h3>
+		<p>Annulation gratuite pendant 48 heures.</p>
+		<p>Si vous annulez 7 jours avant la date d'arrivée, vous aurez droit à un remboursement partiel.</p>
+		<p>Consultez les <a href="{{ path('app_condition_generales_vente') }}" class="underline">conditions d'utilisations</a> pour en savoir plus.</p>
+	</section>
+
+	<div class="line mx-4"></div>
+
+	<section class="py-4 px-4 lg:px-12">
+		<h3><i class="fa-solid fa-plus mr-2"></i> Extra</h3>
+		<p>La terrasse du logement dispose d'un bain nordique privatif. Pour en profiter, la réservation est obligatoire.</p>
+		<p>Choisissez une date pendant votre séjour : le bain sera chauffé et prêt à partir de 19h ce jour-là, et vous pourrez en profiter de manière illimitée tout au long de la soirée.</p>
+		<p class="font-bold"><i class="fa-solid fa-circle-info"></i> Vous pouvez ajouter le bain nordique à votre réservation, sur la page suivante.</p>
+		<div class="flex items-center my-4">
+			<figure class="p-2 w-1/2 lg:w-1/5">
+				<img src="{{ asset('assets/img/bain-nordique-gite-alsace.webp') }}" alt="bain nordique en Alsace" class="aspect-square object-cover rounded-lg" />
+			</figure>
+			<div class="p-2 w-1/2 lg:ml-4">
+				<h3>Bain nordique</h3>
+				<p>4 personnes</p>
+				<p>Projecteur led</p>
+				<p>Système hydro-massage</p>
+				<p class="font-bold">59 € la soirée <span class="italic">(illimitée)</span></p>
+			</div>
+		</div>
+	</section>
+
+	<section class="flex flex-col items-center justify-around bg-white1 sticky bottom-0 z-10 p-4 -mx-4 -mb-4 lg:-mx-12">
+		<div id="btn-detail" class="cursor-pointer border-b border-gray-500 border-opacity-70 hover:border-opacity-100 transition duration-300 mb-2">Voir les détails</div>
 			<div id="vue-detail" class="overflow-hidden max-h-0 transition-max-h duration-500 ease-in-out">
 				<div class="">
 					<div class="flex justify-between">
@@ -171,12 +168,10 @@
 						<span class="italic text-xs">TTC</span>
 					</p>				
 				</div>
-
 			<div class="">
 				<a href="{{ path('new_reservation') }}" class="btn-primary w-full mt-2 px-2">Réserver</a>
 			</div>
-		</section>
-	</div>
+	</section>
 
 	{% include "_partials/_footer.html.twig" %}
 
@@ -255,6 +250,5 @@
 				}
 			});
 		});
-
 	</script>
 {% endblock %}
